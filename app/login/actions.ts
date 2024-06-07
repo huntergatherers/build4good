@@ -1,46 +1,84 @@
-'use server'
+"use server";
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 
-import { createClient } from '@/utils/supabase/server'
-
-export async function login(formData: FormData) {
-  const supabase = createClient()
-
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
-
-  const { error } = await supabase.auth.signInWithPassword(data)
-
-  if (error) {
-    redirect('/error')
-  }
-
-  revalidatePath('/', 'layout')
-  redirect('/')
+function validateEmail(email: string): boolean {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
 }
 
-export async function signup(formData: FormData) {
-  const supabase = createClient()
+function validatePassword(password: string): boolean {
+    return password.length >= 6;
+}
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
+function getData(
+    formData: FormData,
+    isSignup: boolean
+): { email: string; password: string; username?: string } {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const username = isSignup
+        ? (formData.get("username") as string)
+        : undefined;
 
-  const { error } = await supabase.auth.signUp(data)
+    if (!email || !validateEmail(email)) {
+        throw new Error("Invalid email address");
+    }
 
-  if (error) {
-    redirect('/error')
-  }
+    if (!password || !validatePassword(password)) {
+        throw new Error("Invalid password");
+    }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+    if (isSignup && (!username || username.trim() === "")) {
+        throw new Error("Invalid username");
+    }
+
+    return isSignup ? { email, password, username } : { email, password };
+}
+
+export async function login(formData: FormData): Promise<void> {
+    const supabase = createClient();
+
+    let data;
+    try {
+        data = getData(formData, false);
+    } catch (error: any) {
+        console.error("Validation error");
+        redirect("/error");
+    }
+
+    const { error } = await supabase.auth.signInWithPassword(data);
+
+    if (error) {
+        redirect("/error");
+    }
+
+    revalidatePath("/", "layout");
+    redirect("/");
+}
+
+export async function signup(formData: FormData): Promise<void> {
+    const supabase = createClient();
+
+    let data;
+    try {
+        data = getData(formData, true);
+    } catch (error: any) {
+        console.error("Validation error");
+        redirect("/error");
+    }
+
+    const { error } = await supabase.auth.signUp({
+        ...data,
+        options: { data: { username: data.username } },
+    });
+
+    if (error) {
+        redirect("/error");
+    }
+
+    revalidatePath("/", "layout");
+    redirect("/login?message=Please+check+your+email+to+verify+your+account.");
 }
