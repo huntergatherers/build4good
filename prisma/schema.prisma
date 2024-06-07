@@ -297,9 +297,33 @@ model users {
   mfa_factors                 mfa_factors[]
   one_time_tokens             one_time_tokens[]
   sessions                    sessions[]
+  conversations               conversation[]    @relation("UserChats")
+  message                     message[]
 
   @@index([instance_id])
   @@index([is_anonymous])
+  @@schema("auth")
+}
+
+model conversation {
+    id        Int       @id @default(autoincrement())
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    users     users[]      @relation("UserChats")
+    messages  message[]
+
+    @@schema("auth")
+}
+
+model message {
+  id        Int       @id @default(autoincrement())
+  content   String
+  createdAt DateTime  @default(now())
+  senderId  String    @db.Uuid
+  conversationId    Int
+  sender    users      @relation(fields: [senderId], references: [id])
+  conversation  conversation      @relation(fields: [conversationId], references: [id])
+
   @@schema("auth")
 }
 
