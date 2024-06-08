@@ -147,20 +147,19 @@ const MapPage = () => {
           <Search color="#ffffff" />
         </DrawerTrigger>
         <DrawerContent
-          className="rounded-3xl border-b-0 bg-gray-100"
+          className="rounded-3xl border-b-0 bg-gray-100 bg-opacity-85"
           style={{ zIndex: 999999999 }}
         >
           <DrawerHeader className="opacity-100">
-            <DrawerTitle className=" flex">
+            <DrawerTitle className="flex">
               <Search style={{ marginTop: '8px', marginRight: '5px' }} />
               <Input
-                className=" bg-white opacity-100 font-normal text-base"
+                className="bg-white opacity-100 font-normal text-base"
                 placeholder="Search"
               />
             </DrawerTitle>
-            {/* <DrawerDescription>This action cannot be undone.</DrawerDescription> */}
           </DrawerHeader>
-          <div className="flex justify-between pl-6 pr-6 mb-6 ">
+          <div className="flex justify-between pl-6 pr-6 mb-6 z-50">
             <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white">
               Donors
             </Button>
@@ -172,7 +171,7 @@ const MapPage = () => {
             </Button>
           </div>
 
-          <ScrollArea className="h-72 bg-gray-100">
+          <ScrollArea className="bg-gray-100">
             <div className="">
               {userData.map((user, index) => (
                 <div

@@ -12,7 +12,7 @@ export default async function Index() {
     }
 
     return (
-        <div className="flex flex-col items-center w-full">
+        <div className="flex flex-col items-center w-full p-6">
             <main className="flex-1 flex flex-col w-full">
                 <div className="flex justify-center items-center space-x-2">
                     <div className="relative w-full ml-auto">

@@ -28,20 +28,20 @@ export function Navbar() {
     const getIconColor = (path: string) =>
         pathname === path
             ? "text-white bg-black p-2 px-4"
-            : "text-black bg-gray-100 p-2 px-4";
+            : "text-black bg-gray-100 p-2 px-4 opacity-100";
 
     return (
-        <nav className="w-full flex justify-between py-4 items-center">
+        <nav className={`w-full flex justify-between py-4 items-center z-[401] px-6 ${pathname == "/map" ? 'absolute top-0' : ''}`}>
             <div className="space-x-2">
                 <Link href="/">
                     <Badge className={getIconColor("/")}>
                         Listings
                     </Badge>
                 </Link>
-                <Link href="/search">
+                <Link href="/map">
                     <Badge className={getIconColor("/map")}>Map</Badge>
                 </Link>
-                <Link href="/search">
+                <Link href="/community">
                     <Badge className={getIconColor("/community")}>
                         Community
                     </Badge>
@@ -52,7 +52,7 @@ export function Navbar() {
                     <MenubarTrigger>
                         <Menu color="white" size={18} />
                     </MenubarTrigger>
-                    <MenubarContent className="space-y-1 flex flex-col my-4">
+                    <MenubarContent className="space-y-1 flex flex-col my-4 z-[401]">
                         <div className="p-2 font-bold">ScraPals</div>
                         <Separator />
                         <Link className="p-2 flex" href="/new">
