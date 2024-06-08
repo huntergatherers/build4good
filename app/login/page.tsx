@@ -56,7 +56,7 @@ export default function AuthForm({
           required
         />
         <Button
-          className="bg-green-700 rounded-md px-4 py-2 text-white mb-2"
+          className="rounded-md px-4 py-2 text-white mb-2"
         >
           {isSignup ? "Sign Up" : "Sign In"}
         </Button>
