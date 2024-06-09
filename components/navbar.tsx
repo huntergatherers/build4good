@@ -47,7 +47,7 @@ export function Navbar() {
                     </Badge>
                 </Link>
             </div>
-            <Menubar className="border-none bg-black rounded-full flex items-center justify-center h-8 w-8">
+            <Menubar className="border-none bg-black rounded-full flex items-center justify-center h-8 w-8 text-xs">
                 <MenubarMenu>
                     <MenubarTrigger>
                         <Menu color="white" size={18} />

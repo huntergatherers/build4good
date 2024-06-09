@@ -5,11 +5,11 @@ import { Filter, Search } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export default async function Index() {
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data?.user) {
-        redirect("/login");
-    }
+    // const supabase = createClient();
+    // const { data, error } = await supabase.auth.getUser();
+    // if (error || !data?.user) {
+    //     redirect("/login");
+    // }
 
     return (
         <div className="flex flex-col items-center w-full p-6">

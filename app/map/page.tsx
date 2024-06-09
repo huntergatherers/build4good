@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Search, Dot } from 'lucide-react';
 import {
@@ -18,6 +17,14 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Broccoli from './assets/broccoli';
 import Apple from './assets/apple';
+import dynamic from 'next/dynamic'
+
+const MapContainer = dynamic(() => import('react-leaflet').then((mod) => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then((mod) => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then((mod) => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { ssr: false });
+
+
 
 const MapPage = () => {
   const userData = [
@@ -110,7 +117,7 @@ const MapPage = () => {
   };
 
   return (
-    <div className="relative h-screen w-screen">
+    <div className="relative min-h-screen w-screen">
       <MapContainer
         center={[1.3521, 103.8198]}
         zoom={13}
@@ -132,7 +139,7 @@ const MapPage = () => {
         <DrawerTrigger
           style={{
             position: 'absolute',
-            bottom: 10,
+            bottom: 100,
             left: '45%',
             zIndex: 999999999,
             backgroundColor: 'black',
@@ -206,7 +213,7 @@ const MapPage = () => {
                       Food scrapping for{' '}
                       {calculateFoodScrappingDuration(user.startDate)}
                     </p>
-                    <p className="text-gray-500 flex justify-between px-4 mt-2">
+                    <div className="text-gray-500 flex justify-between px-4 mt-2">
                       {[
                         'Monday',
                         'Tuesday',
@@ -227,7 +234,7 @@ const MapPage = () => {
                           {day[0]}
                         </p>
                       ))}
-                    </p>
+                    </div>
                     <div className=" flex justify-between items-center mt-4 px-3">
                       <div className="flex">
                         <Button className="bg-gray-100 p-0 rounded-3xl px-3 mr-3 ">

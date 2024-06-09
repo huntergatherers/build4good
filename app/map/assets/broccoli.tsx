@@ -9,7 +9,7 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_9_2954)">
+      <g clipPath="url(#clip0_9_2954)">
         <path
           d="M11.9331 9.68564C11.641 9.39064 11.3489 9.09565 11.0567 8.80068C10.3593 9.40284 9.76823 10.0802 9.2882 10.8177C9.23027 10.9067 9.08935 10.8737 9.08006 10.7688L8.82206 7.85498H6.82824L6.57024 10.7688C6.56096 10.8737 6.42004 10.9067 6.36211 10.8177C5.88208 10.0801 5.29097 9.40284 4.59361 8.80065C4.30148 9.09565 4.00932 9.39064 3.71716 9.68561C4.87322 10.964 5.76913 12.6936 6.05355 14.239C6.14564 14.7393 6.59833 15.1008 7.12159 15.1006C7.56416 15.1004 8.08617 15.1004 8.52883 15.1005C9.05201 15.1007 9.50463 14.7392 9.59672 14.239C9.88118 12.6936 10.7771 10.964 11.9331 9.68564Z"
           fill="url(#paint0_linear_9_2954)"
@@ -64,8 +64,8 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="13.0941"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#BBEC6C" />
-          <stop offset="1" stop-color="#81B823" />
+          <stop stopColor="#BBEC6C" />
+          <stop offset="1" stopColor="#81B823" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_9_2954"
@@ -75,10 +75,10 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="9.04753"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#47A920" stop-opacity="0" />
-          <stop offset="0.2298" stop-color="#45932F" stop-opacity="0.23" />
-          <stop offset="0.7392" stop-color="#40694D" stop-opacity="0.739" />
-          <stop offset="1" stop-color="#3E5959" />
+          <stop stopColor="#47A920" stopOpacity="0" />
+          <stop offset="0.2298" stopColor="#45932F" stopOpacity="0.23" />
+          <stop offset="0.7392" stopColor="#40694D" stopOpacity="0.739" />
+          <stop offset="1" stopColor="#3E5959" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_9_2954"
@@ -88,10 +88,10 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="10.0239"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#47A920" stop-opacity="0" />
-          <stop offset="0.242" stop-color="#459A2A" stop-opacity="0.242" />
-          <stop offset="0.7001" stop-color="#417545" stop-opacity="0.7" />
-          <stop offset="1" stop-color="#3E5959" />
+          <stop stopColor="#47A920" stopOpacity="0" />
+          <stop offset="0.242" stopColor="#459A2A" stopOpacity="0.242" />
+          <stop offset="0.7001" stopColor="#417545" stopOpacity="0.7" />
+          <stop offset="1" stopColor="#3E5959" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_9_2954"
@@ -101,10 +101,10 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="9.13172"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#47A920" stop-opacity="0" />
-          <stop offset="0.242" stop-color="#459A2A" stop-opacity="0.242" />
-          <stop offset="0.7001" stop-color="#417545" stop-opacity="0.7" />
-          <stop offset="1" stop-color="#3E5959" />
+          <stop stopColor="#47A920" stopOpacity="0" />
+          <stop offset="0.242" stopColor="#459A2A" stopOpacity="0.242" />
+          <stop offset="0.7001" stopColor="#417545" stopOpacity="0.7" />
+          <stop offset="1" stopColor="#3E5959" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_9_2954"
@@ -114,10 +114,10 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="10.0239"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#47A920" stop-opacity="0" />
-          <stop offset="0.242" stop-color="#459A2A" stop-opacity="0.242" />
-          <stop offset="0.7001" stop-color="#417545" stop-opacity="0.7" />
-          <stop offset="1" stop-color="#3E5959" />
+          <stop stopColor="#47A920" stopOpacity="0" />
+          <stop offset="0.242" stopColor="#459A2A" stopOpacity="0.242" />
+          <stop offset="0.7001" stopColor="#417545" stopOpacity="0.7" />
+          <stop offset="1" stopColor="#3E5959" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_9_2954"
@@ -127,10 +127,10 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="8.98897"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#47A920" stop-opacity="0" />
-          <stop offset="0.242" stop-color="#459A2A" stop-opacity="0.242" />
-          <stop offset="0.7001" stop-color="#417545" stop-opacity="0.7" />
-          <stop offset="1" stop-color="#3E5959" />
+          <stop stopColor="#47A920" stopOpacity="0" />
+          <stop offset="0.242" stopColor="#459A2A" stopOpacity="0.242" />
+          <stop offset="0.7001" stopColor="#417545" stopOpacity="0.7" />
+          <stop offset="1" stopColor="#3E5959" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_9_2954"
@@ -140,10 +140,10 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="15.2202"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#47A920" stop-opacity="0" />
-          <stop offset="0.242" stop-color="#459A2A" stop-opacity="0.242" />
-          <stop offset="0.7001" stop-color="#417545" stop-opacity="0.7" />
-          <stop offset="1" stop-color="#3E5959" />
+          <stop stopColor="#47A920" stopOpacity="0" />
+          <stop offset="0.242" stopColor="#459A2A" stopOpacity="0.242" />
+          <stop offset="0.7001" stopColor="#417545" stopOpacity="0.7" />
+          <stop offset="1" stopColor="#3E5959" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_9_2954"
@@ -153,8 +153,8 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="10.302"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#8BC727" />
-          <stop offset="1" stop-color="#017B4E" />
+          <stop stopColor="#8BC727" />
+          <stop offset="1" stopColor="#017B4E" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_9_2954"
@@ -164,10 +164,10 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="10.576"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#026841" stop-opacity="0" />
-          <stop offset="0.2377" stop-color="#0A6644" stop-opacity="0.238" />
-          <stop offset="0.6075" stop-color="#20614D" stop-opacity="0.608" />
-          <stop offset="1" stop-color="#3E5959" />
+          <stop stopColor="#026841" stopOpacity="0" />
+          <stop offset="0.2377" stopColor="#0A6644" stopOpacity="0.238" />
+          <stop offset="0.6075" stopColor="#20614D" stopOpacity="0.608" />
+          <stop offset="1" stopColor="#3E5959" />
         </linearGradient>
         <linearGradient
           id="paint9_linear_9_2954"
@@ -177,10 +177,10 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="5.15175"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#026841" stop-opacity="0" />
-          <stop offset="0.2377" stop-color="#0A6644" stop-opacity="0.238" />
-          <stop offset="0.6075" stop-color="#20614D" stop-opacity="0.608" />
-          <stop offset="1" stop-color="#3E5959" />
+          <stop stopColor="#026841" stopOpacity="0" />
+          <stop offset="0.2377" stopColor="#0A6644" stopOpacity="0.238" />
+          <stop offset="0.6075" stopColor="#20614D" stopOpacity="0.608" />
+          <stop offset="1" stopColor="#3E5959" />
         </linearGradient>
         <linearGradient
           id="paint10_linear_9_2954"
@@ -190,10 +190,10 @@ const Broccoli: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="7.12265"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#026841" stop-opacity="0" />
-          <stop offset="0.2377" stop-color="#0A6644" stop-opacity="0.238" />
-          <stop offset="0.6075" stop-color="#20614D" stop-opacity="0.608" />
-          <stop offset="1" stop-color="#3E5959" />
+          <stop stopColor="#026841" stopOpacity="0" />
+          <stop offset="0.2377" stopColor="#0A6644" stopOpacity="0.238" />
+          <stop offset="0.6075" stopColor="#20614D" stopOpacity="0.608" />
+          <stop offset="1" stopColor="#3E5959" />
         </linearGradient>
         <clipPath id="clip0_9_2954">
           <rect

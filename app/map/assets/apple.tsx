@@ -9,7 +9,7 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_9_2939)">
+      <g clipPath="url(#clip0_9_2939)">
         <path
           d="M10.0367 3.71386C9.20315 3.89331 8.42167 4.63056 7.85414 4.63056C7.28661 4.63056 6.50502 3.89331 5.67155 3.71386C3.90344 3.48254 1.39368 4.71786 1.39368 8.51562C1.39368 12.3133 4.14367 15.4125 5.32238 15.4125C6.6319 15.4125 6.80649 14.8014 7.85414 14.8014C8.90178 14.8014 9.07637 15.4125 10.3859 15.4125C11.5646 15.4125 14.3146 12.3133 14.3146 8.51562C14.3146 4.71786 11.8048 3.48254 10.0367 3.71386Z"
           fill="url(#paint0_radial_9_2939)"
@@ -64,14 +64,14 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           gradientUnits="userSpaceOnUse"
           gradientTransform="translate(2.79262 4.03184) scale(13.3722 13.3722)"
         >
-          <stop stop-color="#FF4B3E" />
-          <stop offset="0.4462" stop-color="#FD4A3D" />
-          <stop offset="0.6069" stop-color="#F64939" />
-          <stop offset="0.7215" stop-color="#EB4533" />
-          <stop offset="0.8141" stop-color="#DA412A" />
-          <stop offset="0.8935" stop-color="#C43A1F" />
-          <stop offset="0.9625" stop-color="#A93311" />
-          <stop offset="1" stop-color="#972E07" />
+          <stop stopColor="#FF4B3E" />
+          <stop offset="0.4462" stopColor="#FD4A3D" />
+          <stop offset="0.6069" stopColor="#F64939" />
+          <stop offset="0.7215" stopColor="#EB4533" />
+          <stop offset="0.8141" stopColor="#DA412A" />
+          <stop offset="0.8935" stopColor="#C43A1F" />
+          <stop offset="0.9625" stopColor="#A93311" />
+          <stop offset="1" stopColor="#972E07" />
         </radialGradient>
         <linearGradient
           id="paint1_linear_9_2939"
@@ -81,8 +81,8 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="3.02875"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FF1D25" stop-opacity="0" />
-          <stop offset="1" stop-color="#FF1D25" />
+          <stop stopColor="#FF1D25" stopOpacity="0" />
+          <stop offset="1" stopColor="#FF1D25" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_9_2939"
@@ -92,8 +92,8 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="1.95488"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#972E07" stop-opacity="0" />
-          <stop offset="1" stop-color="#582707" />
+          <stop stopColor="#972E07" stopOpacity="0" />
+          <stop offset="1" stopColor="#582707" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_9_2939"
@@ -103,8 +103,8 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="4.6721"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#ACC130" />
-          <stop offset="1" stop-color="#97A03B" />
+          <stop stopColor="#ACC130" />
+          <stop offset="1" stopColor="#97A03B" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_9_2939"
@@ -114,8 +114,8 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="2.06767"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#97A03B" stop-opacity="0" />
-          <stop offset="1" stop-color="#575C55" />
+          <stop stopColor="#97A03B" stopOpacity="0" />
+          <stop offset="1" stopColor="#575C55" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_9_2939"
@@ -125,8 +125,8 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="3.24178"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#97A03B" />
-          <stop offset="1" stop-color="#6C7D47" />
+          <stop stopColor="#97A03B" />
+          <stop offset="1" stopColor="#6C7D47" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_9_2939"
@@ -136,8 +136,8 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="3.23574"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#C08552" />
-          <stop offset="1" stop-color="#895738" />
+          <stop stopColor="#C08552" />
+          <stop offset="1" stopColor="#895738" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_9_2939"
@@ -147,8 +147,8 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="18.324"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#972E07" stop-opacity="0" />
-          <stop offset="1" stop-color="#582707" />
+          <stop stopColor="#972E07" stopOpacity="0" />
+          <stop offset="1" stopColor="#582707" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_9_2939"
@@ -158,8 +158,8 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="2.49204"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#972E07" stop-opacity="0" />
-          <stop offset="1" stop-color="#582707" />
+          <stop stopColor="#972E07" stopOpacity="0" />
+          <stop offset="1" stopColor="#582707" />
         </linearGradient>
         <linearGradient
           id="paint9_linear_9_2939"
@@ -169,8 +169,8 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="5.99549"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#972E07" stop-opacity="0" />
-          <stop offset="1" stop-color="#582707" />
+          <stop stopColor="#972E07" stopOpacity="0" />
+          <stop offset="1" stopColor="#582707" />
         </linearGradient>
         <linearGradient
           id="paint10_linear_9_2939"
@@ -180,9 +180,9 @@ const Apple: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
           y2="3.08761"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0.0013" stop-color="#E7EEED" stop-opacity="0" />
-          <stop offset="0.7731" stop-color="#F9FBFA" stop-opacity="0.772549" />
-          <stop offset="1" stop-color="white" />
+          <stop offset="0.0013" stopColor="#E7EEED" stopOpacity="0" />
+          <stop offset="0.7731" stopColor="#F9FBFA" stopOpacity="0.772549" />
+          <stop offset="1" stopColor="white" />
         </linearGradient>
         <clipPath id="clip0_9_2939">
           <rect
