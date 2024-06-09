@@ -336,6 +336,174 @@ model profiles {
 
   @@schema("public")
 }
+model Profile {
+  id               String   @id @default(uuid()) @map("id")
+  username         String   @unique
+  is_donor         Boolean  @default(false)
+  is_composter     Boolean  @default(false)
+  is_gardener      Boolean  @default(false)
+  last_activity    DateTime?
+  coords_lat       Float?
+  coords_long      Float?
+  social_media_url String?
+  posts            Post[]
+  listings         Listing[]
+  comments         PostComment[]
+  listingComments  ListingComment[]
+  transactions     Transaction[]
+  
+  @@schema("public")
+}
+
+model Post {
+  id          String         @id @default(uuid())
+  profile_id  String         @map("profile_id")
+  profile     Profile        @relation(fields: [profile_id], references: [id])
+  created_at  DateTime       @default(now())
+  is_embedded Boolean        @default(false)
+  is_archived Boolean        @default(false)
+  manualPosts ManualPost[]
+  embeddedPosts EmbeddedPost[]
+  comments    PostComment[]
+
+  @@schema("public")
+}
+
+model ManualPost {
+  id         String @id @default(uuid())
+  post_id    String @map("post_id")
+  post       Post   @relation(fields: [post_id], references: [id])
+  header     String?
+  body       String?
+  coords_lat Float?
+  coords_long Float?
+  images     PostImage[]
+
+  @@schema("public")
+}
+
+model EmbeddedPost {
+  id          String @id @default(uuid())
+  post_id     String @map("post_id")
+  post        Post   @relation(fields: [post_id], references: [id])
+  created_at  DateTime @default(now())
+  embedded_url String?
+
+  @@schema("public")
+}
+
+model PostImage {
+  id           String      @id @default(uuid())
+  manual_post_id String    @map("manual_post_id")
+  manualPost   ManualPost  @relation(fields: [manual_post_id], references: [id])
+  url          String
+
+  @@schema("public")
+}
+
+model PostComment {
+  id          String     @id @default(uuid())
+  post_id     String     @map("post_id")
+  post        Post       @relation(fields: [post_id], references: [id])
+  profile_id  String     @map("profile_id")
+  profile     Profile    @relation(fields: [profile_id], references: [id])
+  created_at  DateTime   @default(now())
+  body_text   String
+  like_count  Int        @default(0)
+  is_archived Boolean    @default(false)
+
+  @@schema("public")
+}
+
+model Listing {
+  id            String          @id @default(uuid())
+  profile_id    String          @map("profile_id")
+  profile       Profile         @relation(fields: [profile_id], references: [id])
+  created_at    DateTime        @default(now())
+  header        String
+  body          String
+  coords_lat    Float?
+  coords_long   Float?
+  total_amount  Float
+  current_amount Float
+  deadline      DateTime
+  is_active     Boolean         @default(true)
+  images        ListingImage[]
+  comments      ListingComment[]
+  tags          ListingTag[]
+  transactions  Transaction[]
+
+  @@schema("public")
+}
+
+model ListingImage {
+  id         String   @id @default(uuid())
+  listing_id String   @map("listing_id")
+  listing    Listing  @relation(fields: [listing_id], references: [id])
+  url        String
+  
+  @@schema("public")
+}
+
+model ListingComment {
+  id         String    @id @default(uuid())
+  listing_id String    @map("listing_id")
+  listing    Listing   @relation(fields: [listing_id], references: [id])
+  profile_id String    @map("profile_id")
+  profile    Profile   @relation(fields: [profile_id], references: [id])
+  created_at DateTime  @default(now())
+  body_text  String
+  like_count Int       @default(0)
+  is_archived Boolean  @default(false)
+
+  @@schema("public")
+}
+
+model ListingTag {
+  id         String    @id @default(uuid())
+  listing_id String    @map("listing_id")
+  listing    Listing   @relation(fields: [listing_id], references: [id])
+  tag_type   tag_type_enum
+  scrap_type scrap_type_enum? @relation(fields: [tag_type], references: [tag_type])
+  compost_type compost_type_enum? @relation(fields: [tag_type], references: [tag_type])
+
+  @@check(tag_type = "scrap" AND scrap_type IS NOT NULL OR tag_type = "compost" AND compost_type IS NOT NULL)
+  @@schema("public")
+}
+
+enum tag_type_enum {
+  scrap
+  compost
+}
+
+model Transaction {
+  id            String     @id @default(uuid())
+  listing_id    String     @map("listing_id")
+  listing       Listing    @relation(fields: [listing_id], references: [id])
+  donor_id      String     @map("donor_id")
+  donor         Profile    @relation(fields: [donor_id], references: [id])
+  donated_amount Float
+  created_at    DateTime   @default(now())
+  completed_at  DateTime?
+
+  @@schema("public")
+}
+
+enum scrap_type_enum {
+  greens
+  browns
+  grains
+  meats
+  others
+}
+
+enum compost_type_enum {
+  aerobic
+  vermicompost
+  bokashi
+  chicken
+  others
+}
 
 enum aal_level {
   aal1
