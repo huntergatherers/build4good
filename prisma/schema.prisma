@@ -298,7 +298,7 @@ model users {
   mfa_factors                 mfa_factors[]
   one_time_tokens             one_time_tokens[]
   sessions                    sessions[]
-  profiles                    profiles?
+  profiles                    Profile[]
   conversations               conversation[]    @relation("UserChats")
 
   @@index([instance_id])
@@ -329,16 +329,11 @@ model message {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model profiles {
-  id       String  @id @db.Uuid
-  username String? @unique
-  users    users   @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@schema("public")
-}
 model Profile {
-  id               String   @id @default(uuid()) @map("id")
-  username         String   @unique
+  id               String   @id @db.Uuid
+  username         String   @unique 
+  user_id          String   @db.Uuid @map("user_id")
+  users            users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   is_donor         Boolean  @default(false)
   is_composter     Boolean  @default(false)
   is_gardener      Boolean  @default(false)
@@ -351,14 +346,15 @@ model Profile {
   comments         PostComment[]
   listingComments  ListingComment[]
   transactions     Transaction[]
+  notifications    Notification[]
   
   @@schema("public")
 }
 
 model Post {
-  id          String         @id @default(uuid())
-  profile_id  String         @map("profile_id")
-  profile     Profile        @relation(fields: [profile_id], references: [id])
+  id          Int            @id @default(autoincrement())
+  profile_id  String         @db.Uuid @map("profile_id")
+  profile     Profile        @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   created_at  DateTime       @default(now())
   is_embedded Boolean        @default(false)
   is_archived Boolean        @default(false)
@@ -374,20 +370,20 @@ model Post {
 }
 
 model PostImage {
-  id           String      @id @default(uuid())
-  manual_post_id String    @map("manual_post_id")
-  Post         Post  @relation(fields: [manual_post_id], references: [id])
+  id           Int      @id @default(autoincrement())
+  manual_post_id Int    @map("manual_post_id")
+  Post         Post  @relation(fields: [manual_post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   url          String
 
   @@schema("public")
 }
 
 model PostComment {
-  id          String     @id @default(uuid())
-  post_id     String     @map("post_id")
-  post        Post       @relation(fields: [post_id], references: [id])
-  profile_id  String     @map("profile_id")
-  profile     Profile    @relation(fields: [profile_id], references: [id])
+  id          Int     @id @default(autoincrement())
+  post_id     Int     @map("post_id")
+  post        Post       @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profile_id  String     @db.Uuid @map("profile_id")
+  profile     Profile    @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   created_at  DateTime   @default(now())
   body_text   String
   like_count  Int        @default(0)
@@ -397,9 +393,9 @@ model PostComment {
 }
 
 model Listing {
-  id            String          @id @default(uuid())
-  profile_id    String          @map("profile_id")
-  profile       Profile         @relation(fields: [profile_id], references: [id])
+  id            Int          @id @default(autoincrement())
+  profile_id    String          @db.Uuid @map("profile_id")
+  profile       Profile         @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   created_at    DateTime        @default(now())
   header        String
   body          String
@@ -419,8 +415,8 @@ model Listing {
 
 model ListingImage {
   id         String   @id @default(uuid())
-  listing_id String   @map("listing_id")
-  listing    Listing  @relation(fields: [listing_id], references: [id])
+  listing_id Int   @map("listing_id")
+  listing    Listing  @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   url        String
   
   @@schema("public")
@@ -428,10 +424,10 @@ model ListingImage {
 
 model ListingComment {
   id         String    @id @default(uuid())
-  listing_id String    @map("listing_id")
-  listing    Listing   @relation(fields: [listing_id], references: [id])
-  profile_id String    @map("profile_id")
-  profile    Profile   @relation(fields: [profile_id], references: [id])
+  listing_id Int       @map("listing_id")
+  listing    Listing   @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profile_id String    @db.Uuid @map("profile_id")
+  profile    Profile   @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   created_at DateTime  @default(now())
   body_text  String
   like_count Int       @default(0)
@@ -441,9 +437,9 @@ model ListingComment {
 }
 
 model ListingTag {
-  id         String    @id @default(uuid())
-  listing_id String    @map("listing_id")
-  listing    Listing   @relation(fields: [listing_id], references: [id])
+  id         Int    @id @default(autoincrement())
+  listing_id Int    @map("listing_id")
+  listing    Listing   @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   tag_type   tag_type_enum
   scrap_type scrap_type_enum? 
   compost_type compost_type_enum?
@@ -459,13 +455,14 @@ enum tag_type_enum {
 }
 
 model Transaction {
-  id            String     @id @default(uuid())
-  listing_id    String     @map("listing_id")
-  listing       Listing    @relation(fields: [listing_id], references: [id])
-  donor_id      String     @map("donor_id")
-  donor         Profile    @relation(fields: [donor_id], references: [id])
+  id            Int     @id @default(autoincrement())
+  listing_id    Int     @map("listing_id")
+  listing       Listing    @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  donor_id      String     @db.Uuid @map("donor_id")
+  donor         Profile    @relation(fields: [donor_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   donated_amount Float
   created_at    DateTime   @default(now())
+  approved_at   DateTime?
   completed_at  DateTime?
 
   @@schema("public")
@@ -487,6 +484,19 @@ enum compost_type_enum {
   bokashi
   chicken
   others
+
+  @@schema("public")
+}
+
+model Notification {
+  id          Int    @id @default(autoincrement())
+  profile_id  String    @db.Uuid @map("profile_id")
+  profile     Profile   @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  created_at  DateTime  @default(now())
+  header      String
+  body_text   String
+  redirect_url String
+  is_read     Boolean   @default(false)
 
   @@schema("public")
 }
