@@ -20,7 +20,7 @@ const CommunityPage = () => {
     }
 
     return (
-        <div className="p-6">
+        <div className="p-6 flex flex-col space-y-6">
             <div style={{ display: "flex", justifyContent: "center" }}>
                 <FacebookEmbed
                     className="w-full"

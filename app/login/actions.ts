@@ -75,7 +75,10 @@ export async function signup(formData: FormData): Promise<void> {
         options: { data: { username: data.username } },
     });
 
+
+
     if (error) {
+        console.log(error)
         redirect("/error");
     }
 
