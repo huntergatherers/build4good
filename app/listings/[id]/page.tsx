@@ -7,14 +7,21 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { daysBetween } from "@/lib/utils";
 import ListingComment from "./components/listing-comment";
+import CommentBox from "./components/comment-box";
+import { createClient } from "@/utils/supabase/server";
 export default async function ListingPage({
     params,
 }: {
     params: { id: string };
 }) {
+    const listingId = parseInt(params.id, 10); // Convert the id to an integer
+
+    if (isNaN(listingId)) {
+        return <div>Invalid listing ID</div>; // Handle invalid ID scenario
+    }
     const listing = await prisma.listing.findUnique({
         where: {
-            id: parseInt(params.id),
+            id: listingId,
         },
         include: {
             ListingComment: true,
@@ -26,15 +33,14 @@ export default async function ListingPage({
     }
     const transactions = listing.Transaction;
     const comments = listing.ListingComment;
-    // const comments = await prisma.comments.findMany({
-    //     where: {
-    //         listingId: params.id,
-    //     },
-    // });
+
     const totalDonation = transactions.reduce(
         (acc, transaction) => acc + transaction.donated_amount,
         0
     );
+
+    const supabase = createClient();
+    const { data } = await supabase.auth.getUser();
     return (
         <div className="w-full p-6">
             <h1 className="font-bold">Aden needs...</h1>
@@ -86,11 +92,12 @@ export default async function ListingPage({
                     {comments.length}
                 </Badge>
             </div>
-            <div className="flex flex-col gap-8 mt-4">
+            <div className="flex flex-col gap-4 mt-4">
                 {comments.map((comment) => (
                     <ListingComment key={comment.id} comment={comment} />
                 ))}
             </div>
+            {data?.user && <CommentBox />}
         </div>
     );
 }
