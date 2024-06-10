@@ -3,6 +3,7 @@ import { Navbar } from "@/components/(navbar)/navbar";
 import "./globals.css";
 import Notifications from "@/components/(navbar)/notifications";
 import UserMenu from "@/components/(navbar)/user-menu";
+import { Toaster } from "@/components/ui/toaster";
 
 const defaultUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
@@ -29,6 +30,7 @@ export default function RootLayout({
                     </Navbar>
                     {children}
                 </main>
+                <Toaster />
             </body>
         </html>
     );

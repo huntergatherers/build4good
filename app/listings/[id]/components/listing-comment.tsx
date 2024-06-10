@@ -4,13 +4,16 @@ import prisma from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
 import { hasUserLikedComment } from "@/lib/actions";
 import ListingCommentActionButtons from "./listing-comment-action-buttons";
+import CommentReplyForm from "./comment-reply-form";
 
 interface ListingCommentItemProps {
     comment: ListingComment;
+    listingId: number;
 }
 
 export default async function ListingCommentItem({
     comment,
+    listingId,
 }: ListingCommentItemProps) {
     const supabase = createClient();
 
@@ -33,6 +36,9 @@ export default async function ListingCommentItem({
         where: {
             parent_id: comment.id,
         },
+        include: {
+            profiles: true,
+        },
     });
 
     const { data } = await supabase.auth.getUser();
@@ -48,11 +54,12 @@ export default async function ListingCommentItem({
                 </div>
             </div>
             <p className="mt-2">{comment.body_text}</p>
+            <CommentReplyForm parentId={comment.id} listingId={listingId} />
             <ListingCommentActionButtons
                 initialIsLiked={isLiked}
                 commentId={comment.id}
                 initialLikeCount={comment.like_count}
-                repliesCount={replies.length}
+                replies={replies}
             />
         </div>
     );

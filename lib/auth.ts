@@ -1,6 +1,6 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
-import { createClient as client } from "@/utils/supabase/client";
+import { revalidatePath } from "next/cache";
 export async function getCurrentUserId() {
     const supabase = createClient();
 
@@ -9,8 +9,18 @@ export async function getCurrentUserId() {
 }
 
 export async function getCurrentUserClient() {
-    const supabase = client();
+    const supabase = createClient();
     const { data } = await supabase.auth.getUser();
     console.log(data.user);
     return data.user;
+}
+
+export async function signOut() {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+        console.error("Sign out error", error);
+        return error;
+    }
+    revalidatePath("/", "layout");
 }

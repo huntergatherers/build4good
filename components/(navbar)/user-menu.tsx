@@ -6,7 +6,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getCurrentUserClient } from "@/lib/auth";
+import { signOut } from "@/lib/auth";
+import { createClient } from "@/utils/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import {
     LogOut,
@@ -19,14 +20,18 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function UserMenu() {
+    const { toast } = useToast();
+    const router = useRouter();
     const [user, setUser] = useState<SupabaseUser | null>(null);
+    const supabase = createClient();
     useEffect(() => {
         const getUser = async () => {
-            const user = await getCurrentUserClient();
-            console.log(user);
-            setUser(user);
+            const { data } = await supabase.auth.getUser();
+            setUser(data.user);
         };
         getUser();
     }, []);
@@ -75,7 +80,19 @@ export default function UserMenu() {
                         <div
                             className="flex"
                             onClick={async () => {
-                                // const { error } = await supabase.auth.signOut()
+                                const error = await signOut();
+                                if (error) {
+                                    console.error("Sign out error", error);
+                                    return;
+                                }
+                                toast({
+                                    className: "bg-green-700 text-white",
+                                    title: "Logged out",
+                                    description: "You have been logged out.",
+                                });
+                                setUser(null);
+                                router.push("/listings");
+                                router.refresh();
                             }}
                         >
                             <LogOut size={18} className="mr-2" />
@@ -87,7 +104,7 @@ export default function UserMenu() {
                         <div
                             className="flex"
                             onClick={async () => {
-                                // const { error } = await supabase.auth.signOut()
+                                router.push("/login");
                             }}
                         >
                             <LogOut size={18} className="mr-2" />

@@ -24,7 +24,11 @@ export default async function ListingPage({
             id: listingId,
         },
         include: {
-            ListingComment: true,
+            ListingComment: {
+                where: {
+                    parent_id: null,
+                },
+            },
             Transaction: true,
         },
     });
@@ -92,12 +96,18 @@ export default async function ListingPage({
                     {comments.length}
                 </Badge>
             </div>
-            <div className="flex flex-col gap-4 mt-4">
-                {comments.map((comment) => (
-                    <ListingComment key={comment.id} comment={comment} />
-                ))}
-            </div>
-            {data?.user && <CommentBox />}
+            {comments.length > 0 && (
+                <div className="flex flex-col gap-4 my-4">
+                    {comments.map((comment) => (
+                        <ListingComment
+                            key={comment.id}
+                            comment={comment}
+                            listingId={listingId}
+                        />
+                    ))}
+                </div>
+            )}
+            {data?.user && <CommentBox listingId={listingId} parentId={null} />}
         </div>
     );
 }
