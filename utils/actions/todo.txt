@@ -1,0 +1,5 @@
+profile/ listings
+- given coords, find all listings, all profiles within a defined euclidean distance
+filtering listings 
+- inputs are tags
+- sort by nearest distance, expiry date?
