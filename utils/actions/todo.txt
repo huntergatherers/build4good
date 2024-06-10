@@ -3,3 +3,14 @@ profile/ listings
 filtering listings 
 - inputs are tags
 - sort by nearest distance, expiry date?
+
+
+ensure every user has a profile
+profile update- input is id, update username, coords, roles, url.
+listing crud-> if requesting then has_progress
+listing coords default is profile's coords
+add tag to listing
+listing expired/fulfilled
+
+create transaction
+- 
