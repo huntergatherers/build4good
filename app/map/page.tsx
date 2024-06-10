@@ -1,14 +1,10 @@
 'use client';
 import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Search, Dot } from 'lucide-react';
+import { Search } from 'lucide-react';
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -18,70 +14,98 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Broccoli from './assets/broccoli';
 import Apple from './assets/apple';
+import dynamic from 'next/dynamic'
+import { getMarkerIcon } from './utils';
+
+const MapContainer = dynamic(() => import('react-leaflet').then((mod) => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then((mod) => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then((mod) => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { ssr: false });
+
+
 
 const MapPage = () => {
+
   const userData = [
     {
-      id: 1,
-      name: 'John Doe',
-      profilePicture:
-        'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
-      wasteReceived: 150,
-      wasteDonated: 75,
-      startDate: new Date('2023-05-15'),
-      freeDays: ['Monday', 'Wednesday', 'Friday'],
+        id: 1,
+        name: 'John Doe',
+        profilePicture:
+            'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
+        wasteReceived: 150,
+        wasteDonated: 75,
+        startDate: new Date('2023-05-15'),
+        freeDays: ['Monday', 'Wednesday', 'Friday'],
+        role: 'Gardener',
+        latitude: 1.3521,
+        longitude: 103.8198
     },
     {
-      id: 2,
-      name: 'Jane Smith',
-      profilePicture:
-        'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
-      wasteReceived: 200,
-      wasteDonated: 100,
-      startDate: new Date('2023-03-20'),
-      freeDays: ['Tuesday', 'Thursday'],
+        id: 2,
+        name: 'Jane Smith',
+        profilePicture:
+            'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
+        wasteReceived: 200,
+        wasteDonated: 100,
+        startDate: new Date('2023-03-20'),
+        freeDays: ['Tuesday', 'Thursday'],
+        role: 'Compostor',
+        latitude: 1.3422,
+        longitude: 103.8200
     },
     {
-      id: 3,
-      name: 'Tim Poon',
-      profilePicture:
-        'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
-      wasteReceived: 100,
-      wasteDonated: 50,
-      startDate: new Date('2024-05-15'),
-      freeDays: ['Saturday', 'Sunday'],
+        id: 3,
+        name: 'Tim Poon',
+        profilePicture:
+            'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
+        wasteReceived: 100,
+        wasteDonated: 50,
+        startDate: new Date('2024-05-15'),
+        freeDays: ['Saturday', 'Sunday'],
+        role: 'Donor',
+        latitude: 1.3623,
+        longitude: 103.8202
     },
     {
-      id: 1,
-      name: 'Lay Bay',
-      profilePicture:
-        'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
-      wasteReceived: 150,
-      wasteDonated: 75,
-      startDate: new Date('2023-01-15'),
-      freeDays: ['Monday', 'Wednesday', 'Friday'],
+        id: 1,
+        name: 'Lay Bay',
+        profilePicture:
+            'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
+        wasteReceived: 150,
+        wasteDonated: 75,
+        startDate: new Date('2023-01-15'),
+        freeDays: ['Monday', 'Wednesday', 'Friday'],
+        role: 'Gardener',
+        latitude: 1.3524,
+        longitude: 103.8004
     },
     {
-      id: 2,
-      name: 'Sean Tane',
-      profilePicture:
-        'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
-      wasteReceived: 200,
-      wasteDonated: 100,
-      startDate: new Date('2023-05-15'),
-      freeDays: ['Tuesday', 'Thursday'],
+        id: 2,
+        name: 'Sean Tane',
+        profilePicture:
+            'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
+        wasteReceived: 200,
+        wasteDonated: 100,
+        startDate: new Date('2023-05-15'),
+        freeDays: ['Tuesday', 'Thursday'],
+        role: 'Compostor',
+        latitude: 1.3525,
+        longitude: 103.8406
     },
     {
-      id: 3,
-      name: 'Tom Lee',
-      profilePicture:
-        'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
-      wasteReceived: 100,
-      wasteDonated: 50,
-      startDate: new Date('2023-05-15'),
-      freeDays: ['Saturday', 'Sunday'],
-    },
-  ];
+        id: 3,
+        name: 'Tom Lee',
+        profilePicture:
+            'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg',
+        wasteReceived: 100,
+        wasteDonated: 50,
+        startDate: new Date('2023-05-15'),
+        freeDays: ['Saturday', 'Sunday'],
+        role: 'Donor',
+        latitude: 1.3526,
+        longitude: 103.8318
+    }
+];
 
   const calculateFoodScrappingDuration = (startDate: Date) => {
     const today = new Date();
@@ -110,7 +134,7 @@ const MapPage = () => {
   };
 
   return (
-    <div className="relative h-screen w-screen">
+    <div className="relative min-h-screen w-screen flex justify-center items-center">
       <MapContainer
         center={[1.3521, 103.8198]}
         zoom={13}
@@ -122,19 +146,35 @@ const MapPage = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright"'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={[1.3521, 103.8198]}>
-          <Popup>
-            Welcome to Singapore! <br /> The Lion City.
-          </Popup>
-        </Marker>
+        {userData.map(item => (
+            <Marker
+              key={item.id}
+              position={[item.latitude, item.longitude]}
+              icon={getMarkerIcon(item.role)}
+              // eventHandlers={{
+              //   mouseover: e => {
+              //     setHoveredMarker(item);
+              //   },
+              //   mouseout: () => {
+              //     setHoveredMarker(undefined);
+              //   },
+              // }}
+              // riseOnHover
+            >
+              <Popup>
+              hi {item.id}
+              </Popup>
+             
+            </Marker>
+          ))}
+          
       </MapContainer>
       <Drawer>
         <DrawerTrigger
           style={{
             position: 'absolute',
-            bottom: 10,
-            left: '45%',
-            zIndex: 999999999,
+            bottom: 100,
+            zIndex: 402,
             backgroundColor: 'black',
             borderRadius: '15px',
             padding: '10px',
@@ -187,17 +227,17 @@ const MapPage = () => {
                     <p className="text-base font-normal mt-2">{user.name}</p>
                   </div>
                   <div>
-                    <div className="flex text-left justify-between px-4">
-                      <p className="text-lg text-green-600 font-medium">
+                    <div className="flex justify-between px-4">
+                      <p className="text-base text-green-600 font-medium mb-1">
                         {user.wasteReceived} kg{' '}
-                        <span className="text-base text-black font-normal">
+                        <span className="text-sm text-black font-normal">
                           received{' '}
                         </span>
                       </p>
-                      {/* <Dot color="#d2d6dc" size={40} /> */}
-                      <p className="text-lg text-green-600 font-medium">
+                      <p className="text-xl text-gray-400 font-medium mx-1"> •</p>
+                      <p className="text-base text-green-600 font-medium">
                         {user.wasteDonated} kg{' '}
-                        <span className="text-base text-black font-normal">
+                        <span className="text-sm text-black font-normal">
                           donated{' '}
                         </span>
                       </p>
@@ -206,7 +246,7 @@ const MapPage = () => {
                       Food scrapping for{' '}
                       {calculateFoodScrappingDuration(user.startDate)}
                     </p>
-                    <p className="text-gray-500 flex justify-between px-4 mt-2">
+                    <div className="text-gray-500 flex justify-between px-4 mt-2">
                       {[
                         'Monday',
                         'Tuesday',
@@ -227,7 +267,7 @@ const MapPage = () => {
                           {day[0]}
                         </p>
                       ))}
-                    </p>
+                    </div>
                     <div className=" flex justify-between items-center mt-4 px-3">
                       <div className="flex">
                         <Button className="bg-gray-100 p-0 rounded-3xl px-3 mr-3 ">

@@ -75,10 +75,13 @@ export async function signup(formData: FormData): Promise<void> {
         options: { data: { username: data.username } },
     });
 
+
+
     if (error) {
+        console.log(error)
         redirect("/error");
     }
 
     revalidatePath("/", "layout");
-    redirect("/login?message=Please+check+your+email+to+verify+your+account.");
+    redirect("/login?message=Your+account+has+been+created.+Please+sign+in.");
 }

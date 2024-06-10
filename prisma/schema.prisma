@@ -22,6 +22,16 @@ model audit_log_entries {
   @@schema("auth")
 }
 
+model conversation {
+  id        String    @id @db.Uuid
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+  message   message[]
+  users     users[]   @relation("UserChats")
+
+  @@schema("auth")
+}
+
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model flow_state {
   id                     String                @id @db.Uuid
@@ -53,7 +63,7 @@ model identities {
   last_sign_in_at DateTime? @db.Timestamptz(6)
   created_at      DateTime? @db.Timestamptz(6)
   updated_at      DateTime? @db.Timestamptz(6)
-  email           String?
+  email           String?   @default(dbgenerated("lower((identity_data ->> 'email'::text))"))
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   users           users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -70,6 +80,18 @@ model instances {
   raw_base_config String?
   created_at      DateTime? @db.Timestamptz(6)
   updated_at      DateTime? @db.Timestamptz(6)
+
+  @@schema("auth")
+}
+
+model message {
+  id             String       @id @db.Uuid
+  content        String
+  createdAt      DateTime     @default(now())
+  conversationId String       @db.Uuid
+  senderId       String       @db.Uuid
+  conversation   conversation @relation(fields: [conversationId], references: [id])
+  users          users        @relation(fields: [senderId], references: [id])
 
   @@schema("auth")
 }
@@ -284,7 +306,7 @@ model users {
   phone_change                String?           @default("")
   phone_change_token          String?           @default("") @db.VarChar(255)
   phone_change_sent_at        DateTime?         @db.Timestamptz(6)
-  confirmed_at                DateTime?         @db.Timestamptz(6)
+  confirmed_at                DateTime?         @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
   email_change_token_current  String?           @default("") @db.VarChar(255)
   email_change_confirm_status Int?              @default(0) @db.SmallInt
   banned_until                DateTime?         @db.Timestamptz(6)
@@ -298,205 +320,172 @@ model users {
   mfa_factors                 mfa_factors[]
   one_time_tokens             one_time_tokens[]
   sessions                    sessions[]
-  profiles                    Profile[]
-  conversations               conversation[]    @relation("UserChats")
+  profiles                    profiles?
+  conversation                conversation[]    @relation("UserChats")
 
   @@index([instance_id])
   @@index([is_anonymous])
   @@schema("auth")
 }
 
-model conversation {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  messages  message[]
-  users     users[]   @relation("UserChats")
+model CommentLike {
+  id             Int            @id @default(autoincrement())
+  profile_id     String         @db.Uuid
+  comment_id     String         @db.Uuid
+  created_at     DateTime       @default(now())
+  ListingComment ListingComment @relation(fields: [comment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles       profiles       @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@schema("auth")
-}
-
-model message {
-  id             Int          @id @default(autoincrement())
-  content        String
-  createdAt      DateTime     @default(now())
-  conversationId Int
-  senderId       String       @db.Uuid
-  conversation   conversation @relation(fields: [conversationId], references: [id])
-  sender         users        @relation(fields: [senderId], references: [id])
-
-  @@schema("auth")
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Profile {
-  id               String   @id @db.Uuid
-  username         String   @unique 
-  user_id          String   @db.Uuid @map("user_id")
-  users            users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  is_donor         Boolean  @default(false)
-  is_composter     Boolean  @default(false)
-  is_gardener      Boolean  @default(false)
-  last_activity    DateTime?
-  coords_lat       Float?
-  coords_long      Float?
-  social_media_url String?
-  posts            Post[]
-  listings         Listing[]
-  comments         PostComment[]
-  listingComments  ListingComment[]
-  transactions     Transaction[]
-  notifications    Notification[]
-  
-  @@schema("public")
-}
-
-model Post {
-  id          Int            @id @default(autoincrement())
-  profile_id  String         @db.Uuid @map("profile_id")
-  profile     Profile        @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  created_at  DateTime       @default(now())
-  is_embedded Boolean        @default(false)
-  is_archived Boolean        @default(false)
-  header     String? //only for manual posts
-  body       String? //only for manual posts
-  coords_lat Float? //only for manual posts
-  coords_long Float? //only for manual posts
-  embedded_url String? //only for embedded posts
-  images     PostImage[]
-  comments    PostComment[]
-  
-  @@schema("public")
-}
-
-model PostImage {
-  id           Int      @id @default(autoincrement())
-  manual_post_id Int    @map("manual_post_id")
-  Post         Post  @relation(fields: [manual_post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  url          String
-
-  @@schema("public")
-}
-
-model PostComment {
-  id          Int     @id @default(autoincrement())
-  post_id     Int     @map("post_id")
-  post        Post       @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  profile_id  String     @db.Uuid @map("profile_id")
-  profile     Profile    @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  created_at  DateTime   @default(now())
-  body_text   String
-  like_count  Int        @default(0)
-  is_archived Boolean    @default(false)
-
+  @@unique([profile_id, comment_id])
   @@schema("public")
 }
 
 model Listing {
-  id            Int          @id @default(autoincrement())
-  profile_id    String          @db.Uuid @map("profile_id")
-  profile       Profile         @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  created_at    DateTime        @default(now())
-  header        String
-  body          String
-  coords_lat    Float?
-  coords_long   Float?
-  total_amount  Float
-  current_amount Float
-  deadline      DateTime
-  is_active     Boolean         @default(true)
-  images        ListingImage[]
-  comments      ListingComment[]
-  tags          ListingTag[]
-  transactions  Transaction[]
+  id             Int              @id @default(autoincrement())
+  profile_id     String           @db.Uuid
+  created_at     DateTime         @default(now())
+  header         String
+  body           String
+  coords_lat     Float?
+  coords_long    Float?
+  total_amount   Int
+  deadline       DateTime
+  is_active      Boolean          @default(true)
+  has_progress   Boolean          @default(false)
+  profiles       profiles         @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  ListingComment ListingComment[]
+  ListingImage   ListingImage[]
+  ListingTag     ListingTag[]
+  Transaction    Transaction[]
+
+  @@schema("public")
+}
+
+model ListingComment {
+  id                   String           @id @db.Uuid
+  listing_id           Int
+  profile_id           String           @db.Uuid
+  parent_id            String?          @db.Uuid
+  created_at           DateTime         @default(now())
+  body_text            String
+  like_count           Int              @default(0)
+  is_archived          Boolean          @default(false)
+  CommentLike          CommentLike[]
+  Listing              Listing          @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  ListingComment       ListingComment?  @relation("ListingCommentToListingComment", fields: [parent_id], references: [id])
+  other_ListingComment ListingComment[] @relation("ListingCommentToListingComment")
+  profiles             profiles         @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 model ListingImage {
-  id         String   @id @default(uuid())
-  listing_id Int   @map("listing_id")
-  listing    Listing  @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id         String  @id @db.Uuid
+  listing_id Int
   url        String
-  
-  @@schema("public")
-}
-
-model ListingComment {
-  id         String    @id @default(uuid())
-  listing_id Int       @map("listing_id")
-  listing    Listing   @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  profile_id String    @db.Uuid @map("profile_id")
-  profile    Profile   @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  created_at DateTime  @default(now())
-  body_text  String
-  like_count Int       @default(0)
-  is_archived Boolean  @default(false)
+  Listing    Listing @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 model ListingTag {
-  id         Int    @id @default(autoincrement())
-  listing_id Int    @map("listing_id")
-  listing    Listing   @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  tag_type   tag_type_enum
-  scrap_type scrap_type_enum? 
+  id           Int                @id @default(autoincrement())
+  listing_id   Int
+  tag_type     tag_type_enum
+  scrap_type   scrap_type_enum?
   compost_type compost_type_enum?
-
-  //@@check(tag_type = "scrap" AND scrap_type IS NOT NULL OR tag_type = "compost" AND compost_type IS NOT NULL)
-  @@schema("public")
-}
-
-enum tag_type_enum {
-  scrap
-  compost
-  @@schema("public")
-}
-
-model Transaction {
-  id            Int     @id @default(autoincrement())
-  listing_id    Int     @map("listing_id")
-  listing       Listing    @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  donor_id      String     @db.Uuid @map("donor_id")
-  donor         Profile    @relation(fields: [donor_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  donated_amount Float
-  created_at    DateTime   @default(now())
-  approved_at   DateTime?
-  completed_at  DateTime?
-
-  @@schema("public")
-}
-
-enum scrap_type_enum {
-  greens
-  browns
-  grains
-  meats
-  others
-
-  @@schema("public")
-}
-
-enum compost_type_enum {
-  aerobic
-  vermicompost
-  bokashi
-  chicken
-  others
+  Listing      Listing            @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 model Notification {
-  id          Int    @id @default(autoincrement())
-  profile_id  String    @db.Uuid @map("profile_id")
-  profile     Profile   @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  created_at  DateTime  @default(now())
-  header      String
+  id                String                 @id @db.Uuid
+  profile_id        String                 @db.Uuid
+  created_at        DateTime               @default(now())
+  header            String
+  body_text         String
+  redirect_url      String
+  is_read           Boolean                @default(false)
+  notification_type notification_type_enum
+  profiles          profiles               @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model Post {
+  id           Int           @id @default(autoincrement())
+  profile_id   String        @db.Uuid
+  created_at   DateTime      @default(now())
+  is_embedded  Boolean       @default(false)
+  is_archived  Boolean       @default(false)
+  header       String?
+  body         String?
+  coords_lat   Float?
+  coords_long  Float?
+  embedded_url String?
+  profiles     profiles      @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  PostComment  PostComment[]
+  PostImage    PostImage[]
+
+  @@schema("public")
+}
+
+model PostComment {
+  id          String   @id @db.Uuid
+  post_id     Int
+  profile_id  String   @db.Uuid
+  created_at  DateTime @default(now())
   body_text   String
-  redirect_url String
-  is_read     Boolean   @default(false)
+  like_count  Int      @default(0)
+  is_archived Boolean  @default(false)
+  Post        Post     @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles    profiles @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model PostImage {
+  id             Int    @id @default(autoincrement())
+  manual_post_id Int
+  url            String
+  Post           Post   @relation(fields: [manual_post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model Transaction {
+  id             String    @id @db.Uuid
+  listing_id     Int
+  donated_amount Float
+  created_at     DateTime  @default(now())
+  approved_at    DateTime?
+  completed_at   DateTime?
+  other_id       String    @db.Uuid
+  Listing        Listing   @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles       profiles  @relation(fields: [other_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model profiles {
+  id               String           @id @db.Uuid
+  username         String           @unique
+  coords_lat       Float?
+  coords_long      Float?
+  is_composter     Boolean          @default(false)
+  is_donor         Boolean          @default(false)
+  is_gardener      Boolean          @default(false)
+  last_activity    DateTime?
+  social_media_url String?
+  CommentLike      CommentLike[]
+  Listing          Listing[]
+  ListingComment   ListingComment[]
+  Notification     Notification[]
+  Post             Post[]
+  PostComment      PostComment[]
+  Transaction      Transaction[]
+  users            users            @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -539,4 +528,42 @@ enum one_time_token_type {
   phone_change_token
 
   @@schema("auth")
+}
+
+enum compost_type_enum {
+  aerobic
+  vermicompost
+  bokashi
+  chicken
+  others
+
+  @@schema("public")
+}
+
+enum notification_type_enum {
+  like
+  comment
+  donation
+  listing
+  message
+  transaction
+
+  @@schema("public")
+}
+
+enum scrap_type_enum {
+  greens
+  browns
+  grains
+  meats
+  others
+
+  @@schema("public")
+}
+
+enum tag_type_enum {
+  scrap
+  compost
+
+  @@schema("public")
 }
