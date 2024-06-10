@@ -82,7 +82,9 @@ export default async function ListingPage({
             <Separator className="my-4" />
             <div className="text-xl font-bold flex">
                 Comments
-                <Badge className="ml-2 bg-gray-200 text-black">210</Badge>
+                <Badge className="ml-2 bg-gray-200 text-black">
+                    {comments.length}
+                </Badge>
             </div>
             <div className="flex flex-col gap-8 mt-4">
                 {comments.map((comment) => (

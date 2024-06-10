@@ -1,17 +1,5 @@
-/*
-  Warnings:
-
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- CreateEnum
-CREATE TYPE "public"."tag_type_enum" AS ENUM ('scrap', 'compost');
-
--- CreateEnum
-CREATE TYPE "public"."scrap_type_enum" AS ENUM ('greens', 'browns', 'grains', 'meats', 'others');
-
--- CreateEnum
-CREATE TYPE "public"."compost_type_enum" AS ENUM ('aerobic', 'vermicompost', 'bokashi', 'chicken', 'others');
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "auth";
 
 -- CreateEnum
 CREATE TYPE "auth"."aal_level" AS ENUM ('aal1', 'aal2', 'aal3');
@@ -28,8 +16,17 @@ CREATE TYPE "auth"."factor_type" AS ENUM ('totp', 'webauthn');
 -- CreateEnum
 CREATE TYPE "auth"."one_time_token_type" AS ENUM ('confirmation_token', 'reauthentication_token', 'recovery_token', 'email_change_token_new', 'email_change_token_current', 'phone_change_token');
 
--- DropTable
-DROP TABLE "auth"."User";
+-- CreateEnum
+CREATE TYPE "public"."compost_type_enum" AS ENUM ('aerobic', 'vermicompost', 'bokashi', 'chicken', 'others');
+
+-- CreateEnum
+CREATE TYPE "public"."notification_type_enum" AS ENUM ('like', 'comment', 'donation', 'listing', 'message', 'transaction');
+
+-- CreateEnum
+CREATE TYPE "public"."scrap_type_enum" AS ENUM ('greens', 'browns', 'grains', 'meats', 'others');
+
+-- CreateEnum
+CREATE TYPE "public"."tag_type_enum" AS ENUM ('scrap', 'compost');
 
 -- CreateTable
 CREATE TABLE "auth"."audit_log_entries" (
@@ -266,8 +263,23 @@ CREATE TABLE "auth"."users" (
 );
 
 -- CreateTable
+CREATE TABLE "public"."profiles" (
+    "id" UUID NOT NULL,
+    "username" TEXT NOT NULL,
+    "coords_lat" DOUBLE PRECISION,
+    "coords_long" DOUBLE PRECISION,
+    "is_composter" BOOLEAN NOT NULL DEFAULT false,
+    "is_donor" BOOLEAN NOT NULL DEFAULT false,
+    "is_gardener" BOOLEAN NOT NULL DEFAULT false,
+    "last_activity" TIMESTAMP(3),
+    "social_media_url" TEXT,
+
+    CONSTRAINT "profiles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "auth"."conversation" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -276,42 +288,94 @@ CREATE TABLE "auth"."conversation" (
 
 -- CreateTable
 CREATE TABLE "auth"."message" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL,
     "content" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "conversationId" INTEGER NOT NULL,
+    "conversationId" UUID NOT NULL,
     "senderId" UUID NOT NULL,
 
     CONSTRAINT "message_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "public"."profiles" (
-    "id" UUID NOT NULL,
-    "username" TEXT,
+CREATE TABLE "public"."Listing" (
+    "id" SERIAL NOT NULL,
+    "profile_id" UUID NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "header" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "coords_lat" DOUBLE PRECISION,
+    "coords_long" DOUBLE PRECISION,
+    "total_amount" INTEGER NOT NULL,
+    "deadline" TIMESTAMP(3) NOT NULL,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "has_progress" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "profiles_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Listing_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "public"."Profile" (
-    "id" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
-    "is_donor" BOOLEAN NOT NULL DEFAULT false,
-    "is_composter" BOOLEAN NOT NULL DEFAULT false,
-    "is_gardener" BOOLEAN NOT NULL DEFAULT false,
-    "last_activity" TIMESTAMP(3),
-    "coords_lat" DOUBLE PRECISION,
-    "coords_long" DOUBLE PRECISION,
-    "social_media_url" TEXT,
+CREATE TABLE "public"."ListingComment" (
+    "id" UUID NOT NULL,
+    "listing_id" INTEGER NOT NULL,
+    "profile_id" UUID NOT NULL,
+    "parent_id" UUID,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "body_text" TEXT NOT NULL,
+    "like_count" INTEGER NOT NULL DEFAULT 0,
+    "is_archived" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "Profile_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ListingComment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."CommentLike" (
+    "id" SERIAL NOT NULL,
+    "profile_id" UUID NOT NULL,
+    "comment_id" UUID NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "CommentLike_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."ListingImage" (
+    "id" UUID NOT NULL,
+    "listing_id" INTEGER NOT NULL,
+    "url" TEXT NOT NULL,
+
+    CONSTRAINT "ListingImage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."ListingTag" (
+    "id" SERIAL NOT NULL,
+    "listing_id" INTEGER NOT NULL,
+    "tag_type" "public"."tag_type_enum" NOT NULL,
+    "scrap_type" "public"."scrap_type_enum",
+    "compost_type" "public"."compost_type_enum",
+
+    CONSTRAINT "ListingTag_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."Notification" (
+    "id" UUID NOT NULL,
+    "profile_id" UUID NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "header" TEXT NOT NULL,
+    "body_text" TEXT NOT NULL,
+    "redirect_url" TEXT NOT NULL,
+    "is_read" BOOLEAN NOT NULL DEFAULT false,
+    "notification_type" "public"."notification_type_enum" NOT NULL,
+
+    CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Post" (
-    "id" TEXT NOT NULL,
-    "profile_id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "profile_id" UUID NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "is_embedded" BOOLEAN NOT NULL DEFAULT false,
     "is_archived" BOOLEAN NOT NULL DEFAULT false,
@@ -325,19 +389,10 @@ CREATE TABLE "public"."Post" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."PostImage" (
-    "id" TEXT NOT NULL,
-    "manual_post_id" TEXT NOT NULL,
-    "url" TEXT NOT NULL,
-
-    CONSTRAINT "PostImage_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "public"."PostComment" (
-    "id" TEXT NOT NULL,
-    "post_id" TEXT NOT NULL,
-    "profile_id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
+    "post_id" INTEGER NOT NULL,
+    "profile_id" UUID NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "body_text" TEXT NOT NULL,
     "like_count" INTEGER NOT NULL DEFAULT 0,
@@ -347,70 +402,30 @@ CREATE TABLE "public"."PostComment" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."Listing" (
-    "id" TEXT NOT NULL,
-    "profile_id" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "header" TEXT NOT NULL,
-    "body" TEXT NOT NULL,
-    "coords_lat" DOUBLE PRECISION,
-    "coords_long" DOUBLE PRECISION,
-    "total_amount" DOUBLE PRECISION NOT NULL,
-    "current_amount" DOUBLE PRECISION NOT NULL,
-    "deadline" TIMESTAMP(3) NOT NULL,
-    "is_active" BOOLEAN NOT NULL DEFAULT true,
-
-    CONSTRAINT "Listing_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."ListingImage" (
-    "id" TEXT NOT NULL,
-    "listing_id" TEXT NOT NULL,
+CREATE TABLE "public"."PostImage" (
+    "id" SERIAL NOT NULL,
+    "manual_post_id" INTEGER NOT NULL,
     "url" TEXT NOT NULL,
 
-    CONSTRAINT "ListingImage_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."ListingComment" (
-    "id" TEXT NOT NULL,
-    "listing_id" TEXT NOT NULL,
-    "profile_id" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "body_text" TEXT NOT NULL,
-    "like_count" INTEGER NOT NULL DEFAULT 0,
-    "is_archived" BOOLEAN NOT NULL DEFAULT false,
-
-    CONSTRAINT "ListingComment_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "public"."ListingTag" (
-    "id" TEXT NOT NULL,
-    "listing_id" TEXT NOT NULL,
-    "tag_type" "public"."tag_type_enum" NOT NULL,
-    "scrap_type" "public"."scrap_type_enum",
-    "compost_type" "public"."compost_type_enum",
-
-    CONSTRAINT "ListingTag_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "PostImage_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Transaction" (
-    "id" TEXT NOT NULL,
-    "listing_id" TEXT NOT NULL,
-    "donor_id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
+    "listing_id" INTEGER NOT NULL,
     "donated_amount" DOUBLE PRECISION NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "approved_at" TIMESTAMP(3),
     "completed_at" TIMESTAMP(3),
+    "other_id" UUID NOT NULL,
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "auth"."_UserChats" (
-    "A" INTEGER NOT NULL,
+    "A" UUID NOT NULL,
     "B" UUID NOT NULL
 );
 
@@ -517,7 +532,7 @@ CREATE INDEX "users_is_anonymous_idx" ON "auth"."users"("is_anonymous");
 CREATE UNIQUE INDEX "profiles_username_key" ON "public"."profiles"("username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Profile_username_key" ON "public"."Profile"("username");
+CREATE UNIQUE INDEX "CommentLike_profile_id_comment_id_key" ON "public"."CommentLike"("profile_id", "comment_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_UserChats_AB_unique" ON "auth"."_UserChats"("A", "B");
@@ -559,46 +574,58 @@ ALTER TABLE "auth"."sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY
 ALTER TABLE "auth"."sso_domains" ADD CONSTRAINT "sso_domains_sso_provider_id_fkey" FOREIGN KEY ("sso_provider_id") REFERENCES "auth"."sso_providers"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
+ALTER TABLE "public"."profiles" ADD CONSTRAINT "profiles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
 ALTER TABLE "auth"."message" ADD CONSTRAINT "message_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "auth"."conversation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "auth"."message" ADD CONSTRAINT "message_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "auth"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."profiles" ADD CONSTRAINT "profiles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."Listing" ADD CONSTRAINT "Listing_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."Post" ADD CONSTRAINT "Post_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."Profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."ListingComment" ADD CONSTRAINT "ListingComment_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."Listing"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."PostImage" ADD CONSTRAINT "PostImage_manual_post_id_fkey" FOREIGN KEY ("manual_post_id") REFERENCES "public"."Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."ListingComment" ADD CONSTRAINT "ListingComment_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."PostComment" ADD CONSTRAINT "PostComment_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "public"."Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."ListingComment" ADD CONSTRAINT "ListingComment_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "public"."ListingComment"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."PostComment" ADD CONSTRAINT "PostComment_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."Profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."CommentLike" ADD CONSTRAINT "CommentLike_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."Listing" ADD CONSTRAINT "Listing_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."Profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."CommentLike" ADD CONSTRAINT "CommentLike_comment_id_fkey" FOREIGN KEY ("comment_id") REFERENCES "public"."ListingComment"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."ListingImage" ADD CONSTRAINT "ListingImage_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."Listing"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."ListingImage" ADD CONSTRAINT "ListingImage_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."Listing"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."ListingComment" ADD CONSTRAINT "ListingComment_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."Listing"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."ListingTag" ADD CONSTRAINT "ListingTag_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."Listing"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."ListingComment" ADD CONSTRAINT "ListingComment_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."Profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Notification" ADD CONSTRAINT "Notification_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."ListingTag" ADD CONSTRAINT "ListingTag_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."Listing"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Post" ADD CONSTRAINT "Post_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."Transaction" ADD CONSTRAINT "Transaction_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."Listing"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."PostComment" ADD CONSTRAINT "PostComment_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "public"."Post"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "public"."Transaction" ADD CONSTRAINT "Transaction_donor_id_fkey" FOREIGN KEY ("donor_id") REFERENCES "public"."Profile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."PostComment" ADD CONSTRAINT "PostComment_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "public"."PostImage" ADD CONSTRAINT "PostImage_manual_post_id_fkey" FOREIGN KEY ("manual_post_id") REFERENCES "public"."Post"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "public"."Transaction" ADD CONSTRAINT "Transaction_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "public"."Listing"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "public"."Transaction" ADD CONSTRAINT "Transaction_other_id_fkey" FOREIGN KEY ("other_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "auth"."_UserChats" ADD CONSTRAINT "_UserChats_A_fkey" FOREIGN KEY ("A") REFERENCES "auth"."conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
