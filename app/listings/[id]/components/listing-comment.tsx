@@ -5,7 +5,7 @@ interface ListingCommentItemProps {
     comment: ListingComment;
 }
 
-export default function ListingCommentItem({
+export default async function ListingCommentItem({
     comment,
 }: ListingCommentItemProps) {
     const formattedDate = format(
@@ -18,7 +18,7 @@ export default function ListingCommentItem({
             <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gray-100"></div>
                 <div>
-                    <p className="font-semibold">hi</p>
+                    {/* <p className="font-semibold">{comment.}</p> */}
                     <p className="text-gray-400">{formattedDate}</p>
                 </div>
             </div>
