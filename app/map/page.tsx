@@ -117,7 +117,7 @@ const MapPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-screen">
+    <div className="relative min-h-screen w-screen flex justify-center items-center">
       <MapContainer
         center={[1.3521, 103.8198]}
         zoom={13}
@@ -140,8 +140,7 @@ const MapPage = () => {
           style={{
             position: 'absolute',
             bottom: 100,
-            left: '45%',
-            zIndex: 999999999,
+            zIndex: 402,
             backgroundColor: 'black',
             borderRadius: '15px',
             padding: '10px',

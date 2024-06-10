@@ -27,10 +27,10 @@ export default async function Index() {
                         <Filter size={18} />
                     </div>
                 </div>
-                <div className="text-xl font-bold mt-6">Fellow scrappers are looking for...</div>
+                <div className="text-xl font-bold mt-6">Fellow Scrappers are looking for...</div>
                 <p className="text-xs text-gray-400 mb-4">Check out what other people are requesting!</p>
                 <ListingHorizontalScroll listings={[1,2,3,4,5,6,7,8]}/>
-                <div className="text-xl font-bold mt-6">Fellow scrappers are donating...</div>
+                <div className="text-xl font-bold mt-6">Fellow Scrappers are donating...</div>
                 <p className="text-xs text-gray-400 mb-4">Check out what other people are offering!</p>
                 <ListingHorizontalScroll listings={[1,2,3,4,5,6,7,8]}/>
             </main>
