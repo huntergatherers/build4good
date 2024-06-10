@@ -227,17 +227,17 @@ const MapPage = () => {
                     <p className="text-base font-normal mt-2">{user.name}</p>
                   </div>
                   <div>
-                    <div className="flex text-left justify-between px-4">
-                      <p className="text-lg text-green-600 font-medium">
+                    <div className="flex justify-between px-4">
+                      <p className="text-base text-green-600 font-medium mb-1">
                         {user.wasteReceived} kg{' '}
-                        <span className="text-base text-black font-normal">
+                        <span className="text-sm text-black font-normal">
                           received{' '}
                         </span>
                       </p>
-                      {/* <Dot color="#d2d6dc" size={40} /> */}
-                      <p className="text-lg text-green-600 font-medium">
+                      <p className="text-xl text-gray-400 font-medium mx-1"> •</p>
+                      <p className="text-base text-green-600 font-medium">
                         {user.wasteDonated} kg{' '}
-                        <span className="text-base text-black font-normal">
+                        <span className="text-sm text-black font-normal">
                           donated{' '}
                         </span>
                       </p>
