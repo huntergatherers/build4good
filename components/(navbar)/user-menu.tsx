@@ -21,7 +21,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 
-export default function UserMenu({user}: {user: User | null}) {
+export default function UserMenu({ user }: { user: User | null }) {
     const { toast } = useToast();
     const router = useRouter();
     return (
@@ -39,7 +39,7 @@ export default function UserMenu({user}: {user: User | null}) {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <Link className="flex" href="/new">
+                    <Link className="flex" href="/listings/create">
                         <PackagePlus size={18} className="mr-2" />
                         Create a listing
                     </Link>

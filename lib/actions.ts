@@ -8,6 +8,9 @@ import {
 import { redirect } from "next/navigation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { en } from "@faker-js/faker";
+import { z } from "zod";
+import { CreateListingFormSchema } from "@/app/listings/create/page";
+import { cookies } from "next/headers";
 
 export async function hasUserLikedComment(commentId: string): Promise<boolean> {
     const userId = await getCurrentUserId();
@@ -122,20 +125,12 @@ export async function updateProfile(id: string, data: UpdateProfileData) {
     }
 }
 
-// create listing
-interface CreateListingData {
-    profile_id: string;
-    header: string;
-    body: string;
-    total_amount: number;
-    deadline: Date;
-    type: "receive" | "donate"; // 'receive' sets has_progress to true, 'donate' sets it to false
-    item_type: "greens" | "browns" | "compost",
-    coords_lat?: number;
-    coords_long?: number;
-}
-
-export async function createListing(data: CreateListingData) {
+export async function createListing(
+    data: Omit<z.infer<typeof CreateListingFormSchema>, "image"> & {
+        image: string;
+    }
+) {
+    console.log("data", data);
     try {
         const userId = await getCurrentUserId();
         if (!userId) {
@@ -143,29 +138,31 @@ export async function createListing(data: CreateListingData) {
         }
         const profile = await getUserProfileFromUserId(userId);
         // Fetch profile to get default coordinates if not provided
-  
+
         if (!profile) {
             throw new Error("Profile not found");
         }
 
-        const has_progress = data.type === "receive";
+        const has_progress = data.action === "receive";
         // Use profile's coordinates if not specified
-        const coords_lat = data.coords_lat ?? profile.coords_lat;
-        const coords_long = data.coords_long ?? profile.coords_long;
+        const coords_lat = data.location.latitude ?? profile.coords_lat;
+        const coords_long = data.location.longitude ?? profile.coords_long;
         const listing = await prisma.listing.create({
             data: {
                 profile_id: profile.id,
-                header: data.header,
-                body: data.body,
-                total_amount: data.total_amount,
+                header: data.title,
+                body: data.description,
+                total_amount: data.amount,
                 deadline: data.deadline,
-                listing_type: data.type,
-                listing_item_type: data.item_type,
+                listing_type: data.action,
+                listing_item_type: data.type,
                 has_progress: has_progress,
                 coords_lat: coords_lat,
                 coords_long: coords_long,
             },
         });
+
+        cookies().set("listingId", listing.id.toString(), { path: "/" });
 
         return listing;
     } catch (error) {
@@ -173,6 +170,7 @@ export async function createListing(data: CreateListingData) {
         throw error;
     }
 }
+
 //adding tags to listing via listing id
 enum tag_type_enum {
     scrap,

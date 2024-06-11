@@ -27,11 +27,11 @@ export default async function ListingPage({
         include: {
             ListingComment: {
                 include: {
-                  other_ListingComment: {
-                    include: {
-                      profiles: true,
-                    },
-                  }, // Include the replies of the comment
+                    other_ListingComment: {
+                        include: {
+                            profiles: true,
+                        },
+                    }, // Include the replies of the comment
                 },
             },
             Transaction: true,
@@ -57,9 +57,7 @@ export default async function ListingPage({
         <div className="w-full p-6">
             <h1 className="font-bold text-xl">
                 {username}{" "}
-                {listingType == "donate"
-                    ? "is donating"
-                    : "is requesting for"}
+                {listingType == "donate" ? "is donating" : "is requesting for"}
                 ...
             </h1>
             <ListingMap />
@@ -68,7 +66,7 @@ export default async function ListingPage({
                 <Badge>2.1km</Badge>
             </div>
             <p className="text-gray-400 my-2">{listing.body}</p>
-            {listingType == "donate" && (
+            {listingType == "receive" && (
                 <>
                     <Progress
                         value={(totalDonation / listing.total_amount) * 100}
@@ -98,20 +96,21 @@ export default async function ListingPage({
                     </div>
                 </>
             )}
-            <div className="text-xl font-semibold mt-4">
+            <div className="text-md text-gray-600 font-semibold mt-4">
                 {listingType == "receive"
                     ? "Your food scraps will be going to..."
                     : "What you will be receiving..."}
             </div>
             <Image
-                className="rounded-2xl my-4 w-full h-56"
+                className="rounded-2xl mb-4 w-full h-56"
                 src="https://images.unsplash.com/photo-1594498653385-d5172c532c00?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 width={500}
                 height={500}
                 alt="Picture of the author"
             />
-            <p>Yishun Community Park</p>
-            <Button className="mt-4 w-full">{listingType == "receive" ? "Donate" : "Request for this"}</Button>
+            <Button className="mt-4 w-full">
+                {listingType == "receive" ? "Donate" : "Request"}
+            </Button>
             <Separator className="my-4" />
             <div className="text-xl font-bold flex">
                 Comments
@@ -119,7 +118,11 @@ export default async function ListingPage({
                     {comments.length}
                 </Badge>
             </div>
-            <CommentSection comments={comments} user={data.user} listingId={listingId}/>
+            <CommentSection
+                comments={comments}
+                user={data.user}
+                listingId={listingId}
+            />
         </div>
     );
 }

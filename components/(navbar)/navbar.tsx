@@ -4,7 +4,13 @@ import { usePathname } from "next/navigation";
 import UserMenu from "./user-menu";
 import { User } from "@supabase/supabase-js";
 
-export function Navbar({ children, user }: { children: React.ReactNode, user: User | null }) {
+export function Navbar({
+    children,
+    user,
+}: {
+    children: React.ReactNode;
+    user: User | null;
+}) {
     const pathname = usePathname();
     return (
         <nav
@@ -15,7 +21,7 @@ export function Navbar({ children, user }: { children: React.ReactNode, user: Us
             <Tabs />
             <div className="flex justify-center items-center space-x-3">
                 {children}
-                <UserMenu user={user}  />
+                <UserMenu user={user} />
             </div>
         </nav>
     );
