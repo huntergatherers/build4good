@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import 'leaflet/dist/leaflet.css';
 
+
 const MapContainer = dynamic(
     () => import("react-leaflet").then((mod) => mod.MapContainer),
     { ssr: false }

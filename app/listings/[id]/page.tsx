@@ -6,10 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { daysBetween } from "@/lib/utils";
-import ListingComment from "./components/listing-comment";
-import CommentBox from "./components/comment-box";
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
+import CommentSection from "./components/comment-section";
+
 export default async function ListingPage({
     params,
 }: {
@@ -25,18 +25,26 @@ export default async function ListingPage({
             id: listingId,
         },
         include: {
-            ListingComment: true,
+            ListingComment: {
+                include: {
+                  other_ListingComment: {
+                    include: {
+                      profiles: true,
+                    },
+                  }, // Include the replies of the comment
+                },
+            },
             Transaction: true,
+            profiles: true,
         },
     });
     if (!listing) {
         return <div>Listing not found</div>;
     }
+    const listingType = listing.listing_type;
+    const username = listing.profiles.username;
     const transactions = listing.Transaction;
     const comments = listing.ListingComment;
-    const parentComments = listing.ListingComment.filter(
-        (comment) => !comment.parent_id
-    );
 
     const totalDonation = transactions.reduce(
         (acc, transaction) => acc + transaction.donated_amount,
@@ -47,39 +55,53 @@ export default async function ListingPage({
     const { data } = await supabase.auth.getUser();
     return (
         <div className="w-full p-6">
-            <h1 className="font-bold">Aden needs...</h1>
+            <h1 className="font-bold text-xl">
+                {username}{" "}
+                {listingType == "donate"
+                    ? "is donating"
+                    : "is requesting for"}
+                ...
+            </h1>
             <ListingMap />
             <div className="flex justify-between items-center">
                 <p className="text-xl font-semibold">{listing.header}</p>
                 <Badge>2.1km</Badge>
             </div>
             <p className="text-gray-400 my-2">{listing.body}</p>
-            <Progress
-                value={(totalDonation / listing.total_amount) * 100}
-                className="h-[10px] [&>*]:bg-green-700"
-            />
-            <div className="flex justify-between items-center mt-2">
-                <div className="text-green-700">
-                    <p className="font-semibold">{totalDonation}kg</p>
-                    donated of {listing.total_amount}kg
-                </div>
-                <div className="text-gray-400">
-                    <p className="font-semibold">
-                        {listing.Transaction.length}
-                    </p>
-                    Donaters
-                </div>
+            {listingType == "donate" && (
+                <>
+                    <Progress
+                        value={(totalDonation / listing.total_amount) * 100}
+                        className="h-[10px] [&>*]:bg-green-700"
+                    />
+                    <div className="flex justify-between items-center mt-2">
+                        <div className="text-green-700">
+                            <p className="font-semibold">{totalDonation}kg</p>
+                            donated of {listing.total_amount}kg
+                        </div>
+                        <div className="text-gray-400">
+                            <p className="font-semibold">
+                                {listing.Transaction.length}
+                            </p>
+                            Donors
+                        </div>
 
-                <div className="text-gray-400">
-                    {/* calculate number of days between two dateTime */}
-                    <p className="font-semibold">
-                        {daysBetween(listing.created_at, listing.deadline)}
-                    </p>
-                    Days to go
-                </div>
-            </div>
+                        <div className="text-gray-400">
+                            <p className="font-semibold">
+                                {daysBetween(
+                                    listing.created_at,
+                                    listing.deadline
+                                )}
+                            </p>
+                            Days to go
+                        </div>
+                    </div>
+                </>
+            )}
             <div className="text-xl font-semibold mt-4">
-                Your donation will be going to...
+                {listingType == "receive"
+                    ? "Your food scraps will be going to..."
+                    : "What you will be receiving..."}
             </div>
             <Image
                 className="rounded-2xl my-4 w-full h-56"
@@ -89,7 +111,7 @@ export default async function ListingPage({
                 alt="Picture of the author"
             />
             <p>Yishun Community Park</p>
-            <Button className="mt-4">Donate</Button>
+            <Button className="mt-4 w-full">{listingType == "receive" ? "Donate" : "Request for this"}</Button>
             <Separator className="my-4" />
             <div className="text-xl font-bold flex">
                 Comments
@@ -97,18 +119,7 @@ export default async function ListingPage({
                     {comments.length}
                 </Badge>
             </div>
-            {parentComments.length > 0 && (
-                <div className="flex flex-col gap-4 my-4">
-                    {parentComments.map((comment) => (
-                        <ListingComment
-                            key={comment.id}
-                            comment={comment}
-                            listingId={listingId}
-                        />
-                    ))}
-                </div>
-            )}
-            {data?.user && <CommentBox listingId={listingId} parentId={null} />}
+            <CommentSection comments={comments} user={data.user} listingId={listingId}/>
         </div>
     );
 }

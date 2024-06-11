@@ -70,7 +70,7 @@ export async function createComment(
 ) {
     const userId = await getCurrentUserId();
     if (!userId) {
-        return false;
+        throw new Error("User session not found");
     }
     try {
         await prisma.listingComment.create({
@@ -82,10 +82,8 @@ export async function createComment(
             },
         });
     } catch (error) {
-        console.error("Error creating comment", error);
-        return false;
+        throw new Error("Error creating comment: " + error);
     }
-    return true;
 }
 //profile crud
 export async function getProfileById(id: string) {
@@ -161,6 +159,7 @@ export async function createListing(data: CreateListingData) {
                 body: data.body,
                 total_amount: data.total_amount,
                 deadline: data.deadline,
+                listing_type: data.type,
                 listing_item_type: data.item_type,
                 has_progress: has_progress,
                 coords_lat: coords_lat,

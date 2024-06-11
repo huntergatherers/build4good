@@ -1,55 +1,42 @@
-import { ListingComment } from "@prisma/client";
+"use client";
+import { Prisma } from "@prisma/client";
 import { format } from "date-fns";
-import prisma from "@/lib/db";
-import { createClient } from "@/utils/supabase/server";
-import { hasUserLikedComment } from "@/lib/actions";
 import ListingCommentActionButtons from "./listing-comment-action-buttons";
 import CommentReplyForm from "./comment-reply-form";
+import { User } from "@supabase/supabase-js";
+
+type commentsWithReplies = Prisma.ListingCommentGetPayload<{
+  include: { other_ListingComment: {
+    include: { profiles: true }
+  } };
+}>
 
 interface ListingCommentItemProps {
-    comment: ListingComment;
+    user: User | null;
+    isLiked: boolean;
+    comment: commentsWithReplies;
     listingId: number;
 }
 
-export default async function ListingCommentItem({
+export default function ListingCommentItem({
+  user,
+    isLiked,
     comment,
     listingId,
 }: ListingCommentItemProps) {
-    const supabase = createClient();
-
     const formattedDate = format(
         new Date(comment.created_at),
         "MMMM dd, yyyy p"
     );
 
-    const profile = await prisma.profiles.findUnique({
-        where: {
-            id: comment.profile_id,
-        },
-    });
-
-    if (!profile) {
-        return null;
-    }
-
-    const replies = await prisma.listingComment.findMany({
-        where: {
-            parent_id: comment.id,
-        },
-        include: {
-            profiles: true,
-        },
-    });
-
-    const { data } = await supabase.auth.getUser();
-    const isLiked = data?.user ? await hasUserLikedComment(comment.id) : false;
+    const replies = comment.other_ListingComment;
 
     return (
         <div key={comment.id} className="flex flex-col rounded-md">
             <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gray-100"></div>
                 <div>
-                    <p className="font-semibold">{profile.username}</p>
+                    <p className="font-semibold">{}</p>
                     <p className="text-gray-400 text-xs">{formattedDate}</p>
                 </div>
             </div>
@@ -60,7 +47,7 @@ export default async function ListingCommentItem({
                 initialLikeCount={comment.like_count}
                 replies={replies}
             />
-            <CommentReplyForm parentId={comment.id} listingId={listingId} />
+            {user && <CommentReplyForm parentId={comment.id} listingId={listingId} />}
         </div>
     );
 }

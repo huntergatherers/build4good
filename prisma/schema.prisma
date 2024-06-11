@@ -341,24 +341,24 @@ model CommentLike {
 }
 
 model Listing {
-  id             Int              @id @default(autoincrement())
-  profile_id     String           @db.Uuid
-  created_at     DateTime         @default(now())
-  header         String
-  body           String
-  coords_lat     Float?
-  coords_long    Float?
-  total_amount   Int
-  deadline       DateTime
-  is_active      Boolean          @default(true)
-  has_progress   Boolean          @default(false)
-  profiles       profiles         @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  ListingComment ListingComment[]
-  ListingImage   ListingImage[]
-  ListingTag     ListingTag[]
-  Transaction    Transaction[]
-  listing_item_type    listing_item_type_enum
-
+  id                Int                    @id @default(autoincrement())
+  profile_id        String                 @db.Uuid
+  created_at        DateTime               @default(now())
+  header            String
+  body              String
+  coords_lat        Float?
+  coords_long       Float?
+  total_amount      Int
+  deadline          DateTime
+  is_active         Boolean                @default(true)
+  has_progress      Boolean                @default(false)
+  profiles          profiles               @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  ListingComment    ListingComment[]
+  ListingImage      ListingImage[]
+  ListingTag        ListingTag[]
+  Transaction       Transaction[]
+  listing_type      listing_type_enum
+  listing_item_type listing_item_type_enum
 
   @@schema("public")
 }
@@ -566,6 +566,13 @@ enum scrap_type_enum {
 enum tag_type_enum {
   scrap
   compost
+
+  @@schema("public")
+}
+
+enum listing_type_enum {
+  receive
+  donate
 
   @@schema("public")
 }
