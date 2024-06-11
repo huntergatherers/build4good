@@ -227,7 +227,7 @@ export default function CreateListing() {
             }}
           >
             <Image
-                 className="rounded-xs my-2 w-full h-[8vh]"
+                 className="rounded-xs my-2 w-fit h-[8vh]"
                 src={GreensImage}
                 width={500}
                 height={500}
@@ -283,7 +283,7 @@ export default function CreateListing() {
             }}
           >
             <Image
-                 className="rounded-xs my-2 w-full h-[8vh]"
+                 className="rounded-xs my-2 w-fit h-[8vh]"
                 src={BrownsImage}
                 width={500}
                 height={500}
@@ -291,7 +291,7 @@ export default function CreateListing() {
             />
             <p className="text-sm font-normal">Browns</p>
             <p className="text-[0.65rem] font-light">Dry leaves, newspaper, dead plant clippings</p>
-            <div className="flex items-center justify-center space-x-1 text-center px-2">
+            <div className="flex items-center justify-center space-x-1 text-center px-2 pb-2">
               <Button
                 variant="outline"
                 size="icon"
@@ -338,7 +338,7 @@ export default function CreateListing() {
             }}
           >
             <Image
-                className="rounded-xs my-2 w-full h-[8vh]"
+                className="rounded-xs my-2 w-fit h-[8vh]"
                 src={CompostImage}
                 width={500}
                 height={500}
@@ -346,7 +346,7 @@ export default function CreateListing() {
             />
             <p className="text-sm font-normal">Compost</p>
             <p className="text-[0.65rem] font-light">Plant fertiliser to improve soil's properties</p>
-            <div className="flex items-center justify-center space-x-1 text-center px-2">
+            <div className="flex items-center justify-center space-x-1 text-center px-2 pb-2">
               <Button
                 variant="outline"
                 size="icon"
