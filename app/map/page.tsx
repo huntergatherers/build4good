@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { Search } from 'lucide-react';
 import {
@@ -25,6 +25,11 @@ const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { 
 
 
 const MapPage = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const userData = [
     {
@@ -132,6 +137,10 @@ const MapPage = () => {
 
     return duration.trim();
   };
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <div className="relative min-h-screen w-screen flex justify-center items-center">
