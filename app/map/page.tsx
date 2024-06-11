@@ -1,5 +1,6 @@
 'use client';
-import { useSearchParams } from 'next/navigation'
+export const dynamic = 'force-dynamic'
+
 import React, { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { Search } from 'lucide-react';
@@ -15,23 +16,12 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Broccoli from './assets/broccoli';
 import Apple from './assets/apple';
-import dynamic from 'next/dynamic'
 import { getMarkerIcon } from './utils';
-
-const MapContainer = dynamic(() => import('react-leaflet').then((mod) => mod.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import('react-leaflet').then((mod) => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then((mod) => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { ssr: false });
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 
 
 
 const MapPage = () => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   const userData = [
     {
         id: 1,
@@ -138,10 +128,6 @@ const MapPage = () => {
 
     return duration.trim();
   };
-
-  if (!isClient) {
-    return null;
-  }
 
   return (
     <div className="relative min-h-screen w-screen flex justify-center items-center">
