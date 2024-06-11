@@ -1,4 +1,5 @@
 'use client';
+import { useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { Search } from 'lucide-react';
