@@ -1,8 +1,5 @@
 'use client';
-export const dynamic = 'force-dynamic'
-
 import React, { useEffect, useState } from 'react';
-import 'leaflet/dist/leaflet.css';
 import { Search } from 'lucide-react';
 import {
   Drawer,
@@ -16,12 +13,14 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Broccoli from './assets/broccoli';
 import Apple from './assets/apple';
-import { getMarkerIcon } from './utils';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import dynamic from "next/dynamic"
+
+const MapItem = dynamic(() => import("./map-item"), { ssr:false })
 
 
-
-const MapPage = () => {
+const MapPage = ({searchParams}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) => {
   const userData = [
     {
         id: 1,
@@ -129,42 +128,11 @@ const MapPage = () => {
     return duration.trim();
   };
 
+  console.log(searchParams);
+
   return (
     <div className="relative min-h-screen w-screen flex justify-center items-center">
-      <MapContainer
-        center={[1.3521, 103.8198]}
-        zoom={13}
-        scrollWheelZoom={false}
-        zoomControl={false}
-        className="absolute inset-0 z-1"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright"'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {userData.map(item => (
-            <Marker
-              key={item.id}
-              position={[item.latitude, item.longitude]}
-              icon={getMarkerIcon(item.role)}
-              // eventHandlers={{
-              //   mouseover: e => {
-              //     setHoveredMarker(item);
-              //   },
-              //   mouseout: () => {
-              //     setHoveredMarker(undefined);
-              //   },
-              // }}
-              // riseOnHover
-            >
-              <Popup>
-              hi {item.id}
-              </Popup>
-             
-            </Marker>
-          ))}
-          
-      </MapContainer>
+      <MapItem/>
       <Drawer>
         <DrawerTrigger
           style={{
