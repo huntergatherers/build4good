@@ -1,6 +1,7 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import prisma from "./db";
 export async function getCurrentUserId() {
     const supabase = createClient();
 
@@ -8,11 +9,23 @@ export async function getCurrentUserId() {
     return data.user?.id;
 }
 
-export async function getCurrentUserClient() {
+export async function getCurrentUser() {
     const supabase = createClient();
     const { data } = await supabase.auth.getUser();
     console.log(data.user);
     return data.user;
+}
+
+export async function getUserProfileFromUserId(userId: string) {
+  const user = await prisma.users.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      profiles: true,
+    }
+  });
+  return user?.profiles;
 }
 
 export async function signOut() {

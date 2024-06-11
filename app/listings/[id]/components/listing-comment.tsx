@@ -54,13 +54,13 @@ export default async function ListingCommentItem({
                 </div>
             </div>
             <p className="mt-2">{comment.body_text}</p>
-            <CommentReplyForm parentId={comment.id} listingId={listingId} />
             <ListingCommentActionButtons
                 initialIsLiked={isLiked}
                 commentId={comment.id}
                 initialLikeCount={comment.like_count}
                 replies={replies}
             />
+            <CommentReplyForm parentId={comment.id} listingId={listingId} />
         </div>
     );
 }

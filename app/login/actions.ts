@@ -45,7 +45,6 @@ export async function login(formData: FormData): Promise<void> {
     try {
         data = getData(formData, false);
     } catch (error: any) {
-        console.error("Validation error");
         redirect("/error");
     }
 

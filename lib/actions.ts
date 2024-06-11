@@ -1,6 +1,10 @@
 "use server";
 import prisma from "./db";
-import { getCurrentUserId } from "./auth";
+import {
+    getCurrentUser,
+    getCurrentUserId,
+    getUserProfileFromUserId,
+} from "./auth";
 import { redirect } from "next/navigation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { en } from "@faker-js/faker";
@@ -128,19 +132,22 @@ interface CreateListingData {
     total_amount: number;
     deadline: Date;
     type: "receive" | "donate"; // 'receive' sets has_progress to true, 'donate' sets it to false
+    item_type: "greens" | "browns" | "compost",
     coords_lat?: number;
     coords_long?: number;
 }
 
 export async function createListing(data: CreateListingData) {
     try {
+        const userId = await getCurrentUserId();
+        if (!userId) {
+            throw new Error("User not found");
+        }
+        const profile = await getUserProfileFromUserId(userId);
         // Fetch profile to get default coordinates if not provided
-        const profile = await prisma.profiles.findUnique({
-            where: { id: data.profile_id },
-        });
-
+  
         if (!profile) {
-            throw new Error(`Profile with id ${data.profile_id} not found`);
+            throw new Error("Profile not found");
         }
 
         const has_progress = data.type === "receive";
@@ -149,11 +156,12 @@ export async function createListing(data: CreateListingData) {
         const coords_long = data.coords_long ?? profile.coords_long;
         const listing = await prisma.listing.create({
             data: {
-                profile_id: data.profile_id,
+                profile_id: profile.id,
                 header: data.header,
                 body: data.body,
                 total_amount: data.total_amount,
                 deadline: data.deadline,
+                listing_item_type: data.item_type,
                 has_progress: has_progress,
                 coords_lat: coords_lat,
                 coords_long: coords_long,

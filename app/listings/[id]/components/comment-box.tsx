@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { createComment } from "@/lib/actions";
-import { SendHorizontal } from "lucide-react";
+import { LoaderCircle, SendHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
@@ -26,8 +26,8 @@ export default function CommentBox({
                     try {
                         setIsPending(true);
                         await createComment(newComment, listingId, parentId);
-                        setNewComment("");
                         router.refresh();
+                        setNewComment("");
                     } catch (error) {
                         console.error(error);
                     }
@@ -52,6 +52,7 @@ export default function CommentBox({
                                 Replying to a comment
                             </div>
                             <Textarea
+                                disabled={isPending}
                                 className="w-full p-4 bg-background border border-foreground rounded-lg h-2"
                                 placeholder={
                                     parentId
@@ -68,11 +69,19 @@ export default function CommentBox({
                                         isPending || newComment.length == 0
                                     }
                                 >
-                                    <SendHorizontal
-                                        size={18}
-                                        className="mr-2"
-                                    />
-                                    {parentId ? "Reply" : "Send"}
+                                    {isPending ? (
+                                        <div className="animate-spin">
+                                            <LoaderCircle />
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <SendHorizontal
+                                                size={18}
+                                                className="mr-2"
+                                            />
+                                            {parentId ? "Reply" : "Send"}
+                                        </>
+                                    )}
                                 </Button>
                             </div>
                         </div>
@@ -80,6 +89,7 @@ export default function CommentBox({
                 ) : (
                     <div>
                         <Textarea
+                            disabled={isPending}
                             className="w-full p-4 bg-background border border-foreground rounded-lg h-2"
                             placeholder={
                                 parentId ? "Add a reply..." : "Add a comment..."
@@ -92,8 +102,19 @@ export default function CommentBox({
                                 type="submit"
                                 disabled={isPending || newComment.length == 0}
                             >
-                                <SendHorizontal size={18} className="mr-2" />
-                                {parentId ? "Reply" : "Send"}
+                                {isPending ? (
+                                    <div className="animate-spin">
+                                        <LoaderCircle />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <SendHorizontal
+                                            size={18}
+                                            className="mr-2"
+                                        />
+                                        {parentId ? "Reply" : "Send"}
+                                    </>
+                                )}
                             </Button>
                         </div>
                     </div>

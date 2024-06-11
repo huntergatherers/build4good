@@ -9,6 +9,7 @@ import { daysBetween } from "@/lib/utils";
 import ListingComment from "./components/listing-comment";
 import CommentBox from "./components/comment-box";
 import { createClient } from "@/utils/supabase/server";
+import { Button } from "@/components/ui/button";
 export default async function ListingPage({
     params,
 }: {
@@ -24,11 +25,7 @@ export default async function ListingPage({
             id: listingId,
         },
         include: {
-            ListingComment: {
-                where: {
-                    parent_id: null,
-                },
-            },
+            ListingComment: true,
             Transaction: true,
         },
     });
@@ -37,6 +34,9 @@ export default async function ListingPage({
     }
     const transactions = listing.Transaction;
     const comments = listing.ListingComment;
+    const parentComments = listing.ListingComment.filter(
+        (comment) => !comment.parent_id
+    );
 
     const totalDonation = transactions.reduce(
         (acc, transaction) => acc + transaction.donated_amount,
@@ -89,6 +89,7 @@ export default async function ListingPage({
                 alt="Picture of the author"
             />
             <p>Yishun Community Park</p>
+            <Button className="mt-4">Donate</Button>
             <Separator className="my-4" />
             <div className="text-xl font-bold flex">
                 Comments
@@ -96,9 +97,9 @@ export default async function ListingPage({
                     {comments.length}
                 </Badge>
             </div>
-            {comments.length > 0 && (
+            {parentComments.length > 0 && (
                 <div className="flex flex-col gap-4 my-4">
-                    {comments.map((comment) => (
+                    {parentComments.map((comment) => (
                         <ListingComment
                             key={comment.id}
                             comment={comment}

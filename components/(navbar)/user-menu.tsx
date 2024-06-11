@@ -7,8 +7,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/lib/auth";
-import { createClient } from "@/utils/supabase/client";
-import { User as SupabaseUser } from "@supabase/supabase-js";
 import {
     LogOut,
     Menu,
@@ -16,25 +14,16 @@ import {
     PackagePlus,
     Pencil,
     Settings,
-    User,
+    User as UserLucide,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
 
-export default function UserMenu() {
+export default function UserMenu({user}: {user: User | null}) {
     const { toast } = useToast();
     const router = useRouter();
-    const [user, setUser] = useState<SupabaseUser | null>(null);
-    const supabase = createClient();
-    useEffect(() => {
-        const getUser = async () => {
-            const { data } = await supabase.auth.getUser();
-            setUser(data.user);
-        };
-        getUser();
-    }, []);
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="bg-black rounded-full flex items-center justify-center h-8 w-8">
@@ -64,7 +53,7 @@ export default function UserMenu() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                     <Link className="flex" href="/new">
-                        <User size={18} className="mr-2" />
+                        <UserLucide size={18} className="mr-2" />
                         Profile
                     </Link>
                 </DropdownMenuItem>
@@ -78,20 +67,14 @@ export default function UserMenu() {
                 {user ? (
                     <DropdownMenuItem>
                         <div
-                            className="flex"
+                            className="flex text-red-600 font-semibold"
                             onClick={async () => {
                                 const error = await signOut();
                                 if (error) {
                                     console.error("Sign out error", error);
                                     return;
                                 }
-                                toast({
-                                    className: "bg-green-700 text-white",
-                                    title: "Logged out",
-                                    description: "You have been logged out.",
-                                });
-                                setUser(null);
-                                router.push("/listings");
+                                router.push("/");
                                 router.refresh();
                             }}
                         >

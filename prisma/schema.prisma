@@ -357,6 +357,8 @@ model Listing {
   ListingImage   ListingImage[]
   ListingTag     ListingTag[]
   Transaction    Transaction[]
+  listing_item_type    listing_item_type_enum
+
 
   @@schema("public")
 }
@@ -563,6 +565,14 @@ enum scrap_type_enum {
 
 enum tag_type_enum {
   scrap
+  compost
+
+  @@schema("public")
+}
+
+enum listing_item_type_enum {
+  greens
+  browns
   compost
 
   @@schema("public")
