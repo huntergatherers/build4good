@@ -18,9 +18,7 @@ import dynamic from "next/dynamic"
 const MapItem = dynamic(() => import("./map-item"), { ssr:false })
 
 
-const MapPage = ({searchParams}: {
-  searchParams: { [key: string]: string | string[] | undefined }
-}) => {
+const MapPage = () => {
   const userData = [
     {
         id: 1,
@@ -127,9 +125,7 @@ const MapPage = ({searchParams}: {
 
     return duration.trim();
   };
-
-  console.log(searchParams);
-
+  
   return (
     <div className="relative min-h-screen w-screen flex justify-center items-center">
       <MapItem/>
