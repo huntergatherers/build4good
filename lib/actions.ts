@@ -1,5 +1,5 @@
 "use server";
-import prisma, { listing_type_enum, tag_type_enum , scrap_type_enum, compost_type_enum } from "./db";
+import prisma, {Prisma, listing_item_type_enum, listing_type_enum, tag_type_enum , scrap_type_enum, compost_type_enum } from "./db";
 import {
     getCurrentUser,
     getCurrentUserId,
@@ -11,6 +11,46 @@ import { en } from "@faker-js/faker";
 import { z } from "zod";
 import { CreateListingFormSchema } from "@/app/listings/create/page";
 import { cookies } from "next/headers";
+import { calculateDistance } from './utils';
+
+
+// Functions related to Current User
+// --------------------------------------------------------
+
+async function getCurrentUserCoords(): Promise<{ lat: number; lon: number } | null> {
+    // Replace this with your actual logic to get the current user's coordinates
+    const userId = await getCurrentUserId();
+        if (!userId) {
+            throw new Error("User not found");
+        }
+    const profile = await getUserProfileFromUserId(userId);
+    if (profile && profile.coords_lat !== null && profile.coords_long !== null) {
+      return { lat: profile.coords_lat, lon: profile.coords_long };
+    }
+    return null;
+  }
+  
+export async function getCurrentDistanceToInstance(instance: { coords_lat: number | null, coords_long: number | null }): Promise<number | null> {
+    try {
+    const userCoords = await getCurrentUserCoords();
+    if (!userCoords) {
+        throw new Error('Current user coordinates not found');
+    }
+    if (instance.coords_lat === null || instance.coords_long === null) {
+        throw new Error('Instance coordinates not found');
+    }
+    const distance = calculateDistance(
+        userCoords.lat,
+        userCoords.lon,
+        instance.coords_lat,
+        instance.coords_long
+    );
+    return distance;
+    } catch (error) {
+    console.error('Error calculating distance:', error);
+    return null;
+    }
+}
 
 // Functions related to Comments
 // --------------------------------------------------------
@@ -93,12 +133,6 @@ export async function createComment(
 
 // Functions related to Profiles
 // --------------------------------------------------------
-export async function getProfileById(id: string) {
-    const profile = await prisma.profiles.findUnique({
-        where: { id },
-    });
-    return profile;
-}
 export async function getProfileByUsername(username: string) {
     const profile = await prisma.profiles.findUnique({
         where: { username },
@@ -131,22 +165,22 @@ export async function updateProfile(id: string, data: UpdateProfileData) {
 
 export async function getListingsByProfileId(profileId: string) {
     try {
-      const listings = await prisma.listing.findMany({
+    const listings = await prisma.listing.findMany({
         where: { profile_id: profileId },
         include: {
-          ListingComment: true,
-          ListingImage: true,
-          ListingTag: true,
-          Transaction: true,
+        ListingComment: true,
+        ListingImage: true,
+        ListingTag: true,
+        Transaction: true,
         },
-      });
-  
-      return listings;
+    });
+
+    return listings;
     } catch (error) {
-      console.error('Error fetching listings:', error);
-      throw error;
+    console.error('Error fetching listings:', error);
+    throw error;
     } 
-  }
+}
 
 // Functions related to Listings
 // --------------------------------------------------------
@@ -231,6 +265,72 @@ export async function addTagsToListing(data: AddTagsToListingData) {
     throw error;
     }
 }
+//listings search
+interface SearchListingsParams {
+    tags?: Prisma.ListingTagWhereInput[];
+    isActive?: boolean;
+    listingType?: listing_type_enum;
+    listingItemType?: listing_item_type_enum;
+    withinKm?: number;
+    currentUserCoords?: { lat: number; lon: number };
+    orderBy?: 'created_at' | 'deadline';
+    orderDirection?: 'asc' | 'desc';
+    topK?: number;
+}
+export async function searchListings(params: SearchListingsParams) {
+    try {
+    const {
+        tags,
+        isActive,
+        listingType,
+        listingItemType,
+        withinKm,
+        currentUserCoords,
+        orderBy = 'created_at',
+        orderDirection = 'asc',
+        topK = 10,
+    } = params;
+
+    // Building the where clause dynamically
+    const where: Prisma.ListingWhereInput = {
+        AND: [
+        ...(tags ? [{ ListingTag: { every: { OR: tags } } }] : []),
+        ...(isActive !== undefined ? [{ is_active: isActive }] : []),
+        ...(listingType ? [{ listing_type: listingType }] : []),
+        ...(listingItemType ? [{ listing_item_type: listingItemType }] : []),
+        ],
+    };
+
+    // Fetch listings
+    let listings = await prisma.listing.findMany({
+        where,
+        include: { ListingTag: true },
+        orderBy: { [orderBy]: orderDirection },
+        take: topK,
+    });
+
+    // Filter by distance if withinKm and currentUserCoords are provided
+    if (withinKm && currentUserCoords) {
+        listings = listings.filter(listing => {
+        if (listing.coords_lat !== null && listing.coords_long !== null) {
+            const distance = calculateDistance(
+            listing.coords_lat,
+            listing.coords_long,
+            currentUserCoords.lat,
+            currentUserCoords.lon
+            );
+            return distance <= withinKm;
+        }
+        return false;
+        });
+    }
+
+    return listings;
+    } catch (error) {
+    console.error('Error searching listings:', error);
+    throw error;
+    }
+}
 
 //check and mark listing as fulfilled or expired
 export async function checkListingStatus(listingId: number): Promise<void> {
@@ -283,3 +383,79 @@ export async function checkListingStatus(listingId: number): Promise<void> {
       throw error;
     }
   }
+
+// Functions related to Transactions
+// --------------------------------------------------------
+//create transaction
+export async function createTransaction(
+    listingId: number,
+    donatedAmount: number,
+    otherId: string // the id of the user who is contributing to the listing
+) {
+    try {
+        //ensure listingId is valid, listing is active, otherId is valid
+        const listing = await prisma.listing.findUnique({
+            where: { id: listingId },
+        });
+        if (!listing) {
+            throw new Error(`Listing with id ${listingId} not found`);
+        }
+        if (!listing.is_active) {
+            throw new Error(`Listing with id ${listingId} is not active`);
+        }
+        const otherProfile = await prisma.profiles.findUnique({
+            where: { id: otherId },
+        });
+        if (!otherProfile) {
+            throw new Error(`Profile with id ${otherId} not found`);
+        }
+        const transaction = await prisma.transaction.create({
+            data: {
+                other_id: otherId,
+                listing_id: listingId,
+                donated_amount: donatedAmount,
+                created_at: new Date(),
+            },
+        });
+        return transaction;
+    } catch (error) {
+        console.error("Error creating transaction:", error);
+        throw error;
+    }
+}
+//approve transaction
+export async function approveTransaction(transactionId: string) {
+    try {
+        const transaction = await prisma.transaction.update({
+            where: { id: transactionId },
+            data: { approved_at: new Date() },
+        });
+        return transaction;
+    } catch (error) {
+        console.error("Error approving transaction:", error);
+        throw error;
+    }
+}
+//mark transaction as completed
+export async function completeTransaction(transactionId: string) {
+    // ensure transactionId is approved
+    const transaction = await prisma.transaction.findUnique({
+        where: { id: transactionId },
+    });
+    if (!transaction) {
+        throw new Error(`Transaction with id ${transactionId} not found`);
+    }
+    if (!transaction.approved_at) {
+        throw new Error(`Transaction with id ${transactionId} is not approved yet`);
+    }
+    try {
+        const transaction = await prisma.transaction.update({
+            where: { id: transactionId },
+            data: { completed_at: new Date() },
+        });
+        return transaction;
+    } catch (error) {
+        console.error("Error completing transaction:", error);
+        throw error;
+    }
+}
