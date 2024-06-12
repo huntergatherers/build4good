@@ -77,34 +77,48 @@ export default function TransactionBtn({
     async function handleCreateTransaction() {
         console.log("Creating transaction...");
         setIsLoading(true);
-        const transaction = await createTransaction(listing.id, goal);
+        await createTransaction(listing.id, goal);
+        toast({
+            className: "bg-green-500 text-white border-none",
+            title: "Successfully created",
+            description: `Your ${
+                listing.listing_type === "donate" ? "request" : "offer"
+            } has been created. You will be notified when it is accepted.`,
+        });
         setOpen(false);
+        setIsLoading(false);
         router.refresh();
     }
 
     async function handleDeleteTransaction() {
         setIsLoading(true);
         console.log("Deleting transaction...");
-        const transaction = await deleteTransaction(matchingTransaction?.id);
+        await deleteTransaction(matchingTransaction?.id);
+        toast({
+            className: "bg-green-500 text-white border-none",
+            title: "Successfully deleted",
+            description: `Your ${
+                listing.listing_type === "donate" ? "request" : "offer"
+            } has been deleted.`,
+        });
         setOpen(false);
+        setIsLoading(false);
         router.refresh();
     }
 
     async function handleEditTransaction() {
         setIsLoading(true);
         console.log("Editing transaction...");
-        const transaction = await editTransaction(
-            matchingTransaction?.id,
-            goal
-        );
+        await editTransaction(matchingTransaction?.id, goal);
         toast({
-            className: "bg-green-500 text-white",
-            title: "Edit successful!",
+            className: "bg-green-500 text-white border-none",
+            title: "Successfully updated",
             description: `Your ${
                 listing.listing_type === "donate" ? "request" : "offer"
             } has been updated to ${goal}kg.`,
         });
         setOpen(false);
+        setIsLoading(false);
         router.refresh();
     }
 
@@ -114,8 +128,11 @@ export default function TransactionBtn({
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
                 <Button
-                    className={`mt-4 w-full ${
-                        hasPendingTransaction && "bg-green-600"
+                    className={`mt-4 w-full px-6 ${
+                        hasPendingTransaction &&
+                        listing.listing_type === "donate"
+                            ? "bg-blue-700"
+                            : "bg-green-700"
                     }`}
                 >
                     {hasPendingTransaction
@@ -123,7 +140,7 @@ export default function TransactionBtn({
                             ? "View pending offer"
                             : "View pending request"
                         : listingType == "receive"
-                        ? "Donate"
+                        ? "Contribute"
                         : "Request"}
                 </Button>
             </DrawerTrigger>
@@ -134,7 +151,7 @@ export default function TransactionBtn({
                             <DrawerTitle>
                                 {listingOwner.username}{" "}
                                 {listing.listing_type === "donate"
-                                    ? "is donating"
+                                    ? "is contributing"
                                     : "is requesting for"}{" "}
                                 {listing.total_amount}kg of{" "}
                                 {listing.listing_item_type}
@@ -161,6 +178,7 @@ export default function TransactionBtn({
                                 </Button>
                                 <div className="flex-1 text-center">
                                     <input
+                                        pattern="\d*"
                                         type="text"
                                         className="text-5xl font-bold tracking-tighter text-center w-full"
                                         value={goal}

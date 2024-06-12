@@ -354,7 +354,7 @@ interface SearchListingsParams {
     listingType?: listing_type_enum;
     listingItemType?: listing_item_type_enum;
     withinKm?: number;
-    currentUserCoords?: { lat: number; lon: number };
+    currentUserCoords?: { lat: number; lng: number };
     orderBy?: "created_at" | "deadline";
     orderDirection?: "asc" | "desc";
     topK?: number;
@@ -404,7 +404,7 @@ export async function searchListings(params: SearchListingsParams) {
                         listing.coords_lat,
                         listing.coords_long,
                         currentUserCoords.lat,
-                        currentUserCoords.lon
+                        currentUserCoords.lng
                     );
                     return distance <= withinKm;
                 }

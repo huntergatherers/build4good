@@ -232,7 +232,7 @@ export default function CreateListing() {
                                             : ""
                                     }`}
                                 >
-                                    Donate
+                                    Contribute
                                 </p>
                                 <p
                                     className={`text-xl font-light ${
@@ -303,14 +303,10 @@ export default function CreateListing() {
                 {/* SECOND STEP: SELECT CATEGORY */}
                 {step === 2 && (
                     <div>
-                        <h1 className="text-2xl font-semibold">
-                            I want to{" "}
+                        <h1 className="text-xl font-semibold mb-2">
                             {selectedAction === "donate"
-                                ? "donate"
-                                : selectedAction === "receive"
-                                ? "receive"
-                                : "donate/receive"}
-                            ...
+                                ? "What will you be contributing?"
+                                : "What do you want to receive?"}
                         </h1>
                         <div>
                             <div className="flex flex-col space-y-4">
@@ -698,7 +694,7 @@ export default function CreateListing() {
                                         {selectedAction && (
                                             <p className="text-xs text-gray-400 font-normal mt-1">
                                                 {selectedAction === "donate"
-                                                    ? "Show the community what you are offering"
+                                                    ? "Show the community what you are contributing"
                                                     : "Show the community what they will be contributing to"}
                                             </p>
                                         )}

@@ -58,10 +58,12 @@ export default async function ListingPage({
 
     const user = await getCurrentUser();
     return (
-        <div className="w-full p-6">
+        <div className="w-full p-6 relative">
             <h1 className="font-bold text-xl">
                 {username}{" "}
-                {listingType == "donate" ? "is donating" : "is requesting for"}
+                {listingType == "donate"
+                    ? "is contributing"
+                    : "is requesting for"}
                 ...
             </h1>
             <p className="font-semibold">
@@ -69,27 +71,40 @@ export default async function ListingPage({
             </p>
             <ListingMap />
             <div className="flex justify-between items-center">
-                <p className="text-xl font-semibold">{listing.header}</p>
+                <p className="text-xl font-semibold w-[80%] overflow-hidden text-ellipsis">
+                    {listing.header}
+                </p>
                 <Badge>2.1km</Badge>
             </div>
             <p className="text-gray-400 my-2">{listing.body}</p>
             <>
                 <Progress
                     value={(totalDonation / listing.total_amount) * 100}
-                    className="h-[10px] [&>*]:bg-green-700"
+                    className={`h-[10px] ${
+                        listing.listing_type === "donate"
+                            ? "[&>*]:bg-blue-700"
+                            : "[&>*]:bg-green-700"
+                    }`}
                 />
                 <div className="flex justify-between items-center mt-2">
-                    <div className="text-green-700">
+                    <div
+                        className={`${
+                            listing.listing_type === "donate"
+                                ? "text-blue-700"
+                                : "text-green-700"
+                        }`}
+                    >
                         <p className="font-semibold">{totalDonation}kg</p>
                         {listingType === "donate"
                             ? "claimed"
-                            : "donated"} of {listing.total_amount}kg
+                            : "contributed"}{" "}
+                        of {listing.total_amount}kg
                     </div>
                     <div className="text-gray-400">
                         <p className="font-semibold">
                             {listing.Transaction.length}
                         </p>
-                        {listingType === "donate" ? "claimed" : "donated"}
+                        {listingType === "donate" ? "claimed" : "contributors"}
                     </div>
 
                     <div className="text-gray-400">
@@ -114,18 +129,6 @@ export default async function ListingPage({
                 height={500}
                 alt="Picture of the author"
             />
-            {user ? (
-                <TransactionBtn
-                    user={user}
-                    listing={listing}
-                    listingOwner={owner}
-                />
-            ) : (
-                <LoginButton
-                    text={listingType == "receive" ? "Donate" : "Request"}
-                />
-            )}
-
             <Separator className="my-4" />
             <div className="text-xl font-bold flex">
                 Comments
@@ -138,6 +141,21 @@ export default async function ListingPage({
                 user={user}
                 listingId={listingId}
             />
+            <div className="sticky bottom-0 p-4 -mx-6 bg-white rounded-t-lg border-t-2 border-t-gray-200 drop-shadow-2xl">
+                {user ? (
+                    <TransactionBtn
+                        user={user}
+                        listing={listing}
+                        listingOwner={owner}
+                    />
+                ) : (
+                    <LoginButton
+                        text={
+                            listingType == "receive" ? "Contribute" : "Request"
+                        }
+                    />
+                )}
+            </div>
         </div>
     );
 }

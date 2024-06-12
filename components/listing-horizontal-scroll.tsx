@@ -1,16 +1,24 @@
+import { Listing, Prisma } from "@prisma/client";
 import ListingItem from "./listing-item";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
-const ListingHorizontalScroll = async ({ listings }: any) => {
-    // const listing = await prisma.listings.findAll({
-    //     where: {
+export type ListingWithTransaction = Prisma.ListingGetPayload<{
+    include: {
+        Transaction: true;
+    };
+}>;
 
-    //     }
-    // })
+interface ListingHorizontalScrollProps {
+    listings: ListingWithTransaction[];
+}
+
+const ListingHorizontalScroll = async ({
+    listings,
+}: ListingHorizontalScrollProps) => {
     return (
         <ScrollArea className="">
             <div className="flex space-x-4">
-                {listings.map((listing: any, index: number) => (
+                {listings.map((listing, index: number) => (
                     <ListingItem key={index} listing={listing} />
                 ))}
             </div>
