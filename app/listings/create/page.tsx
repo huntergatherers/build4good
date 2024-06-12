@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast";
+import { toast, useToast } from "@/components/ui/use-toast";
 import { ImagePlus, Minus, Package, PackageOpen, Plus } from "lucide-react";
 import { useState } from "react";
 import GreensImage from "./assets/greens.png";
@@ -78,8 +78,7 @@ export default function CreateListing() {
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [step, setStep] = useState(1);
-
-    const router = useRouter();
+    const { toast } = useToast();
 
     const requestLocation = () => {
         if ("geolocation" in navigator) {
@@ -101,7 +100,7 @@ export default function CreateListing() {
     };
 
     function onClickGreens(adjustment: number) {
-        console.log("CLICKED ON GREEEN");
+        setSelectedType("greens");
         form.setValue("type", listing_item_type_enum.greens);
         setGoalGreens(goalGreens + adjustment);
         setGoalBrowns(0);
@@ -110,6 +109,7 @@ export default function CreateListing() {
     }
 
     function onClickBrowns(adjustment: number) {
+        setSelectedType("browns");
         form.setValue("type", listing_item_type_enum.browns);
         setGoalBrowns(goalBrowns + adjustment);
         setGoalGreens(0);
@@ -118,6 +118,7 @@ export default function CreateListing() {
     }
 
     function onClickCompost(adjustment: number) {
+        setSelectedType("compost");
         form.setValue("type", listing_item_type_enum.compost);
         setGoalCompost(goalCompost + adjustment);
         setGoalBrowns(0);
@@ -201,14 +202,13 @@ export default function CreateListing() {
             image: "test",
         };
         setIsSubmitting(true);
-        await createListing(newData);
-        const listingId = getCookie("listingId");
+        const result = await createListing(newData);
+        toast({
+            className: "bg-green-600 text-white",
+            title: "Listing Created",
+            description: "Your listing has been successfully created",
+        });
         setIsSubmitting(false);
-        if (listingId) {
-            router.push(`/listings/${listingId}`);
-        } else {
-            router.push("/");
-        }
     }
 
     return (
@@ -225,7 +225,7 @@ export default function CreateListing() {
                         {error && <p>Error: {error}</p>}
                         <div className="flex flex-col justify-evenly h-full space-y-5">
                             <Button
-                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/2 break-words whitespace-normal text-left items-start space-y-1 ${
+                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/2 break-words whitespace-normal text-left items-start space-y-1 hover:bg-none ${
                                     selectedAction === "donate"
                                         ? "bg-primary"
                                         : ""
@@ -333,7 +333,7 @@ export default function CreateListing() {
                         <div>
                             <div className="flex flex-col space-y-4">
                                 <div
-                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left space-y-3 ${
+                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left ${
                                         selectedType !== "greens" &&
                                         selectedType
                                             ? "opacity-25"
@@ -359,11 +359,11 @@ export default function CreateListing() {
                                     <p className="text-2xl font-semibold">
                                         Greens
                                     </p>
-                                    <p className="text-xl mb-2">
+                                    <p className="text-xl">
                                         Vegetables and/or fruit scraps, grass
                                         clippings
                                     </p>
-                                    <div className="mt-4 flex items-center justify-center space-x-1 text-center px-2">
+                                    <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
                                         <Button
                                             size="icon"
                                             className={`h-10 w-10 shrink-0 rounded-full bg-black ${
@@ -372,7 +372,10 @@ export default function CreateListing() {
                                                     ? "opacity-50 pointer-events-none"
                                                     : ""
                                             }`}
-                                            onClick={() => onClickGreens(-1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickGreens(-1);
+                                            }}
                                             disabled={goalGreens <= 0}
                                             type="button"
                                         >
@@ -409,7 +412,10 @@ export default function CreateListing() {
                                         <Button
                                             size="icon"
                                             className="h-10 w-10 shrink-0 rounded-full bg-black"
-                                            onClick={() => onClickGreens(1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickGreens(1);
+                                            }}
                                             type="button"
                                             // disabled={goal >= 400}
                                         >
@@ -424,7 +430,7 @@ export default function CreateListing() {
                                     </span>
                                 </div>
                                 <div
-                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left space-y-1 ${
+                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left ${
                                         selectedType !== "browns" &&
                                         selectedType
                                             ? "opacity-25"
@@ -454,7 +460,7 @@ export default function CreateListing() {
                                         Dry leaves, newspaper, dead plant
                                         clippings
                                     </p>
-                                    <div className="flex items-center justify-center space-x-1 text-center px-2">
+                                    <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
                                         <Button
                                             size="icon"
                                             className={`h-10 w-10 shrink-0 rounded-full bg-black ${
@@ -463,7 +469,10 @@ export default function CreateListing() {
                                                     ? "opacity-50 pointer-events-none"
                                                     : ""
                                             }`}
-                                            onClick={() => onClickBrowns(-1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickBrowns(-1);
+                                            }}
                                             disabled={goalBrowns <= 0}
                                             type="button"
                                         >
@@ -500,7 +509,10 @@ export default function CreateListing() {
                                         <Button
                                             size="icon"
                                             className="h-10 w-10 shrink-0 rounded-full bg-black"
-                                            onClick={() => onClickBrowns(1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickBrowns(1);
+                                            }}
                                             type="button"
                                         >
                                             <Plus
@@ -514,7 +526,7 @@ export default function CreateListing() {
                                     </span>
                                 </div>
                                 <div
-                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left space-y-1 ${
+                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left ${
                                         selectedType !== "compost" &&
                                         selectedType
                                             ? "opacity-25"
@@ -544,7 +556,7 @@ export default function CreateListing() {
                                         Plant fertiliser to improve soil's
                                         properties
                                     </p>
-                                    <div className="flex items-center justify-center space-x-1 text-center px-2">
+                                    <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
                                         <Button
                                             size="icon"
                                             className={`h-10 w-10 shrink-0 rounded-full bg-black ${
@@ -553,7 +565,10 @@ export default function CreateListing() {
                                                     ? "opacity-50 pointer-events-none"
                                                     : ""
                                             }`}
-                                            onClick={() => onClickCompost(-1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickCompost(-1);
+                                            }}
                                             disabled={goalCompost <= 0}
                                             type="button"
                                         >
@@ -590,7 +605,10 @@ export default function CreateListing() {
                                         <Button
                                             size="icon"
                                             className="h-10 w-10 shrink-0 rounded-full bg-black"
-                                            onClick={() => onClickCompost(1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickCompost(1);
+                                            }}
                                             type="button"
                                         >
                                             <Plus

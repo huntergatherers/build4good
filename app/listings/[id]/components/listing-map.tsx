@@ -1,8 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import 'leaflet/dist/leaflet.css';
-
+import "leaflet/dist/leaflet.css";
 
 const MapContainer = dynamic(
     () => import("react-leaflet").then((mod) => mod.MapContainer),
@@ -22,7 +21,7 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
 
 export default function ListingMap() {
     return (
-        <div className="relative min-h-56 w-full my-4">
+        <div className="relative min-h-44 w-full my-4">
             <MapContainer
                 center={[1.3521, 103.8198]}
                 zoom={13}

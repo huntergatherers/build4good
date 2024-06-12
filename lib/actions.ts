@@ -125,12 +125,79 @@ export async function updateProfile(id: string, data: UpdateProfileData) {
     }
 }
 
+export async function createTransaction(
+    listingId: number,
+    donatedAmount: number
+) {
+    try {
+        const userId = await getCurrentUserId();
+        if (!userId) {
+            throw new Error("User not found");
+        }
+        const transaction = await prisma.transaction.create({
+            data: {
+                listing_id: listingId,
+                donated_amount: donatedAmount,
+                other_id: userId,
+            },
+        });
+    } catch (error) {
+        console.error("Error creating transaction:", error);
+        throw error;
+    }
+}
+
+export async function editTransaction(
+    transactionId: string | undefined,
+    donatedAmount: number
+) {
+    try {
+        if (!transactionId) {
+            throw new Error("Transaction ID not found");
+        }
+        const userId = await getCurrentUserId();
+        if (!userId) {
+            throw new Error("User not found");
+        }
+        const transaction = await prisma.transaction.update({
+            where: {
+                id: transactionId,
+            },
+            data: {
+                donated_amount: donatedAmount,
+            },
+        });
+    } catch (error) {
+        console.error("Error editing transaction:", error);
+        throw error;
+    }
+}
+
+export async function deleteTransaction(transactionId: string | undefined) {
+    try {
+        if (!transactionId) {
+            throw new Error("Transaction ID not found");
+        }
+        const userId = await getCurrentUserId();
+        if (!userId) {
+            throw new Error("User not found");
+        }
+        await prisma.transaction.delete({
+            where: {
+                id: transactionId,
+            },
+        });
+    } catch (error) {
+        console.error("Error deleting transaction:", error);
+        throw error;
+    }
+}
+
 export async function createListing(
     data: Omit<z.infer<typeof CreateListingFormSchema>, "image"> & {
         image: string;
     }
 ) {
-    console.log("data", data);
     try {
         const userId = await getCurrentUserId();
         if (!userId) {
@@ -161,10 +228,7 @@ export async function createListing(
                 coords_long: coords_long,
             },
         });
-
-        cookies().set("listingId", listing.id.toString(), { path: "/" });
-
-        return listing;
+        redirect("/listings/" + listing.id);
     } catch (error) {
         console.error("Error creating listing:", error);
         throw error;
