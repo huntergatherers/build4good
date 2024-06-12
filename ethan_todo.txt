@@ -1,0 +1,28 @@
+profile/ listings
+- given coords, find all listings, all profiles, all posts within a defined euclidean distance
+
+listings search function, which can filter by any one of the following search criteria and then 
+return top k listings by either ascending or descending created_at or deadline. 
+the search criteria are:
+- listing tag(s) which applies to all tags passed in
+- is_active
+- listing_type
+- listing_item_type
+- within x km of current user
+
+get euclidean distance
+
+
+ensure every user has a profile
+profile update- input is id, update username, coords, roles, url.
+listing crud-> if requesting then has_progress
+listing coords default is profile's coords
+add tag to listing
+listing expired/fulfilled
+
+create transaction
+notifications-> for any action need to invoke notification actions
+
+posts actions
+comments-> listing and comments are different
+
