@@ -6,6 +6,7 @@ import prisma, {
     tag_type_enum,
     scrap_type_enum,
     compost_type_enum,
+    Post
 } from "./db";
 import {
     getCurrentUser,
@@ -552,11 +553,67 @@ export async function completeTransaction(transactionId: string) {
     }
 }
 //get listing images 
-//add images to listing
+export async function getListingImages(listingId: number): Promise<string[]> {
+    try {
+      const images = await prisma.listingImage.findMany({
+        where: {
+          listing_id: listingId,
+        },
+        select: {
+          url: true,
+        },
+      });
 
+      return images.map((image) => image.url);
+    } catch (error) {
+      console.error("Error retrieving listing images:", error);
+      throw error;
+    }
+  }
+//add images to listing
+export async function addImagesToListing(listingId: number, images: string[]): Promise<void> {
+    try {
+      await Promise.all(
+        images.map(async (image) => {
+          await prisma.listingImage.create({
+            data: {
+              listing_id: listingId,
+              url: image,
+            },
+          });
+        })
+      );
+    } catch (error) {
+      console.error("Error adding images to listing:", error);
+      throw error;
+    }
+  }
 //profiles
 // get active posts by profile
-// search profiles by role, last active, distance?
+export async function getPostsByProfileId(profileId: string): Promise<Post[]>{
+    try {
+      const posts = await prisma.post.findMany({
+        where: {
+          AND: [
+            { profile_id: profileId },
+            { is_archived: false },
+            { is_embedded: false },
+          ],
+        },
+        include: {
+          PostComment: true,
+          PostImage: true,
+        },
+      });
+  
+      return posts;
+    } catch (error) {
+      console.error("Error retrieving active posts by profile ID:", error);
+      throw error;
+    }
+  }
+// search profiles by role, last active, distance
+
 
 // Functions related to Posts
 // --------------------------------------------------------
