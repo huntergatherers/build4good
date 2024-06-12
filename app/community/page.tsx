@@ -24,14 +24,20 @@ const CommunityPage = () => {
             <div style={{ display: "flex", justifyContent: "center" }}>
                 <FacebookEmbed
                     className="w-full"
-                    url="https://www.facebook.com/andrewismusic/posts/pfbid021RBJeV6E9auoW6qmj4m7KRiS73fqPTDwwCEX55SpZ9QEu7FXQ6s6b183miNyFEQBl"
+                    url="https://www.facebook.com/projectblackgold.sg/posts/pfbid08PNHcipgqX6s45NUYv9DYedhcquwQAZiHedZiJENqZsmowdkZaXvoRjRb5Xc5Lnfl"
+                />
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+                <FacebookEmbed
+                    className="w-full"
+                    url="https://www.facebook.com/habitatcollective.sg/posts/pfbid023vDCkZwLPCx3ayMDakLheLLWuEFELHPQVGs6YkFhwPuoPAuu8AvHH2KdTzYeSZwPl?rdid=z8d3dZTJAnX638P0"
                 />
             </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
                 <LinkedInEmbed
                     className="w-full"
-                    url="https://www.linkedin.com/embed/feed/update/urn:li:share:6898694772484112384"
-                    postUrl="https://www.linkedin.com/posts/peterdiamandis_5-discoveries-the-james-webb-telescope-will-activity-6898694773406875648-z-D7"
+                    url="https://www.linkedin.com/embed/feed/update/urn:li:share:7203565661850116096"
+                    postUrl="https://www.linkedin.com/posts/cuifenpui_compost-compostmakers-meetup-activity-7203565663011889152-El34?utm_source=share&utm_medium=member_desktop"
                 />
             </div>
         </div>

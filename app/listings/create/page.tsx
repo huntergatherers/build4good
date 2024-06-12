@@ -1,5 +1,5 @@
 "use client";
-import { Autocomplete } from "@react-google-maps/api";
+import { Autocomplete, LoadScript } from "@react-google-maps/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast";
+import { toast, useToast } from "@/components/ui/use-toast";
 import { ImagePlus, Minus, Package, PackageOpen, Plus } from "lucide-react";
 import { useState } from "react";
 import GreensImage from "./assets/greens.png";
@@ -74,34 +74,15 @@ export default function CreateListing() {
     const [goalGreens, setGoalGreens] = useState(0);
     const [goalBrowns, setGoalBrowns] = useState(0);
     const [goalCompost, setGoalCompost] = useState(0);
-    const [location, setLocation] = useState<UserLocation | null>(null);
+    const [location, setLocation] =
+        useState<google.maps.places.Autocomplete | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [step, setStep] = useState(1);
-
-    const router = useRouter();
-
-    const requestLocation = () => {
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    setLocation({ latitude, longitude });
-                    form.setValue("location", { latitude, longitude });
-                    setError(null);
-                },
-                (error) => {
-                    setError(error.message);
-                    setLocation(null);
-                }
-            );
-        } else {
-            setError("Geolocation is not supported by your browser");
-        }
-    };
+    const { toast } = useToast();
 
     function onClickGreens(adjustment: number) {
-        console.log("CLICKED ON GREEEN");
+        setSelectedType("greens");
         form.setValue("type", listing_item_type_enum.greens);
         setGoalGreens(goalGreens + adjustment);
         setGoalBrowns(0);
@@ -110,6 +91,7 @@ export default function CreateListing() {
     }
 
     function onClickBrowns(adjustment: number) {
+        setSelectedType("browns");
         form.setValue("type", listing_item_type_enum.browns);
         setGoalBrowns(goalBrowns + adjustment);
         setGoalGreens(0);
@@ -118,6 +100,7 @@ export default function CreateListing() {
     }
 
     function onClickCompost(adjustment: number) {
+        setSelectedType("compost");
         form.setValue("type", listing_item_type_enum.compost);
         setGoalCompost(goalCompost + adjustment);
         setGoalBrowns(0);
@@ -201,14 +184,13 @@ export default function CreateListing() {
             image: "test",
         };
         setIsSubmitting(true);
-        await createListing(newData);
-        const listingId = getCookie("listingId");
+        const result = await createListing(newData);
+        toast({
+            className: "bg-green-600 text-white",
+            title: "Listing Created",
+            description: "Your listing has been successfully created",
+        });
         setIsSubmitting(false);
-        if (listingId) {
-            router.push(`/listings/${listingId}`);
-        } else {
-            router.push("/");
-        }
     }
 
     return (
@@ -225,7 +207,7 @@ export default function CreateListing() {
                         {error && <p>Error: {error}</p>}
                         <div className="flex flex-col justify-evenly h-full space-y-5">
                             <Button
-                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/2 break-words whitespace-normal text-left items-start space-y-1 ${
+                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/2 break-words whitespace-normal text-left items-start space-y-1 hover:bg-none ${
                                     selectedAction === "donate"
                                         ? "bg-primary"
                                         : ""
@@ -250,7 +232,7 @@ export default function CreateListing() {
                                             : ""
                                     }`}
                                 >
-                                    Donate
+                                    Contribute
                                 </p>
                                 <p
                                     className={`text-xl font-light ${
@@ -320,20 +302,16 @@ export default function CreateListing() {
 
                 {/* SECOND STEP: SELECT CATEGORY */}
                 {step === 2 && (
-                    <>
-                        <h1 className="text-2xl font-semibold">
-                            I want to{" "}
+                    <div>
+                        <h1 className="text-xl font-semibold mb-2">
                             {selectedAction === "donate"
-                                ? "donate"
-                                : selectedAction === "receive"
-                                ? "receive"
-                                : "donate/receive"}
-                            ...
+                                ? "What will you be contributing?"
+                                : "What do you want to receive?"}
                         </h1>
                         <div>
                             <div className="flex flex-col space-y-4">
                                 <div
-                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left space-y-3 ${
+                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left ${
                                         selectedType !== "greens" &&
                                         selectedType
                                             ? "opacity-25"
@@ -359,11 +337,11 @@ export default function CreateListing() {
                                     <p className="text-2xl font-semibold">
                                         Greens
                                     </p>
-                                    <p className="text-xl mb-2">
+                                    <p className="text-xl">
                                         Vegetables and/or fruit scraps, grass
                                         clippings
                                     </p>
-                                    <div className="mt-4 flex items-center justify-center space-x-1 text-center px-2">
+                                    <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
                                         <Button
                                             size="icon"
                                             className={`h-10 w-10 shrink-0 rounded-full bg-black ${
@@ -372,7 +350,10 @@ export default function CreateListing() {
                                                     ? "opacity-50 pointer-events-none"
                                                     : ""
                                             }`}
-                                            onClick={() => onClickGreens(-1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickGreens(-1);
+                                            }}
                                             disabled={goalGreens <= 0}
                                             type="button"
                                         >
@@ -409,7 +390,10 @@ export default function CreateListing() {
                                         <Button
                                             size="icon"
                                             className="h-10 w-10 shrink-0 rounded-full bg-black"
-                                            onClick={() => onClickGreens(1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickGreens(1);
+                                            }}
                                             type="button"
                                             // disabled={goal >= 400}
                                         >
@@ -424,7 +408,7 @@ export default function CreateListing() {
                                     </span>
                                 </div>
                                 <div
-                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left space-y-1 ${
+                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left ${
                                         selectedType !== "browns" &&
                                         selectedType
                                             ? "opacity-25"
@@ -454,7 +438,7 @@ export default function CreateListing() {
                                         Dry leaves, newspaper, dead plant
                                         clippings
                                     </p>
-                                    <div className="flex items-center justify-center space-x-1 text-center px-2">
+                                    <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
                                         <Button
                                             size="icon"
                                             className={`h-10 w-10 shrink-0 rounded-full bg-black ${
@@ -463,7 +447,10 @@ export default function CreateListing() {
                                                     ? "opacity-50 pointer-events-none"
                                                     : ""
                                             }`}
-                                            onClick={() => onClickBrowns(-1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickBrowns(-1);
+                                            }}
                                             disabled={goalBrowns <= 0}
                                             type="button"
                                         >
@@ -500,7 +487,10 @@ export default function CreateListing() {
                                         <Button
                                             size="icon"
                                             className="h-10 w-10 shrink-0 rounded-full bg-black"
-                                            onClick={() => onClickBrowns(1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickBrowns(1);
+                                            }}
                                             type="button"
                                         >
                                             <Plus
@@ -514,7 +504,7 @@ export default function CreateListing() {
                                     </span>
                                 </div>
                                 <div
-                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left space-y-1 ${
+                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left ${
                                         selectedType !== "compost" &&
                                         selectedType
                                             ? "opacity-25"
@@ -544,7 +534,7 @@ export default function CreateListing() {
                                         Plant fertiliser to improve soil's
                                         properties
                                     </p>
-                                    <div className="flex items-center justify-center space-x-1 text-center px-2">
+                                    <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
                                         <Button
                                             size="icon"
                                             className={`h-10 w-10 shrink-0 rounded-full bg-black ${
@@ -553,7 +543,10 @@ export default function CreateListing() {
                                                     ? "opacity-50 pointer-events-none"
                                                     : ""
                                             }`}
-                                            onClick={() => onClickCompost(-1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickCompost(-1);
+                                            }}
                                             disabled={goalCompost <= 0}
                                             type="button"
                                         >
@@ -590,7 +583,10 @@ export default function CreateListing() {
                                         <Button
                                             size="icon"
                                             className="h-10 w-10 shrink-0 rounded-full bg-black"
-                                            onClick={() => onClickCompost(1)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClickCompost(1);
+                                            }}
                                             type="button"
                                         >
                                             <Plus
@@ -620,7 +616,7 @@ export default function CreateListing() {
                                     </p>
                                 )}
                         </FormMessage>
-                        <div className="flex justify-between space-x-4 pb-4">
+                        <div className="flex justify-between space-x-4 pb-4 bottom-0 sticky bg-white pt-4">
                             <Button
                                 className="w-full"
                                 onClick={() => setStep(1)}
@@ -640,7 +636,7 @@ export default function CreateListing() {
                                 Next
                             </Button>
                         </div>
-                    </>
+                    </div>
                 )}
 
                 {/* THIRD STEP: FILL IN DETAILS */}
@@ -698,7 +694,7 @@ export default function CreateListing() {
                                         {selectedAction && (
                                             <p className="text-xs text-gray-400 font-normal mt-1">
                                                 {selectedAction === "donate"
-                                                    ? "Show the community what you are offering"
+                                                    ? "Show the community what you are contributing"
                                                     : "Show the community what they will be contributing to"}
                                             </p>
                                         )}
@@ -829,7 +825,7 @@ export default function CreateListing() {
                                         match is made
                                     </FormDescription>
                                     <FormControl>
-                                        {location ? (
+                                        {/* {location ? (
                                             <div>
                                                 Current Location:{" "}
                                                 {`${location.latitude}, ${location.longitude}`}
@@ -843,13 +839,50 @@ export default function CreateListing() {
                                             >
                                                 Retrieve my current location
                                             </Button>
-                                        )}
+                                        )} */}
 
-                                        {/* <Input
-                                  className="text-xs"
-                                  placeholder="Location for meet-ups"
-                                  {...field}
-                              /> */}
+                                        <LoadScript
+                                            googleMapsApiKey={
+                                                process.env
+                                                    .NEXT_PUBLIC_GOOGLE_MAPS!
+                                            }
+                                            libraries={["places"]}
+                                        >
+                                            <Autocomplete
+                                                restrictions={{ country: "sg" }}
+                                                onLoad={(autocomplete) =>
+                                                    setLocation(autocomplete)
+                                                }
+                                                onPlaceChanged={() => {
+                                                    const place =
+                                                        location?.getPlace();
+                                                    if (!place) return;
+                                                    const geometry =
+                                                        place.geometry;
+                                                    if (!geometry) return;
+                                                    const lng =
+                                                        place!.geometry!.location?.lng();
+                                                    const lat =
+                                                        place!.geometry!.location?.lat();
+
+                                                    if (lng && lat) {
+                                                        form.setValue(
+                                                            "location",
+                                                            {
+                                                                longitude: lng,
+                                                                latitude: lat,
+                                                            }
+                                                        );
+                                                    }
+                                                }}
+                                                fields={[
+                                                    "geometry.location",
+                                                    "formatted_address",
+                                                ]}
+                                            >
+                                                <Input placeholder="Enter your address" />
+                                            </Autocomplete>
+                                        </LoadScript>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -866,7 +899,7 @@ export default function CreateListing() {
                                     <FormControl>
                                         <Textarea
                                             placeholder="Include any additional information or custom instructions you may have"
-                                            className="resize-none text-xs"
+                                            className="resize-none text-md"
                                             {...field}
                                         />
                                     </FormControl>

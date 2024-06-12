@@ -45,15 +45,21 @@ export async function login(formData: FormData): Promise<void> {
     try {
         data = getData(formData, false);
     } catch (error: any) {
-        redirect("/error");
+        throw new Error("Error logging in. Please try again.");
     }
 
     const { error } = await supabase.auth.signInWithPassword(data);
 
     if (error) {
-        redirect("/error");
+        throw new Error("Error logging in. Please try again.");
     }
+    const redirectPath = formData.get("redirect");
+    redirect(redirectPath ? redirectPath.toString() : "/");
+}
 
+export async function logout(): Promise<void> {
+    const supabase = createClient();
+    await supabase.auth.signOut();
     revalidatePath("/", "layout");
     redirect("/");
 }
@@ -74,10 +80,8 @@ export async function signup(formData: FormData): Promise<void> {
         options: { data: { username: data.username } },
     });
 
-
-
     if (error) {
-        console.log(error)
+        console.log(error);
         redirect("/error");
     }
 

@@ -1,16 +1,40 @@
 import ListingHorizontalScroll from "@/components/listing-horizontal-scroll";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/server";
-import { Filter, Search } from "lucide-react";
+import { ChevronRight, Filter, Search } from "lucide-react";
 import { redirect } from "next/navigation";
-
+import prisma, { listing_type_enum } from "@/lib/db";
 export default async function Index() {
     // const supabase = createClient();
     // const { data, error } = await supabase.auth.getUser();
     // if (error || !data?.user) {
     //     redirect("/login");
     // }
+    const requestListings = await prisma.listing.findMany({
+        take: 10,
+        where: {
+            listing_type: listing_type_enum.receive,
+        },
+        orderBy: {
+            created_at: "desc",
+        },
+        include: {
+            Transaction: true,
+        },
+    });
 
+    const donationListings = await prisma.listing.findMany({
+        take: 10,
+        where: {
+            listing_type: listing_type_enum.donate,
+        },
+        orderBy: {
+            created_at: "desc",
+        },
+        include: {
+            Transaction: true,
+        },
+    });
     return (
         <div className="flex flex-col items-center w-full p-6">
             <main className="flex-1 flex flex-col w-full">
@@ -27,12 +51,36 @@ export default async function Index() {
                         <Filter size={18} />
                     </div>
                 </div>
-                <div className="text-xl font-bold mt-6">Fellow Scrappers are looking for...</div>
-                <p className="text-xs text-gray-400 mb-4">Check out what other people are requesting!</p>
-                <ListingHorizontalScroll listings={[1,2,3,4,5,6,7,8]}/>
-                <div className="text-xl font-bold mt-6">Fellow Scrappers are donating...</div>
-                <p className="text-xs text-gray-400 mb-4">Check out what other people are offering!</p>
-                <ListingHorizontalScroll listings={[1,2,3,4,5,6,7,8]}/>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <div className="text-xl font-bold mt-6">
+                            Looking for...
+                        </div>
+                        <p className="text-xs text-gray-400 mb-4">
+                            Check out what other people are requesting for!
+                        </p>
+                    </div>
+                    <div className="text-xs flex items-center justify-center text-gray-600">
+                        View all <ChevronRight />
+                    </div>
+                </div>
+
+                <ListingHorizontalScroll listings={requestListings} />
+                <div className="flex items-center justify-between">
+                    <div>
+                        <div className="text-xl font-bold mt-6">
+                            Giving away...
+                        </div>
+                        <p className="text-xs text-gray-400 mb-4">
+                            Check out what other people are giving away!
+                        </p>
+                    </div>
+                    <div className="text-xs flex items-center justify-center text-gray-600">
+                        View all <ChevronRight />
+                    </div>
+                </div>
+
+                <ListingHorizontalScroll listings={donationListings} />
             </main>
         </div>
     );

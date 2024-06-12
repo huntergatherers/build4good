@@ -9,6 +9,10 @@ import { daysBetween } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
 import CommentSection from "./components/comment-section";
+import { getCurrentUser } from "@/lib/auth";
+import TransactionBtn from "./components/transaction-btn";
+import { useLoginDialog } from "@/app/login/login-dialog-context";
+import LoginButton from "@/app/login/login-button";
 
 export default async function ListingPage({
     params,
@@ -42,6 +46,7 @@ export default async function ListingPage({
         return <div>Listing not found</div>;
     }
     const listingType = listing.listing_type;
+    const owner = listing.profiles;
     const username = listing.profiles.username;
     const transactions = listing.Transaction;
     const comments = listing.ListingComment;
@@ -51,52 +56,68 @@ export default async function ListingPage({
         0
     );
 
-    const supabase = createClient();
-    const { data } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     return (
-        <div className="w-full p-6">
+        <div className="w-full p-6 relative">
             <h1 className="font-bold text-xl">
                 {username}{" "}
-                {listingType == "donate" ? "is donating" : "is requesting for"}
+                {listingType == "donate"
+                    ? "is contributing"
+                    : "is requesting for"}
                 ...
             </h1>
+            <p className="font-semibold">
+                {listing.total_amount}kg of {listing.listing_item_type}
+            </p>
             <ListingMap />
             <div className="flex justify-between items-center">
-                <p className="text-xl font-semibold">{listing.header}</p>
+                <p className="text-xl font-semibold w-[80%] overflow-hidden text-ellipsis">
+                    {listing.header}
+                </p>
                 <Badge>2.1km</Badge>
             </div>
             <p className="text-gray-400 my-2">{listing.body}</p>
-            {listingType == "receive" && (
-                <>
-                    <Progress
-                        value={(totalDonation / listing.total_amount) * 100}
-                        className="h-[10px] [&>*]:bg-green-700"
-                    />
-                    <div className="flex justify-between items-center mt-2">
-                        <div className="text-green-700">
-                            <p className="font-semibold">{totalDonation}kg</p>
-                            donated of {listing.total_amount}kg
-                        </div>
-                        <div className="text-gray-400">
-                            <p className="font-semibold">
-                                {listing.Transaction.length}
-                            </p>
-                            Donors
-                        </div>
-
-                        <div className="text-gray-400">
-                            <p className="font-semibold">
-                                {daysBetween(
-                                    listing.created_at,
-                                    listing.deadline
-                                )}
-                            </p>
-                            Days to go
-                        </div>
+            <>
+                <Progress
+                    value={(totalDonation / listing.total_amount) * 100}
+                    className={`h-[10px] ${
+                        listing.listing_type === "donate"
+                            ? "[&>*]:bg-blue-700"
+                            : "[&>*]:bg-green-700"
+                    }`}
+                />
+                <div className="flex justify-between items-center mt-2">
+                    <div
+                        className={`${
+                            listing.listing_type === "donate"
+                                ? "text-blue-700"
+                                : "text-green-700"
+                        }`}
+                    >
+                        <p className="font-semibold">{totalDonation}kg</p>
+                        {listingType === "donate"
+                            ? "claimed"
+                            : "contributed"}{" "}
+                        of {listing.total_amount}kg
                     </div>
-                </>
-            )}
-            <div className="text-md text-gray-600 font-semibold mt-4">
+                    <div className="text-gray-400">
+                        <p className="font-semibold">
+                            {listing.Transaction.length}
+                        </p>
+                        {listingType === "donate" ? "claimed" : "contributors"}
+                    </div>
+
+                    <div className="text-gray-400">
+                        <p className="font-semibold">
+                            {daysBetween(listing.created_at, listing.deadline)}
+                        </p>
+                        Days to go
+                    </div>
+                </div>
+            </>
+
+            <Separator className="my-4" />
+            <div className="text-md font-semibold mt-4 mb-1">
                 {listingType == "receive"
                     ? "Your food scraps will be going to..."
                     : "What you will be receiving..."}
@@ -108,9 +129,6 @@ export default async function ListingPage({
                 height={500}
                 alt="Picture of the author"
             />
-            <Button className="mt-4 w-full">
-                {listingType == "receive" ? "Donate" : "Request"}
-            </Button>
             <Separator className="my-4" />
             <div className="text-xl font-bold flex">
                 Comments
@@ -120,9 +138,24 @@ export default async function ListingPage({
             </div>
             <CommentSection
                 comments={comments}
-                user={data.user}
+                user={user}
                 listingId={listingId}
             />
+            <div className="sticky bottom-0 p-4 -mx-6 bg-white rounded-t-lg border-t-2 border-t-gray-200 drop-shadow-2xl">
+                {user ? (
+                    <TransactionBtn
+                        user={user}
+                        listing={listing}
+                        listingOwner={owner}
+                    />
+                ) : (
+                    <LoginButton
+                        text={
+                            listingType == "receive" ? "Contribute" : "Request"
+                        }
+                    />
+                )}
+            </div>
         </div>
     );
 }
