@@ -52,7 +52,7 @@ export async function getCurrentDistanceToInstance(instance: { coords_lat: numbe
     }
 }
 
-// Functions related to Comments
+// Functions related to Listing Comments
 // --------------------------------------------------------
 export async function hasUserLikedComment(commentId: string): Promise<boolean> {
     const userId = await getCurrentUserId();
@@ -459,3 +459,22 @@ export async function completeTransaction(transactionId: string) {
         throw error;
     }
 }
+//get listing images 
+//add images to listing
+
+//profiles
+// get active posts by profile
+// search profiles by role, last active, distance?
+
+// Functions related to Posts
+// --------------------------------------------------------
+//shouldnt posts have likes
+//get posts, ordered by created_at or ascending distance from current user
+
+//Post Comments
+// Like, unlike, create comment
+//get comments ordered by created_at
+//add and get post images
+
+// Functions related to notifications
+// --------------------------------------------------------
