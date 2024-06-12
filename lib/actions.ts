@@ -1,5 +1,5 @@
 "use server";
-import prisma from "./db";
+import prisma, { listing_type_enum, tag_type_enum , scrap_type_enum, compost_type_enum } from "./db";
 import {
     getCurrentUser,
     getCurrentUserId,
@@ -12,6 +12,8 @@ import { z } from "zod";
 import { CreateListingFormSchema } from "@/app/listings/create/page";
 import { cookies } from "next/headers";
 
+// Functions related to Comments
+// --------------------------------------------------------
 export async function hasUserLikedComment(commentId: string): Promise<boolean> {
     const userId = await getCurrentUserId();
     if (!userId) {
@@ -88,7 +90,9 @@ export async function createComment(
         throw new Error("Error creating comment: " + error);
     }
 }
-//profile crud
+
+// Functions related to Profiles
+// --------------------------------------------------------
 export async function getProfileById(id: string) {
     const profile = await prisma.profiles.findUnique({
         where: { id },
@@ -125,6 +129,27 @@ export async function updateProfile(id: string, data: UpdateProfileData) {
     }
 }
 
+export async function getListingsByProfileId(profileId: string) {
+    try {
+      const listings = await prisma.listing.findMany({
+        where: { profile_id: profileId },
+        include: {
+          ListingComment: true,
+          ListingImage: true,
+          ListingTag: true,
+          Transaction: true,
+        },
+      });
+  
+      return listings;
+    } catch (error) {
+      console.error('Error fetching listings:', error);
+      throw error;
+    } 
+  }
+
+// Functions related to Listings
+// --------------------------------------------------------
 export async function createListing(
     data: Omit<z.infer<typeof CreateListingFormSchema>, "image"> & {
         image: string;
@@ -172,56 +197,89 @@ export async function createListing(
 }
 
 //adding tags to listing via listing id
-enum tag_type_enum {
-    scrap,
-    compost,
-}
-
-enum scrap_type_enum {
-    greens,
-    browns,
-    grains,
-    meats,
-    others,
-}
-enum compost_type_enum {
-    vermicompost,
-    aerobic,
-    bokashi,
-    chicken,
-    others,
-}
 interface AddTagsToListingData {
     listing_id: number;
     tag_type: tag_type_enum;
     scrap_type?: scrap_type_enum;
     compost_type?: compost_type_enum;
+  }
+
+export async function addTagsToListing(data: AddTagsToListingData) {
+    try {
+    // Validate tag type and corresponding enum
+    if (data.tag_type === tag_type_enum.scrap && !data.scrap_type) {
+        throw new Error('scrap_type is required when tag_type is "scrap"');
+    }
+
+    if (data.tag_type === tag_type_enum.compost && !data.compost_type) {
+        throw new Error('compost_type is required when tag_type is "compost"');
+    }
+    const scrapType = data.scrap_type ?? null;
+    const compostType = data.compost_type ?? null;
+    // Create the ListingTag
+    const ListingTag = await prisma.listingTag.create({
+        data: {
+        listing_id: data.listing_id,
+        tag_type: data.tag_type,
+        scrap_type: scrapType,
+        compost_type: compostType,
+        },
+    });
+    return ListingTag;
+    } catch (error) {
+    console.error('Error adding tag to listing:', error);
+    throw error;
+    }
 }
 
-// export async function addTagsToListing(data: AddTagsToListingData) {
-//     try {
-//     // Validate tag type and corresponding enum
-//     if (data.tag_type === tag_type_enum.scrap && !data.scrap_type) {
-//         throw new Error('scrap_type is required when tag_type is "scrap"');
-//     }
-
-//     if (data.tag_type === tag_type_enum.compost && !data.compost_type) {
-//         throw new Error('compost_type is required when tag_type is "compost"');
-//     }
-
-//     // Create the ListingTag
-//     const ListingTag = await prisma.listingTag.create({
-//         data: {
-//         listing_id: data.listing_id,
-//         tag_type: data.tag_type,
-//         scrap_type: data.scrap_type,
-//         compost_type: data.compost_type,
-//         },
-//     });
-
-//     return ListingTag;
-//     } catch (error) {
-//     console.error('Error adding tag to listing:', error);
-//     throw error;
-//     }
-// }
+//check and mark listing as fulfilled or expired
+export async function checkListingStatus(listingId: number): Promise<void> {
+    try {
+      // Fetch the listing with its transactions
+      const listing = await prisma.listing.findUnique({
+        where: { id: listingId },
+        include: { Transaction: true },
+      });
+  
+      if (!listing) {
+        throw new Error(`Listing with id ${listingId} not found`);
+      }
+  
+      let isActive = true;
+  
+      // Check if the listing is expired
+      if (new Date() > listing.deadline) {
+        isActive = false;
+      } else {
+        if (listing.listing_type === listing_type_enum.receive) {
+          // Calculate the total donated amount for receive listings
+          const totalDonated = listing.Transaction
+            .filter(transaction => transaction.approved_at !== null)
+            .reduce((sum, transaction) => sum + transaction.donated_amount, 0);
+  
+          if (totalDonated >= listing.total_amount) {
+            isActive = false;
+          }
+        } else if (listing.listing_type === listing_type_enum.donate) {
+          // we assume that for donations any approved transaction means the listing is fulfilled
+          const hasApprovedTransaction = listing.Transaction.some(
+            transaction => transaction.approved_at !== null
+          );
+  
+          if (hasApprovedTransaction) {
+            isActive = false;
+          }
+        }
+      }
+      // Update the listing's is_active status
+      await prisma.listing.update({
+        where: { id: listing.id },
+        data: { is_active: isActive },
+      });
+  
+      console.log(`Listing ${listingId} status updated. Active: ${isActive}`);
+    } catch (error) {
+      console.error('Error checking listing status:', error);
+      throw error;
+    }
+  }
