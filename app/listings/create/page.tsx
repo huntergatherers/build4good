@@ -1,5 +1,5 @@
 "use client";
-import { Autocomplete } from "@react-google-maps/api";
+import { Autocomplete, LoadScript } from "@react-google-maps/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -74,30 +74,12 @@ export default function CreateListing() {
     const [goalGreens, setGoalGreens] = useState(0);
     const [goalBrowns, setGoalBrowns] = useState(0);
     const [goalCompost, setGoalCompost] = useState(0);
-    const [location, setLocation] = useState<UserLocation | null>(null);
+    const [location, setLocation] =
+        useState<google.maps.places.Autocomplete | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [step, setStep] = useState(1);
     const { toast } = useToast();
-
-    const requestLocation = () => {
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    setLocation({ latitude, longitude });
-                    form.setValue("location", { latitude, longitude });
-                    setError(null);
-                },
-                (error) => {
-                    setError(error.message);
-                    setLocation(null);
-                }
-            );
-        } else {
-            setError("Geolocation is not supported by your browser");
-        }
-    };
 
     function onClickGreens(adjustment: number) {
         setSelectedType("greens");
@@ -320,7 +302,7 @@ export default function CreateListing() {
 
                 {/* SECOND STEP: SELECT CATEGORY */}
                 {step === 2 && (
-                    <>
+                    <div>
                         <h1 className="text-2xl font-semibold">
                             I want to{" "}
                             {selectedAction === "donate"
@@ -638,7 +620,7 @@ export default function CreateListing() {
                                     </p>
                                 )}
                         </FormMessage>
-                        <div className="flex justify-between space-x-4 pb-4">
+                        <div className="flex justify-between space-x-4 pb-4 bottom-0 sticky bg-white pt-4">
                             <Button
                                 className="w-full"
                                 onClick={() => setStep(1)}
@@ -658,7 +640,7 @@ export default function CreateListing() {
                                 Next
                             </Button>
                         </div>
-                    </>
+                    </div>
                 )}
 
                 {/* THIRD STEP: FILL IN DETAILS */}
@@ -847,7 +829,7 @@ export default function CreateListing() {
                                         match is made
                                     </FormDescription>
                                     <FormControl>
-                                        {location ? (
+                                        {/* {location ? (
                                             <div>
                                                 Current Location:{" "}
                                                 {`${location.latitude}, ${location.longitude}`}
@@ -861,13 +843,50 @@ export default function CreateListing() {
                                             >
                                                 Retrieve my current location
                                             </Button>
-                                        )}
+                                        )} */}
 
-                                        {/* <Input
-                                  className="text-xs"
-                                  placeholder="Location for meet-ups"
-                                  {...field}
-                              /> */}
+                                        <LoadScript
+                                            googleMapsApiKey={
+                                                process.env
+                                                    .NEXT_PUBLIC_GOOGLE_MAPS!
+                                            }
+                                            libraries={["places"]}
+                                        >
+                                            <Autocomplete
+                                                restrictions={{ country: "sg" }}
+                                                onLoad={(autocomplete) =>
+                                                    setLocation(autocomplete)
+                                                }
+                                                onPlaceChanged={() => {
+                                                    const place =
+                                                        location?.getPlace();
+                                                    if (!place) return;
+                                                    const geometry =
+                                                        place.geometry;
+                                                    if (!geometry) return;
+                                                    const lng =
+                                                        place!.geometry!.location?.lng();
+                                                    const lat =
+                                                        place!.geometry!.location?.lat();
+
+                                                    if (lng && lat) {
+                                                        form.setValue(
+                                                            "location",
+                                                            {
+                                                                longitude: lng,
+                                                                latitude: lat,
+                                                            }
+                                                        );
+                                                    }
+                                                }}
+                                                fields={[
+                                                    "geometry.location",
+                                                    "formatted_address",
+                                                ]}
+                                            >
+                                                <Input placeholder="Enter your address" />
+                                            </Autocomplete>
+                                        </LoadScript>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -884,7 +903,7 @@ export default function CreateListing() {
                                     <FormControl>
                                         <Textarea
                                             placeholder="Include any additional information or custom instructions you may have"
-                                            className="resize-none text-xs"
+                                            className="resize-none text-md"
                                             {...field}
                                         />
                                     </FormControl>

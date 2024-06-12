@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { login, signup } from "./actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,9 @@ export default function AuthForm({
     searchParams: { message: string };
 }) {
     const [isSignup, setIsSignup] = useState(false);
+    const pathname = usePathname();
 
+    console.log(pathname);
     const toggleForm = () => {
         setIsSignup(!isSignup);
     };
@@ -30,7 +32,7 @@ export default function AuthForm({
                             Username
                         </label>
                         <Input
-                            className="rounded-md px-4 py-2 bg-inherit border mb-4"
+                            className="rounded-md px-4 py-2 bg-inherit border mb-4 text-md"
                             name="username"
                             placeholder="Your username"
                             required
@@ -41,7 +43,7 @@ export default function AuthForm({
                     Email
                 </label>
                 <Input
-                    className="rounded-md px-4 py-2 bg-inherit border mb-4"
+                    className="rounded-md px-4 py-2 bg-inherit border mb-4 text-md"
                     name="email"
                     placeholder="you@example.com"
                     required
@@ -50,13 +52,14 @@ export default function AuthForm({
                     Password
                 </label>
                 <Input
-                    className="rounded-md px-4 py-2 bg-inherit border mb-6"
+                    className="rounded-md px-4 py-2 bg-inherit border mb-6 text-md"
                     type="password"
                     name="password"
                     placeholder="••••••••"
                     required
                 />
-                <SubmitButton isSignup={isSignup}/>
+                <input type="hidden" name="redirect" value={pathname} />
+                <SubmitButton isSignup={isSignup} />
                 <div>
                     {isSignup ? (
                         <span>

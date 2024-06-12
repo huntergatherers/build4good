@@ -1,4 +1,5 @@
 "use client";
+import { useLoginDialog } from "@/app/login/login-dialog-context";
 import { Button } from "@/components/ui/button";
 import {
     Drawer,
@@ -10,6 +11,7 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -37,6 +39,7 @@ export default function TransactionBtn({
     listing: ListingWithTransaction;
     listingOwner: profiles;
 }) {
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const hasPendingTransaction = listing.Transaction.some(
         (transaction) => transaction.other_id === user?.id
@@ -73,12 +76,14 @@ export default function TransactionBtn({
 
     async function handleCreateTransaction() {
         console.log("Creating transaction...");
+        setIsLoading(true);
         const transaction = await createTransaction(listing.id, goal);
         setOpen(false);
         router.refresh();
     }
 
     async function handleDeleteTransaction() {
+        setIsLoading(true);
         console.log("Deleting transaction...");
         const transaction = await deleteTransaction(matchingTransaction?.id);
         setOpen(false);
@@ -86,6 +91,7 @@ export default function TransactionBtn({
     }
 
     async function handleEditTransaction() {
+        setIsLoading(true);
         console.log("Editing transaction...");
         const transaction = await editTransaction(
             matchingTransaction?.id,
@@ -121,97 +127,102 @@ export default function TransactionBtn({
                         : "Request"}
                 </Button>
             </DrawerTrigger>
-            <DrawerContent className="h-1/3">
-                <div className="mx-auto my-auto w-full max-w-sm">
-                    <DrawerHeader>
-                        <DrawerTitle>
-                            {listingOwner.username}{" "}
-                            {listing.listing_type === "donate"
-                                ? "is donating"
-                                : "is requesting for"}{" "}
-                            {listing.total_amount}kg of{" "}
-                            {listing.listing_item_type}
-                        </DrawerTitle>
-                    </DrawerHeader>
-                    <Separator />
-                    <div className="mt-2 text-center">
-                        You are{" "}
-                        {listingType === "receive"
-                            ? "offering..."
-                            : "requesting..."}{" "}
-                    </div>
-                    <div className="p-4 pb-0">
-                        <div className="flex items-center justify-center space-x-2">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-8 w-8 shrink-0 rounded-full"
-                                onClick={() => onClick(-1)}
-                                disabled={goal <= 0}
-                            >
-                                <MinusIcon className="h-4 w-4" />
-                                <span className="sr-only">Decrease</span>
-                            </Button>
-                            <div className="flex-1 text-center">
-                                <input
-                                    type="text"
-                                    className="text-5xl font-bold tracking-tighter text-center w-full"
-                                    value={goal}
-                                    onChange={onInputChange}
-                                />
-                                <div className="text-[0.70rem] uppercase text-muted-foreground">
-                                    kg
-                                </div>
-                            </div>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-8 w-8 shrink-0 rounded-full"
-                                onClick={() => onClick(1)}
-                                disabled={goal >= listing.total_amount}
-                            >
-                                <PlusIcon className="h-4 w-4" />
-                                <span className="sr-only">Increase</span>
-                            </Button>
-                        </div>
-                    </div>
-                    <DrawerFooter>
-                        {hasPendingTransaction ? (
-                            <div className="space-y-2 flex flex-col">
-                                <Button
-                                    disabled={
-                                        goal < 1 ||
-                                        goal ===
-                                            matchingTransaction!.donated_amount
-                                    }
-                                    onClick={handleEditTransaction}
-                                >
-                                    {listing.listing_type === "donate"
-                                        ? "Edit Request"
-                                        : "Edit Offer"}
-                                </Button>
-                                <Button
-                                    variant="destructive"
-                                    onClick={handleDeleteTransaction}
-                                >
-                                    Cancel{" "}
-                                    {listing.listing_type === "donate"
-                                        ? "Request"
-                                        : "Offer"}
-                                </Button>
-                            </div>
-                        ) : (
-                            <Button
-                                disabled={goal < 1}
-                                onClick={handleCreateTransaction}
-                            >
+            <DrawerContent className="h-1/2">
+                <ScrollArea className="my-auto">
+                    <div className="mx-auto my-auto w-full max-w-sm">
+                        <DrawerHeader>
+                            <DrawerTitle>
+                                {listingOwner.username}{" "}
                                 {listing.listing_type === "donate"
-                                    ? "Create Request"
-                                    : "Create Offer"}
-                            </Button>
-                        )}
-                    </DrawerFooter>
-                </div>
+                                    ? "is donating"
+                                    : "is requesting for"}{" "}
+                                {listing.total_amount}kg of{" "}
+                                {listing.listing_item_type}
+                            </DrawerTitle>
+                        </DrawerHeader>
+                        <Separator />
+                        <div className="mt-2 text-center">
+                            You are{" "}
+                            {listingType === "receive"
+                                ? "offering..."
+                                : "requesting..."}{" "}
+                        </div>
+                        <div className="p-4 pb-0">
+                            <div className="flex items-center justify-center space-x-2">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8 shrink-0 rounded-full"
+                                    onClick={() => onClick(-1)}
+                                    disabled={goal <= 0}
+                                >
+                                    <MinusIcon className="h-4 w-4" />
+                                    <span className="sr-only">Decrease</span>
+                                </Button>
+                                <div className="flex-1 text-center">
+                                    <input
+                                        type="text"
+                                        className="text-5xl font-bold tracking-tighter text-center w-full"
+                                        value={goal}
+                                        onChange={onInputChange}
+                                    />
+                                    <div className="text-[0.70rem] uppercase text-muted-foreground">
+                                        kg
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8 shrink-0 rounded-full"
+                                    onClick={() => onClick(1)}
+                                    disabled={goal >= listing.total_amount}
+                                >
+                                    <PlusIcon className="h-4 w-4" />
+                                    <span className="sr-only">Increase</span>
+                                </Button>
+                            </div>
+                        </div>
+                        <DrawerFooter>
+                            {hasPendingTransaction ? (
+                                <div className="space-y-2 flex flex-col">
+                                    <Button
+                                        disabled={
+                                            goal < 1 ||
+                                            goal ===
+                                                matchingTransaction!
+                                                    .donated_amount ||
+                                            isLoading
+                                        }
+                                        onClick={handleEditTransaction}
+                                    >
+                                        {listing.listing_type === "donate"
+                                            ? "Edit Request"
+                                            : "Edit Offer"}
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={handleDeleteTransaction}
+                                        disabled={isLoading}
+                                    >
+                                        Cancel{" "}
+                                        {listing.listing_type === "donate"
+                                            ? "Request"
+                                            : "Offer"}
+                                    </Button>
+                                </div>
+                            ) : (
+                                <Button
+                                    disabled={goal < 1 || isLoading}
+                                    onClick={handleCreateTransaction}
+                                >
+                                    {listing.listing_type === "donate"
+                                        ? "Create Request"
+                                        : "Create Offer"}
+                                </Button>
+                            )}
+                        </DrawerFooter>
+                    </div>
+                </ScrollArea>
             </DrawerContent>
         </Drawer>
     );

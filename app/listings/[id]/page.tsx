@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import CommentSection from "./components/comment-section";
 import { getCurrentUser } from "@/lib/auth";
 import TransactionBtn from "./components/transaction-btn";
+import { useLoginDialog } from "@/app/login/login-dialog-context";
+import LoginButton from "@/app/login/login-button";
 
 export default async function ListingPage({
     params,
@@ -112,11 +114,18 @@ export default async function ListingPage({
                 height={500}
                 alt="Picture of the author"
             />
-            <TransactionBtn
-                user={user}
-                listing={listing}
-                listingOwner={owner}
-            />
+            {user ? (
+                <TransactionBtn
+                    user={user}
+                    listing={listing}
+                    listingOwner={owner}
+                />
+            ) : (
+                <LoginButton
+                    text={listingType == "receive" ? "Donate" : "Request"}
+                />
+            )}
+
             <Separator className="my-4" />
             <div className="text-xl font-bold flex">
                 Comments

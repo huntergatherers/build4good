@@ -1,27 +1,27 @@
-'use client'
+"use client";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { useLoginDialog } from "./login-dialog-context";
+import AuthForm from "./page";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 
 export default function LoginDialog() {
     const { isOpen, closeDialog } = useLoginDialog();
 
     return (
-        <Dialog open={isOpen} onOpenChange={closeDialog}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Are you absolutely sure?</DialogTitle>
-                    <DialogDescription>
-                        This action cannot be undone. This will permanently delete your account
-                        and remove your data from our servers.
-                    </DialogDescription>
-                </DialogHeader>
-            </DialogContent>
-        </Dialog>
+        <Drawer open={isOpen} onClose={closeDialog}>
+            <DrawerContent className="z-[500] h-1/2">
+                <AuthForm
+                    searchParams={{
+                        message: "",
+                    }}
+                />
+            </DrawerContent>
+        </Drawer>
     );
 }

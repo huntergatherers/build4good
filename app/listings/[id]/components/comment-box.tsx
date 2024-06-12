@@ -53,7 +53,7 @@ export default function CommentBox({
                             </div>
                             <Textarea
                                 disabled={isPending}
-                                className="w-full p-4 bg-background border border-foreground rounded-lg h-2"
+                                className="w-full p-4 bg-background border border-foreground rounded-lg h-2 text-md"
                                 placeholder={
                                     parentId
                                         ? "Add a reply..."
@@ -90,7 +90,7 @@ export default function CommentBox({
                     <div>
                         <Textarea
                             disabled={isPending}
-                            className="w-full p-4 bg-background border border-foreground rounded-lg h-2"
+                            className="w-full p-4 bg-background border border-foreground rounded-lg h-2 text-md"
                             placeholder={
                                 parentId ? "Add a reply..." : "Add a comment..."
                             }
