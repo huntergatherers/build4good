@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { ChevronRight, Filter, Search } from "lucide-react";
 import { redirect } from "next/navigation";
 import prisma, { listing_type_enum } from "@/lib/db";
+import Link from "next/link";
 export default async function Index() {
     // const supabase = createClient();
     // const { data, error } = await supabase.auth.getUser();
@@ -60,9 +61,9 @@ export default async function Index() {
                             Check out what other people are requesting for!
                         </p>
                     </div>
-                    <div className="text-xs flex items-center justify-center text-gray-600">
+                    <Link  href="/listings/all-requests-listings" className="text-xs flex items-center justify-center text-gray-600">
                         View all <ChevronRight />
-                    </div>
+                    </Link>
                 </div>
 
                 <ListingHorizontalScroll listings={requestListings} />
@@ -75,9 +76,9 @@ export default async function Index() {
                             Check out what other people are giving away!
                         </p>
                     </div>
-                    <div className="text-xs flex items-center justify-center text-gray-600">
+                    <Link href="/listings/all-donations-listings" className="text-xs flex items-center justify-center text-gray-600">
                         View all <ChevronRight />
-                    </div>
+                    </Link>
                 </div>
 
                 <ListingHorizontalScroll listings={donationListings} />

@@ -10,7 +10,7 @@ interface ListingItemProps {
     listing: ListingWithTransaction;
 }
 
-const ListingItem = ({ listing }: ListingItemProps) => {
+const ListingItemVertical = ({ listing }: ListingItemProps) => {
     const router = useRouter();
     const progress = listing.Transaction.reduce(
         (acc, transaction) => acc + transaction.donated_amount,
@@ -19,13 +19,12 @@ const ListingItem = ({ listing }: ListingItemProps) => {
     console.log(progress);
     return (
         <div
-            className="flex items-start flex-col w-36"
+            className="flex w-full"
             onClick={() => {
                 router.push(`/listings/${listing.id}`);
             }}
         >
-            <div className="relative w-36 h-36">
-              <div className="text-[0.6rem] text-white absolute -left-[1px] top-2 p-1 rounded-r-sm bg-green-600">{listing.listing_item_type}</div>
+            <div className="w-[7.5rem] h-[7.5rem] mr-6">
                 <Image
                     className="rounded-lg object-cover"
                     src="https://images.unsplash.com/photo-1495615080073-6b89c9839ce0"
@@ -34,6 +33,14 @@ const ListingItem = ({ listing }: ListingItemProps) => {
                     alt={listing.header}
                 />
             </div>
+            <div className="flex flex-col justify-center">
+            <div className="font-bold text-sm mt-1 line-clamp-2 w-48 mb-1">
+                {listing.header}
+            </div>
+            <div className="font-light text-sm mt-1 line-clamp-3 w-48 mb-1">
+                {listing.body}
+            </div>
+            <div>
             <Progress
                 value={(progress / listing.total_amount) * 100}
                 className={`h-[6px] ${
@@ -54,7 +61,6 @@ const ListingItem = ({ listing }: ListingItemProps) => {
                     {progress}/{listing.total_amount}kg
                 </span>{" "}
                 {listing.listing_type === "donate" ? "claimed" : "donated"}
-                {/* <p className="text-right"><Apple/></p> */}
                 
             </label>
             {listing.listing_item_type === "greens" ?
@@ -66,18 +72,13 @@ const ListingItem = ({ listing }: ListingItemProps) => {
             <div className="mt-1">
                  <Recycle size={17} color="#74a5c3" fill="#5ac4e7"/>
             </div>
-           
-            }
-            
-           
-           
-            
+            }           
             </div>
-            <div className="font-medium text-base mt-1 line-clamp-2 w-36">
-                {listing.header}
             </div>
+            </div>
+            
         </div>
     );
 };
 
-export default ListingItem;
+export default ListingItemVertical;
