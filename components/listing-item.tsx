@@ -3,14 +3,15 @@ import Image from "next/image";
 import { Progress } from "./ui/progress";
 import { useRouter } from "next/navigation";
 import { ListingWithTransaction } from "./listing-horizontal-scroll";
-import { Apple, Recycle, Sprout,Trash  } from 'lucide-react';
+import { Apple, Recycle, Sprout, Trash } from "lucide-react";
 import { listing_type_enum } from "@/lib/db";
 
 interface ListingItemProps {
     listing: ListingWithTransaction;
+    showDescription?: boolean;
 }
 
-const ListingItem = ({ listing }: ListingItemProps) => {
+const ListingItem = ({ listing, showDescription }: ListingItemProps) => {
     const router = useRouter();
     const progress = listing.Transaction.reduce(
         (acc, transaction) => acc + transaction.donated_amount,
@@ -19,13 +20,23 @@ const ListingItem = ({ listing }: ListingItemProps) => {
     console.log(progress);
     return (
         <div
-            className="flex items-start flex-col w-36"
+            className="flex items-start flex-col w-36 cursor-pointer"
             onClick={() => {
                 router.push(`/listings/${listing.id}`);
             }}
         >
             <div className="relative w-36 h-36">
-              <div className="text-[0.6rem] text-white absolute -left-[1px] top-2 p-1 rounded-r-sm bg-green-600">{listing.listing_item_type}</div>
+                <div
+                    className={`text-[0.6rem] text-white absolute -left-[1px] top-2 p-1 rounded-r-sm ${
+                        listing.listing_item_type === "greens"
+                            ? "bg-green-600"
+                            : listing.listing_item_type === "browns"
+                            ? "bg-amber-600"
+                            : "bg-blue-800"
+                    }`}
+                >
+                    {listing.listing_item_type}
+                </div>
                 <Image
                     className="rounded-lg object-cover"
                     src="https://images.unsplash.com/photo-1495615080073-6b89c9839ce0"
@@ -43,36 +54,28 @@ const ListingItem = ({ listing }: ListingItemProps) => {
                 }`}
             />
             <div className="flex justify-between w-full">
-            <label
-                className={`text-xs mt-1 ${
-                    listing.listing_type === "donate"
-                        ? "text-blue-700"
-                        : "text-green-700"
-                }`}
-            >
-                <span className="font-bold">
-                    {progress}/{listing.total_amount}kg
-                </span>{" "}
-                {listing.listing_type === "donate" ? "claimed" : "donated"}
-                {/* <p className="text-right"><Apple/></p> */}
-                
-            </label>
-            {listing.listing_item_type === "greens" ?
-            <div className="mt-1">
-            <Apple size={16} color="#87b093" fill="#a4d6b3"/>
-            </div> :
-            listing.listing_item_type === "browns" ?
-            <Sprout size={19} color="#9c7649" fill="#9c7649"/> :
-            <div className="mt-1">
-                 <Recycle size={17} color="#74a5c3" fill="#5ac4e7"/>
-            </div>
-           
-            }           
-            
+                <label
+                    className={`text-xs mt-1 ${
+                        listing.listing_type === "donate"
+                            ? "text-blue-700"
+                            : "text-green-700"
+                    }`}
+                >
+                    <span className="font-bold">
+                        {progress}/{listing.total_amount}kg
+                    </span>{" "}
+                    {listing.listing_type === "donate" ? "claimed" : "donated"}
+                    {/* <p className="text-right"><Apple/></p> */}
+                </label>
             </div>
             <div className="font-medium text-base mt-1 line-clamp-2 w-36">
                 {listing.header}
             </div>
+            {showDescription && (
+                <div className="font-light text-sm mt-1 line-clamp-3 w-36 mb-1 h-16">
+                    {listing.body}
+                </div>
+            )}
         </div>
     );
 };
