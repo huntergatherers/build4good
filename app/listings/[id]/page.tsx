@@ -13,6 +13,8 @@ import { getCurrentUser } from "@/lib/auth";
 import TransactionBtn from "./components/transaction-btn";
 import { useLoginDialog } from "@/app/login/login-dialog-context";
 import LoginButton from "@/app/login/login-button";
+import GoogleMaps from "./components/google-maps";
+import { Loader } from "lucide-react";
 
 export default async function ListingPage({
     params,
@@ -69,7 +71,9 @@ export default async function ListingPage({
             <p className="font-semibold">
                 {listing.total_amount}kg of {listing.listing_item_type}
             </p>
-            <ListingMap />
+            <div className="my-4"><GoogleMaps /></div>
+            
+            {/* <ListingMap /> */}
             <div className="flex justify-between items-center">
                 <p className="text-xl font-semibold w-[80%] overflow-hidden text-ellipsis">
                     {listing.header}
