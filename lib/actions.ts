@@ -391,6 +391,11 @@ export async function createListing(
                 has_progress: has_progress,
                 coords_lat: coords_lat,
                 coords_long: coords_long,
+                ListingImage: {
+                    create: {
+                        url: data.image,
+                    },
+                },
             },
         });
         redirect("/listings/" + listing.id);

@@ -42,6 +42,7 @@ export default async function ListingPage({
             },
             Transaction: true,
             profiles: true,
+            ListingImage: true,
         },
     });
     if (!listing) {
@@ -131,13 +132,19 @@ export default async function ListingPage({
                     ? "Your food scraps will be going to..."
                     : "What you will be receiving..."}
             </div>
-            <Image
-                className="rounded-2xl mb-4 w-full h-56"
-                src="https://images.unsplash.com/photo-1594498653385-d5172c532c00?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                width={500}
-                height={500}
-                alt="Picture of the author"
-            />
+            <div className="relative w-full h-56">
+                <Image
+                    className="rounded-2xl mb-4 w-full h-56 object-cover"
+                    src={
+                        listing.ListingImage.length > 0
+                            ? listing.ListingImage[0].url
+                            : "https://images.unsplash.com/photo-1594498653385-d5172c532c00?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    }
+                    fill
+                    alt="Picture of the author"
+                />
+            </div>
+
             <Separator className="my-4" />
             <div className="text-xl font-bold flex">
                 Comments

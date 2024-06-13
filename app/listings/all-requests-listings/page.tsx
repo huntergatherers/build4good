@@ -14,6 +14,7 @@ export default async function AllDonationsListing() {
         },
         include: {
             Transaction: true,
+            ListingImage: true,
         },
     });
     return (

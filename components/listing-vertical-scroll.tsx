@@ -3,14 +3,15 @@ import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import ListingItemVertical from "./listing-item-vertical";
 import ListingItem from "./listing-item";
 
-export type ListingWithTransaction = Prisma.ListingGetPayload<{
+export type ListingWithTransactionAndImage = Prisma.ListingGetPayload<{
     include: {
         Transaction: true;
+        ListingImage: true;
     };
 }>;
 
 interface ListingVerticleScrollProps {
-    listings: ListingWithTransaction[];
+    listings: ListingWithTransactionAndImage[];
 }
 
 const ListingVerticalScroll = async ({

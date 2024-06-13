@@ -21,6 +21,7 @@ export default async function Index() {
         },
         include: {
             Transaction: true,
+            ListingImage: true,
         },
     });
 
@@ -34,6 +35,7 @@ export default async function Index() {
         },
         include: {
             Transaction: true,
+            ListingImage: true,
         },
     });
     return (
@@ -61,7 +63,10 @@ export default async function Index() {
                             Check out what other people are requesting for!
                         </p>
                     </div>
-                    <Link  href="/listings/all-requests-listings" className="text-xs flex items-center justify-center text-gray-600">
+                    <Link
+                        href="/listings/all-requests-listings"
+                        className="text-xs flex items-center justify-center text-gray-600"
+                    >
                         View all <ChevronRight />
                     </Link>
                 </div>
@@ -76,7 +81,10 @@ export default async function Index() {
                             Check out what other people are giving away!
                         </p>
                     </div>
-                    <Link href="/listings/all-donations-listings" className="text-xs flex items-center justify-center text-gray-600">
+                    <Link
+                        href="/listings/all-donations-listings"
+                        className="text-xs flex items-center justify-center text-gray-600"
+                    >
                         View all <ChevronRight />
                     </Link>
                 </div>

@@ -1,8 +1,11 @@
 "use server";
 
+import { createListing } from "@/lib/actions";
 import { getCurrentUserId } from "@/lib/auth";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { CreateListingFormSchema } from "./page";
+import { z } from "zod";
 
 const s3Client = new S3Client({
     region: process.env.AWS_BUCKET_REGION_HOMELY!,
@@ -12,12 +15,18 @@ const s3Client = new S3Client({
     },
 });
 
-export async function getSignedURL(fileName: string) {
+export async function getSignedURL(
+    fileName: string,
+    data: Omit<z.infer<typeof CreateListingFormSchema>, "image"> & {
+        image: string;
+    },
+    image: FormData
+) {
     const userId = await getCurrentUserId();
     if (!userId) {
         throw new Error("User not found");
     }
-
+    const imageData = image.get("image") as File;
     const putObjectCommand = new PutObjectCommand({
         Bucket: process.env.AWS_BUCKET_NAME_HOMELY!,
         Key: fileName,
@@ -29,5 +38,19 @@ export async function getSignedURL(fileName: string) {
         { expiresIn: 60 } // 60 seconds
     );
 
-    return { success: { url } };
+    console.log(url);
+
+    await fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": imageData.type,
+        },
+        body: imageData,
+    });
+
+    const newData = {
+        ...data,
+        image: url.split("?")[0],
+    };
+    await createListing(newData);
 }

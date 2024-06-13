@@ -43,7 +43,7 @@ import { listing_item_type_enum, listing_type_enum } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import CreationBreadcrumbs from "./creation-breadcrumbs";
 import crypto from "crypto";
-import { getSignedURL } from "./actions";
+import { getSignedURL as getSignedURLAndCreateListing } from "./actions";
 
 interface UserLocation {
     latitude: number;
@@ -76,23 +76,6 @@ export const CreateListingFormSchema = z.object({
 
 const uniqueFileName = (bytes = 32) =>
     crypto.randomBytes(bytes).toString("hex");
-
-const uploadImage = async (image: File) => {
-    const fileName = uniqueFileName();
-    const signedURLResult = await getSignedURL(fileName);
-    const { url } = signedURLResult.success;
-    console.log(url);
-
-    await fetch(url, {
-        method: "PUT",
-        headers: {
-            "Content-Type": image.type,
-        },
-        body: image,
-    });
-    console.log(url.split("?")[0]);
-    return url.split("?")[0]; // Return the base URL without query parameters
-};
 
 export default function CreateListing() {
     const [selectedAction, setSelectedAction] = useState(""); // State to track the selected action
@@ -205,14 +188,15 @@ export default function CreateListing() {
         });
 
     async function onSubmit(data: z.infer<typeof CreateListingFormSchema>) {
-        const imageUpload = await uploadImage(data.image);
-        return;
         setIsSubmitting(true);
+        const fileName = uniqueFileName();
         const newData = {
             ...data,
-            image: "test",
+            image: "",
         };
-        const result = await createListing(newData);
+        const formData = new FormData();
+        formData.append("image", data.image);
+        await getSignedURLAndCreateListing(fileName, newData, formData);
         toast({
             className: "bg-green-600 text-white",
             title: "Listing Created",
