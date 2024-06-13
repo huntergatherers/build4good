@@ -24,7 +24,8 @@ const ListingItem = ({ listing }: ListingItemProps) => {
                 router.push(`/listings/${listing.id}`);
             }}
         >
-            <div className="w-36 h-36">
+            <div className="relative w-36 h-36">
+              <div className="text-[0.6rem] text-white absolute -left-[1px] top-2 p-1 rounded-r-sm bg-green-600">{listing.listing_item_type}</div>
                 <Image
                     className="rounded-lg object-cover"
                     src="https://images.unsplash.com/photo-1495615080073-6b89c9839ce0"

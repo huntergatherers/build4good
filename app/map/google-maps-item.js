@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 const containerStyle = {
     width: "100%",
@@ -31,6 +31,8 @@ function GoogleMapsItem() {
         setMap(null);
     }, []);
 
+    const latlng = { lat: 1.4491, lng: 103.8185 };
+
     return isLoaded ? (
         <GoogleMap
             options={{
@@ -48,6 +50,10 @@ function GoogleMapsItem() {
             onLoad={onLoad}
             onUnmount={onUnmount}
         >
+          <Marker position={latlng} icon={{
+            url: '/icons/donors.svg',
+            size: new window.google.maps.Size(50, 50),
+          }}></Marker>
             {/* Child components, such as markers, info windows, etc. */}
             <></>
         </GoogleMap>
