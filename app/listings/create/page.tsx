@@ -669,9 +669,18 @@ export default function CreateListing() {
                                                 *
                                             </span>
                                         </FormLabel>
+                                        <FormDescription className="text-xs">
+                                            {selectedAction === "donate"
+                                                ? "Specify what you'll be contributing..."
+                                                : "Specify what you wish to receive"}
+                                        </FormDescription>
                                         <FormControl>
                                             <Input
-                                                placeholder="Briefly describe your listing"
+                                                placeholder={`${
+                                                    selectedAction === "donate"
+                                                        ? "E.g. 'bag of banana peels'"
+                                                        : "E.g. 'compost for my garden'"
+                                                }`}
                                                 {...field}
                                             />
                                         </FormControl>
