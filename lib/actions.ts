@@ -201,6 +201,83 @@ export async function createTransaction(
         throw error;
     }
 }
+// get active posts by profile
+export async function getActivePostsByProfile(profileId: string) {
+    try {
+    const activePosts = await prisma.post.findMany({
+        where: {
+        profile_id: profileId,
+        is_archived: false,
+        is_embedded: false,
+        },
+        include: {
+        PostComment: true,
+        PostImage: true,
+        },
+    });
+
+    return activePosts;
+    } catch (error) {
+    console.error('Error fetching active posts:', error);
+    throw error;
+    }}
+// search profiles by role, last active, distance
+interface SearchProfilesParams {
+    role?: 'gardener' | 'composter' | 'donor';
+    orderBy?: 'last_activity' | 'distance';
+    orderDirection?: 'asc' | 'desc';
+    topK?: number;
+    currentUserCoords?: { lat: number; lon: number };
+  }
+  
+export async function searchProfiles(params: SearchProfilesParams) {
+    try {
+    const {
+        role,
+        orderBy = 'last_activity',
+        orderDirection = 'asc',
+        topK = 10,
+        currentUserCoords,
+    } = params;
+
+    // Building the where clause dynamically
+    const where: Prisma.profilesWhereInput = {
+        ...(role === 'gardener' && { is_gardener: true }),
+        ...(role === 'composter' && { is_composter: true }),
+        ...(role === 'donor' && { is_donor: true }),
+    };
+
+    // Fetch profiles
+    let profiles = await prisma.profiles.findMany({
+        where,
+        orderBy: orderBy === 'last_activity' ? { last_activity: orderDirection } : undefined,
+        take: topK,
+    });
+
+    // Filter and sort by distance if necessary
+    if (orderBy === 'distance' && currentUserCoords) {
+        profiles = profiles
+        .map(profile => ({
+            ...profile,
+            distance: profile.coords_lat !== null && profile.coords_long !== null
+            ? calculateDistance(
+                profile.coords_lat,
+                profile.coords_long,
+                currentUserCoords.lat,
+                currentUserCoords.lon
+                )
+            : Infinity,
+        }))
+        .sort((a, b) => (orderDirection === 'asc' ? a.distance - b.distance : b.distance - a.distance))
+        .slice(0, topK);
+    }
+
+    return profiles;
+    } catch (error) {
+    console.error('Error searching profiles:', error);
+    throw error;
+    }
+}
 
 export async function editTransaction(
     transactionId: string | undefined,
@@ -588,37 +665,57 @@ export async function addImagesToListing(listingId: number, images: string[]): P
       throw error;
     }
   }
-//profiles
-// get active posts by profile
-export async function getPostsByProfileId(profileId: string): Promise<Post[]>{
-    try {
-      const posts = await prisma.post.findMany({
-        where: {
-          AND: [
-            { profile_id: profileId },
-            { is_archived: false },
-            { is_embedded: false },
-          ],
-        },
-        include: {
-          PostComment: true,
-          PostImage: true,
-        },
-      });
-  
-      return posts;
-    } catch (error) {
-      console.error("Error retrieving active posts by profile ID:", error);
-      throw error;
-    }
-  }
-// search profiles by role, last active, distance
-
 
 // Functions related to Posts
 // --------------------------------------------------------
 //shouldnt posts have likes
-//get posts, ordered by created_at or ascending distance from current user
+//for creating posts feed: get active posts, ordered by created_at or ascending distance from current user
+interface GetPostsFeedParams {
+    orderBy?: 'created_at' | 'distance';
+    orderDirection?: 'asc' | 'desc';
+    currentUserCoords?: { lat: number; lon: number };
+    topK?: number;
+  }
+export async function getPostsFeed(params: GetPostsFeedParams) {
+    try {
+    const {
+        orderBy = 'created_at',
+        orderDirection = 'asc',
+        currentUserCoords,
+        topK = 10,
+    } = params;
+
+    // Fetch active posts
+    let posts = await prisma.post.findMany({
+        where: { is_archived: false },
+        orderBy: orderBy === 'created_at' ? { created_at: orderDirection } : undefined,
+        take: topK,
+    });
+
+    // Filter and sort by distance if necessary
+    if (orderBy === 'distance' && currentUserCoords) {
+        posts = posts
+        .map(post => ({
+            ...post,
+            distance: post.coords_lat !== null && post.coords_long !== null
+            ? calculateDistance(
+                post.coords_lat,
+                post.coords_long,
+                currentUserCoords.lat,
+                currentUserCoords.lon
+                )
+            : Infinity,
+        }))
+        .sort((a, b) => (orderDirection === 'asc' ? a.distance - b.distance : b.distance - a.distance))
+        .slice(0, topK);
+    }
+
+    return posts;
+    } catch (error) {
+    console.error('Error fetching posts feed:', error);
+    throw error;
+    }
+}  
 
 //Post Comments
 // Like, unlike, create comment
