@@ -16,8 +16,6 @@ const ListingItem = ({ listing, showDescription }: ListingItemProps) => {
     const progress = listing.Transaction.filter(
         (transaction) => transaction.completed_at
     ).reduce((acc, transaction) => acc + transaction.donated_amount, 0);
-
-    console.log(progress);
     return (
         <div
             className="flex items-start flex-col w-36 cursor-pointer"
@@ -64,7 +62,9 @@ const ListingItem = ({ listing, showDescription }: ListingItemProps) => {
                     <span className="font-bold">
                         {progress}/{listing.total_amount}kg
                     </span>{" "}
-                    {listing.listing_type === "donate" ? "claimed" : "donated"}
+                    {listing.listing_type === "donate"
+                        ? "claimed"
+                        : "contributed"}
                     {/* <p className="text-right"><Apple/></p> */}
                 </label>
             </div>

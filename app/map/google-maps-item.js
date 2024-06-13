@@ -1,6 +1,11 @@
 "use client";
 import React from "react";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import {
+    GoogleMap,
+    Marker,
+    useJsApiLoader,
+    InfoWindow,
+} from "@react-google-maps/api";
 
 const containerStyle = {
     width: "100%",
@@ -50,10 +55,17 @@ function GoogleMapsItem() {
             onLoad={onLoad}
             onUnmount={onUnmount}
         >
-          <Marker position={latlng} icon={{
-            url: '/icons/donors.svg',
-            size: new window.google.maps.Size(50, 50),
-          }}></Marker>
+            <Marker
+                position={latlng}
+                icon={{
+                    url: "/icons/donors.svg",
+                }}
+            >
+                <InfoWindow>
+                    <h3>hello</h3>
+                </InfoWindow>
+            </Marker>
+
             {/* Child components, such as markers, info windows, etc. */}
             <></>
         </GoogleMap>

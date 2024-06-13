@@ -6,7 +6,7 @@ import prisma, {
     tag_type_enum,
     scrap_type_enum,
     compost_type_enum,
-    Post
+    Post,
 } from "./db";
 import {
     getCurrentUser,
@@ -18,8 +18,10 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { en } from "@faker-js/faker";
 import { z } from "zod";
 import { CreateListingFormSchema } from "@/app/listings/create/page";
-import { cookies } from "next/headers";
 import { calculateDistance } from "./utils";
+
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // Functions related to Current User
 // --------------------------------------------------------
@@ -204,78 +206,88 @@ export async function createTransaction(
 // get active posts by profile
 export async function getActivePostsByProfile(profileId: string) {
     try {
-    const activePosts = await prisma.post.findMany({
-        where: {
-        profile_id: profileId,
-        is_archived: false,
-        is_embedded: false,
-        },
-        include: {
-        PostComment: true,
-        PostImage: true,
-        },
-    });
+        const activePosts = await prisma.post.findMany({
+            where: {
+                profile_id: profileId,
+                is_archived: false,
+                is_embedded: false,
+            },
+            include: {
+                PostComment: true,
+                PostImage: true,
+            },
+        });
 
-    return activePosts;
+        return activePosts;
     } catch (error) {
-    console.error('Error fetching active posts:', error);
-    throw error;
-    }}
+        console.error("Error fetching active posts:", error);
+        throw error;
+    }
+}
 // search profiles by role, last active, distance
 interface SearchProfilesParams {
-    role?: 'gardener' | 'composter' | 'donor';
-    orderBy?: 'last_activity' | 'distance';
-    orderDirection?: 'asc' | 'desc';
+    role?: "gardener" | "composter" | "donor";
+    orderBy?: "last_activity" | "distance";
+    orderDirection?: "asc" | "desc";
     topK?: number;
     currentUserCoords?: { lat: number; lon: number };
-  }
-  
+}
+
 export async function searchProfiles(params: SearchProfilesParams) {
     try {
-    const {
-        role,
-        orderBy = 'last_activity',
-        orderDirection = 'asc',
-        topK = 10,
-        currentUserCoords,
-    } = params;
+        const {
+            role,
+            orderBy = "last_activity",
+            orderDirection = "asc",
+            topK = 10,
+            currentUserCoords,
+        } = params;
 
-    // Building the where clause dynamically
-    const where: Prisma.profilesWhereInput = {
-        ...(role === 'gardener' && { is_gardener: true }),
-        ...(role === 'composter' && { is_composter: true }),
-        ...(role === 'donor' && { is_donor: true }),
-    };
+        // Building the where clause dynamically
+        const where: Prisma.profilesWhereInput = {
+            ...(role === "gardener" && { is_gardener: true }),
+            ...(role === "composter" && { is_composter: true }),
+            ...(role === "donor" && { is_donor: true }),
+        };
 
-    // Fetch profiles
-    let profiles = await prisma.profiles.findMany({
-        where,
-        orderBy: orderBy === 'last_activity' ? { last_activity: orderDirection } : undefined,
-        take: topK,
-    });
+        // Fetch profiles
+        let profiles = await prisma.profiles.findMany({
+            where,
+            orderBy:
+                orderBy === "last_activity"
+                    ? { last_activity: orderDirection }
+                    : undefined,
+            take: topK,
+        });
 
-    // Filter and sort by distance if necessary
-    if (orderBy === 'distance' && currentUserCoords) {
-        profiles = profiles
-        .map(profile => ({
-            ...profile,
-            distance: profile.coords_lat !== null && profile.coords_long !== null
-            ? calculateDistance(
-                profile.coords_lat,
-                profile.coords_long,
-                currentUserCoords.lat,
-                currentUserCoords.lon
+        // Filter and sort by distance if necessary
+        if (orderBy === "distance" && currentUserCoords) {
+            profiles = profiles
+                .map((profile) => ({
+                    ...profile,
+                    distance:
+                        profile.coords_lat !== null &&
+                        profile.coords_long !== null
+                            ? calculateDistance(
+                                  profile.coords_lat,
+                                  profile.coords_long,
+                                  currentUserCoords.lat,
+                                  currentUserCoords.lon
+                              )
+                            : Infinity,
+                }))
+                .sort((a, b) =>
+                    orderDirection === "asc"
+                        ? a.distance - b.distance
+                        : b.distance - a.distance
                 )
-            : Infinity,
-        }))
-        .sort((a, b) => (orderDirection === 'asc' ? a.distance - b.distance : b.distance - a.distance))
-        .slice(0, topK);
-    }
+                .slice(0, topK);
+        }
 
-    return profiles;
+        return profiles;
     } catch (error) {
-    console.error('Error searching profiles:', error);
-    throw error;
+        console.error("Error searching profiles:", error);
+        throw error;
     }
 }
 
@@ -629,93 +641,104 @@ export async function completeTransaction(transactionId: string) {
         throw error;
     }
 }
-//get listing images 
+//get listing images
 export async function getListingImages(listingId: number): Promise<string[]> {
     try {
-      const images = await prisma.listingImage.findMany({
-        where: {
-          listing_id: listingId,
-        },
-        select: {
-          url: true,
-        },
-      });
-
-      return images.map((image) => image.url);
-    } catch (error) {
-      console.error("Error retrieving listing images:", error);
-      throw error;
-    }
-  }
-//add images to listing
-export async function addImagesToListing(listingId: number, images: string[]): Promise<void> {
-    try {
-      await Promise.all(
-        images.map(async (image) => {
-          await prisma.listingImage.create({
-            data: {
-              listing_id: listingId,
-              url: image,
+        const images = await prisma.listingImage.findMany({
+            where: {
+                listing_id: listingId,
             },
-          });
-        })
-      );
+            select: {
+                url: true,
+            },
+        });
+
+        return images.map((image) => image.url);
     } catch (error) {
-      console.error("Error adding images to listing:", error);
-      throw error;
+        console.error("Error retrieving listing images:", error);
+        throw error;
     }
-  }
+}
+//add images to listing
+export async function addImagesToListing(
+    listingId: number,
+    images: string[]
+): Promise<void> {
+    try {
+        await Promise.all(
+            images.map(async (image) => {
+                await prisma.listingImage.create({
+                    data: {
+                        listing_id: listingId,
+                        url: image,
+                    },
+                });
+            })
+        );
+    } catch (error) {
+        console.error("Error adding images to listing:", error);
+        throw error;
+    }
+}
 
 // Functions related to Posts
 // --------------------------------------------------------
 //shouldnt posts have likes
 //for creating posts feed: get active posts, ordered by created_at or ascending distance from current user
 interface GetPostsFeedParams {
-    orderBy?: 'created_at' | 'distance';
-    orderDirection?: 'asc' | 'desc';
+    orderBy?: "created_at" | "distance";
+    orderDirection?: "asc" | "desc";
     currentUserCoords?: { lat: number; lon: number };
     topK?: number;
-  }
+}
 export async function getPostsFeed(params: GetPostsFeedParams) {
     try {
-    const {
-        orderBy = 'created_at',
-        orderDirection = 'asc',
-        currentUserCoords,
-        topK = 10,
-    } = params;
+        const {
+            orderBy = "created_at",
+            orderDirection = "asc",
+            currentUserCoords,
+            topK = 10,
+        } = params;
 
-    // Fetch active posts
-    let posts = await prisma.post.findMany({
-        where: { is_archived: false },
-        orderBy: orderBy === 'created_at' ? { created_at: orderDirection } : undefined,
-        take: topK,
-    });
+        // Fetch active posts
+        let posts = await prisma.post.findMany({
+            where: { is_archived: false },
+            orderBy:
+                orderBy === "created_at"
+                    ? { created_at: orderDirection }
+                    : undefined,
+            take: topK,
+        });
 
-    // Filter and sort by distance if necessary
-    if (orderBy === 'distance' && currentUserCoords) {
-        posts = posts
-        .map(post => ({
-            ...post,
-            distance: post.coords_lat !== null && post.coords_long !== null
-            ? calculateDistance(
-                post.coords_lat,
-                post.coords_long,
-                currentUserCoords.lat,
-                currentUserCoords.lon
+        // Filter and sort by distance if necessary
+        if (orderBy === "distance" && currentUserCoords) {
+            posts = posts
+                .map((post) => ({
+                    ...post,
+                    distance:
+                        post.coords_lat !== null && post.coords_long !== null
+                            ? calculateDistance(
+                                  post.coords_lat,
+                                  post.coords_long,
+                                  currentUserCoords.lat,
+                                  currentUserCoords.lon
+                              )
+                            : Infinity,
+                }))
+                .sort((a, b) =>
+                    orderDirection === "asc"
+                        ? a.distance - b.distance
+                        : b.distance - a.distance
                 )
-            : Infinity,
-        }))
-        .sort((a, b) => (orderDirection === 'asc' ? a.distance - b.distance : b.distance - a.distance))
-        .slice(0, topK);
-    }
+                .slice(0, topK);
+        }
 
-    return posts;
+        return posts;
     } catch (error) {
-    console.error('Error fetching posts feed:', error);
-    throw error;
+        console.error("Error fetching posts feed:", error);
+        throw error;
     }
-}  
+}
 
 //Post Comments
 // Like, unlike, create comment

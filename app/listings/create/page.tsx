@@ -1,5 +1,10 @@
 "use client";
-import { Autocomplete, Libraries, useLoadScript } from "@react-google-maps/api";
+import {
+    Autocomplete,
+    Libraries,
+    LoadScript,
+    useLoadScript,
+} from "@react-google-maps/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,17 +28,22 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { toast, useToast } from "@/components/ui/use-toast";
 import { ImagePlus, Minus, Package, PackageOpen, Plus } from "lucide-react";
 import { useState } from "react";
-
+import GreensImage from "./assets/greens.png";
+import BrownsImage from "./assets/browns.png";
+import CompostImage from "./assets/compost.png";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 import { createListing } from "@/lib/actions";
 import { listing_item_type_enum, listing_type_enum } from "@prisma/client";
+import { useRouter } from "next/navigation";
 import CreationBreadcrumbs from "./creation-breadcrumbs";
+import crypto from "crypto";
+import { getSignedURL } from "./actions";
 
 interface UserLocation {
     latitude: number;
@@ -64,6 +74,26 @@ export const CreateListingFormSchema = z.object({
     description: z.string(),
 });
 
+const uniqueFileName = (bytes = 32) =>
+    crypto.randomBytes(bytes).toString("hex");
+
+const uploadImage = async (image: File) => {
+    const fileName = uniqueFileName();
+    const signedURLResult = await getSignedURL(fileName);
+    const { url } = signedURLResult.success;
+    console.log(url);
+
+    await fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": image.type,
+        },
+        body: image,
+    });
+    console.log(url.split("?")[0]);
+    return url.split("?")[0]; // Return the base URL without query parameters
+};
+
 export default function CreateListing() {
     const [selectedAction, setSelectedAction] = useState(""); // State to track the selected action
     const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -84,53 +114,35 @@ export default function CreateListing() {
     });
 
     function onClickGreens(adjustment: number) {
-        if (selectedType !== "greens" && form.getValues("amount") !== 0) {
-            return;
-        }
         setSelectedType("greens");
         form.setValue("type", listing_item_type_enum.greens);
         setGoalGreens(goalGreens + adjustment);
         setGoalBrowns(0);
         setGoalCompost(0);
         form.setValue("amount", goalGreens + adjustment);
-        if (goalGreens + adjustment === 0) {
-            setSelectedType(null);
-        }
     }
 
     function onClickBrowns(adjustment: number) {
-        if (selectedType !== "browns" && form.getValues("amount") !== 0) {
-            return;
-        }
         setSelectedType("browns");
         form.setValue("type", listing_item_type_enum.browns);
         setGoalBrowns(goalBrowns + adjustment);
         setGoalGreens(0);
         setGoalCompost(0);
         form.setValue("amount", goalBrowns + adjustment);
-        if (goalBrowns + adjustment === 0) {
-            setSelectedType(null);
-        }
     }
 
     function onClickCompost(adjustment: number) {
-        if (selectedType !== "compost" && form.getValues("amount") !== 0) {
-            return;
-        }
         setSelectedType("compost");
         form.setValue("type", listing_item_type_enum.compost);
         setGoalCompost(goalCompost + adjustment);
         setGoalBrowns(0);
         setGoalGreens(0);
         form.setValue("amount", goalCompost + adjustment);
-        if (goalCompost + adjustment === 0) {
-            setSelectedType(null);
-        }
     }
 
     function handleTypeClick(type: listing_item_type_enum) {
-        if (selectedType !== type && form.getValues("amount") !== 0) {
-            return;
+        if (selectedType !== type) {
+            form.setValue("amount", 0);
         }
         setSelectedType(type); // Toggle the selected action
         if (type === "browns") {
@@ -192,18 +204,14 @@ export default function CreateListing() {
             accept: { "image/png": [], "image/jpg": [], "image/jpeg": [] },
         });
 
-    const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(";").shift();
-    };
-
     async function onSubmit(data: z.infer<typeof CreateListingFormSchema>) {
+        const imageUpload = await uploadImage(data.image);
+        return;
+        setIsSubmitting(true);
         const newData = {
             ...data,
             image: "test",
         };
-        setIsSubmitting(true);
         const result = await createListing(newData);
         toast({
             className: "bg-green-600 text-white",
@@ -388,9 +396,6 @@ export default function CreateListing() {
                                         <div className="flex text-center">
                                             <input
                                                 type="text"
-                                                disabled={
-                                                    selectedType !== "greens"
-                                                }
                                                 value={goalGreens}
                                                 onChange={(e) => {
                                                     const value = parseInt(
@@ -488,9 +493,6 @@ export default function CreateListing() {
                                         <div className="flex text-center">
                                             <input
                                                 type="text"
-                                                disabled={
-                                                    selectedType !== "browns"
-                                                }
                                                 value={goalBrowns}
                                                 onChange={(e) => {
                                                     const value = parseInt(
@@ -586,9 +588,6 @@ export default function CreateListing() {
                                         </Button>
                                         <div className="flex text-center">
                                             <input
-                                                disabled={
-                                                    selectedType !== "compost"
-                                                }
                                                 type="text"
                                                 value={goalCompost}
                                                 onChange={(e) => {

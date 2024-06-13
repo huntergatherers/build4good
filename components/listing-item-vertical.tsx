@@ -61,7 +61,7 @@ const ListingItemVertical = ({ listing }: ListingItemProps) => {
                             </span>{" "}
                             {listing.listing_type === "donate"
                                 ? "claimed"
-                                : "donated"}
+                                : "contributed"}
                         </label>
                         {listing.listing_item_type === "greens" ? (
                             <div className="mt-1">
