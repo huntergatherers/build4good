@@ -14,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Broccoli from "./assets/broccoli";
 import Apple from "./assets/apple";
 import dynamic from "next/dynamic";
+import GoogleMapsItem from "./google-maps-item";
 
 const MapItem = dynamic(() => import("./map-item"), { ssr: false });
 
@@ -127,7 +128,8 @@ const MapPage = () => {
 
     return (
         <div className="relative min-h-screen w-screen flex justify-center items-center">
-            <MapItem />
+            {/* <MapItem /> */}
+            <GoogleMapsItem />
             <Drawer>
                 <DrawerTrigger
                     style={{
