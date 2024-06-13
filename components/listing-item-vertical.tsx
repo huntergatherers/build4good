@@ -33,11 +33,11 @@ const ListingItemVertical = ({ listing }: ListingItemProps) => {
                     alt={listing.header}
                 />
             </div>
-            <div className="flex flex-col justify-center">
+            <div className="">
             <div className="font-bold text-sm mt-1 line-clamp-2 w-48 mb-1">
                 {listing.header}
             </div>
-            <div className="font-light text-sm mt-1 line-clamp-3 w-48 mb-1">
+            <div className="font-light text-sm mt-1 line-clamp-3 w-48 mb-1 h-16">
                 {listing.body}
             </div>
             <div>

@@ -66,10 +66,7 @@ const ListingItem = ({ listing }: ListingItemProps) => {
                  <Recycle size={17} color="#74a5c3" fill="#5ac4e7"/>
             </div>
            
-            }
-            
-           
-           
+            }           
             
             </div>
             <div className="font-medium text-base mt-1 line-clamp-2 w-36">
