@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, useLoadScript } from "@react-google-maps/api";
 
 const containerStyle = {
     width: "100%",
@@ -14,9 +14,10 @@ const center = {
 };
 
 function GoogleMaps() {
-    const { isLoaded } = useJsApiLoader({
-        id: "google-map-script",
+    const placesLibrary = ["places"];
+    const { isLoaded } = useLoadScript({
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS,
+        libraries: placesLibrary,
     });
 
     const [map, setMap] = React.useState(null);

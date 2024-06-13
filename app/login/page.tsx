@@ -9,22 +9,38 @@ import { SubmitButton } from "./submit-button";
 
 export default function AuthForm({
     searchParams,
+    closeDialog,
 }: {
     searchParams: { message: string };
+    closeDialog?: () => void;
 }) {
     const [isSignup, setIsSignup] = useState(false);
     const pathname = usePathname();
 
-    console.log(pathname);
     const toggleForm = () => {
         setIsSignup(!isSignup);
+    };
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        const form = event.currentTarget as HTMLFormElement;
+        const formData = new FormData(form);
+
+        if (isSignup) {
+            await signup(formData);
+        } else {
+            await login(formData);
+        }
+        if (closeDialog) {
+            closeDialog();
+        }
     };
 
     return (
         <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
             <form
                 className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
-                action={isSignup ? signup : login}
+                onSubmit={handleSubmit}
             >
                 {isSignup && (
                     <>

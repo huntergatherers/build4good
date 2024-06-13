@@ -236,7 +236,7 @@ const MapPage = () => {
                                             ))}
                                         </div>
                                         <div className="flex justify-center items-center mt-4">
-                                            <div className="bg-black rounded-3xl font-normal py-2 px-4 text-white">
+                                            <div className="bg-black rounded-3xl py-1 px-2 text-white">
                                                 2.4km
                                             </div>
                                             <div className="text-gray-500 ml-2">

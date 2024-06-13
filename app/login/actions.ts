@@ -51,10 +51,16 @@ export async function login(formData: FormData): Promise<void> {
     const { error } = await supabase.auth.signInWithPassword(data);
 
     if (error) {
-        throw new Error("Error logging in. Please try again.");
+        redirect("/login?message=Error+logging+in.+Please+try+again.");
     }
     const redirectPath = formData.get("redirect");
-    redirect(redirectPath ? redirectPath.toString() : "/");
+    redirect(
+        redirectPath
+            ? redirectPath === "/login"
+                ? "/"
+                : redirectPath.toString()
+            : "/"
+    );
 }
 
 export async function logout(): Promise<void> {

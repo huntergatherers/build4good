@@ -30,12 +30,12 @@ export default function UserMenu({ user }: { user: User | null }) {
                 <Menu color="white" size={18} />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="z-[401]">
-                <DropdownMenuLabel>ScraPals</DropdownMenuLabel>
+                <DropdownMenuLabel>Scrapbook</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    <Link className="flex" href="/new">
+                    <Link className="flex" href="/transactions">
                         <NotepadText size={18} className="mr-2" />
-                        My Requests
+                        My transactions
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
@@ -45,22 +45,16 @@ export default function UserMenu({ user }: { user: User | null }) {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <Link className="flex" href="/new">
+                    <Link className="flex" href="/community/new">
                         <Pencil size={18} className="mr-2" />
                         Write a post
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    <Link className="flex" href="/new">
+                    <Link className="flex" href="/profile">
                         <UserLucide size={18} className="mr-2" />
                         Profile
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <Link className="flex" href="/new">
-                        <Settings size={18} className="mr-2" />
-                        Settings
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

@@ -20,6 +20,7 @@ export default function LoginDialog() {
                     searchParams={{
                         message: "",
                     }}
+                    closeDialog={closeDialog}
                 />
             </DrawerContent>
         </Drawer>

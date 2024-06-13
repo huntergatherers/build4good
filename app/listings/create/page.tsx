@@ -1,5 +1,5 @@
 "use client";
-import { Autocomplete, LoadScript } from "@react-google-maps/api";
+import { Autocomplete, Libraries, useLoadScript } from "@react-google-maps/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,19 +23,16 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { toast, useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { ImagePlus, Minus, Package, PackageOpen, Plus } from "lucide-react";
 import { useState } from "react";
-import GreensImage from "./assets/greens.png";
-import BrownsImage from "./assets/browns.png";
-import CompostImage from "./assets/compost.png";
+
 import React from "react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 import { createListing } from "@/lib/actions";
 import { listing_item_type_enum, listing_type_enum } from "@prisma/client";
-import { useRouter } from "next/navigation";
 import CreationBreadcrumbs from "./creation-breadcrumbs";
 
 interface UserLocation {
@@ -80,37 +77,60 @@ export default function CreateListing() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [step, setStep] = useState(1);
     const { toast } = useToast();
+    const placesLibrary: Libraries = ["places"];
+    const { isLoaded } = useLoadScript({
+        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS!,
+        libraries: placesLibrary,
+    });
 
     function onClickGreens(adjustment: number) {
+        if (selectedType !== "greens" && form.getValues("amount") !== 0) {
+            return;
+        }
         setSelectedType("greens");
         form.setValue("type", listing_item_type_enum.greens);
         setGoalGreens(goalGreens + adjustment);
         setGoalBrowns(0);
         setGoalCompost(0);
         form.setValue("amount", goalGreens + adjustment);
+        if (goalGreens + adjustment === 0) {
+            setSelectedType(null);
+        }
     }
 
     function onClickBrowns(adjustment: number) {
+        if (selectedType !== "browns" && form.getValues("amount") !== 0) {
+            return;
+        }
         setSelectedType("browns");
         form.setValue("type", listing_item_type_enum.browns);
         setGoalBrowns(goalBrowns + adjustment);
         setGoalGreens(0);
         setGoalCompost(0);
         form.setValue("amount", goalBrowns + adjustment);
+        if (goalBrowns + adjustment === 0) {
+            setSelectedType(null);
+        }
     }
 
     function onClickCompost(adjustment: number) {
+        if (selectedType !== "compost" && form.getValues("amount") !== 0) {
+            return;
+        }
         setSelectedType("compost");
         form.setValue("type", listing_item_type_enum.compost);
         setGoalCompost(goalCompost + adjustment);
         setGoalBrowns(0);
         setGoalGreens(0);
         form.setValue("amount", goalCompost + adjustment);
+        if (goalCompost + adjustment === 0) {
+            setSelectedType(null);
+        }
     }
 
     function handleTypeClick(type: listing_item_type_enum) {
-        if (selectedType !== type) {
-            form.setValue("amount", 0);
+        if (selectedType !== type && form.getValues("amount") !== 0) {
+            return;
         }
         setSelectedType(type); // Toggle the selected action
         if (type === "browns") {
@@ -303,11 +323,14 @@ export default function CreateListing() {
                 {/* SECOND STEP: SELECT CATEGORY */}
                 {step === 2 && (
                     <div>
-                        <h1 className="text-xl font-semibold mb-2">
+                        <h1 className="text-xl font-semibold">
                             {selectedAction === "donate"
                                 ? "What will you be contributing?"
                                 : "What do you want to receive?"}
                         </h1>
+                        <p className="mb-4 text-red-500 font-semibold">
+                            Pick one only.
+                        </p>
                         <div>
                             <div className="flex flex-col space-y-4">
                                 <div
@@ -365,6 +388,9 @@ export default function CreateListing() {
                                         <div className="flex text-center">
                                             <input
                                                 type="text"
+                                                disabled={
+                                                    selectedType !== "greens"
+                                                }
                                                 value={goalGreens}
                                                 onChange={(e) => {
                                                     const value = parseInt(
@@ -462,6 +488,9 @@ export default function CreateListing() {
                                         <div className="flex text-center">
                                             <input
                                                 type="text"
+                                                disabled={
+                                                    selectedType !== "browns"
+                                                }
                                                 value={goalBrowns}
                                                 onChange={(e) => {
                                                     const value = parseInt(
@@ -557,6 +586,9 @@ export default function CreateListing() {
                                         </Button>
                                         <div className="flex text-center">
                                             <input
+                                                disabled={
+                                                    selectedType !== "compost"
+                                                }
                                                 type="text"
                                                 value={goalCompost}
                                                 onChange={(e) => {
@@ -841,13 +873,7 @@ export default function CreateListing() {
                                             </Button>
                                         )} */}
 
-                                        <LoadScript
-                                            googleMapsApiKey={
-                                                process.env
-                                                    .NEXT_PUBLIC_GOOGLE_MAPS!
-                                            }
-                                            libraries={["places"]}
-                                        >
+                                        {isLoaded && (
                                             <Autocomplete
                                                 restrictions={{ country: "sg" }}
                                                 onLoad={(autocomplete) =>
@@ -882,7 +908,7 @@ export default function CreateListing() {
                                             >
                                                 <Input placeholder="Enter your address" />
                                             </Autocomplete>
-                                        </LoadScript>
+                                        )}
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

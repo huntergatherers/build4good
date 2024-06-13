@@ -12,11 +12,10 @@ interface ListingItemProps {
 
 const ListingItemVertical = ({ listing }: ListingItemProps) => {
     const router = useRouter();
-    const progress = listing.Transaction.reduce(
-        (acc, transaction) => acc + transaction.donated_amount,
-        0
-    );
-    console.log(progress);
+    const progress = listing.Transaction.filter(
+        (transaction) => transaction.completed_at
+    ).reduce((acc, transaction) => acc + transaction.donated_amount, 0);
+
     return (
         <div
             className="flex w-full"

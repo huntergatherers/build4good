@@ -53,10 +53,9 @@ export default async function ListingPage({
     const transactions = listing.Transaction;
     const comments = listing.ListingComment;
 
-    const totalDonation = transactions.reduce(
-        (acc, transaction) => acc + transaction.donated_amount,
-        0
-    );
+    const totalDonation = transactions
+        .filter((transaction) => transaction.completed_at)
+        .reduce((acc, transaction) => acc + transaction.donated_amount, 0);
 
     const user = await getCurrentUser();
     return (
@@ -71,8 +70,10 @@ export default async function ListingPage({
             <p className="font-semibold">
                 {listing.total_amount}kg of {listing.listing_item_type}
             </p>
-            <div className="my-4"><GoogleMaps /></div>
-            
+            <div className="my-4">
+                <GoogleMaps />
+            </div>
+
             {/* <ListingMap /> */}
             <div className="flex justify-between items-center">
                 <p className="text-xl font-semibold w-[80%] overflow-hidden text-ellipsis">
@@ -106,7 +107,11 @@ export default async function ListingPage({
                     </div>
                     <div className="text-gray-400">
                         <p className="font-semibold">
-                            {listing.Transaction.length}
+                            {
+                                listing.Transaction.filter(
+                                    (transaction) => transaction.completed_at
+                                ).length
+                            }
                         </p>
                         {listingType === "donate" ? "claimed" : "contributors"}
                     </div>

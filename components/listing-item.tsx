@@ -13,10 +13,10 @@ interface ListingItemProps {
 
 const ListingItem = ({ listing, showDescription }: ListingItemProps) => {
     const router = useRouter();
-    const progress = listing.Transaction.reduce(
-        (acc, transaction) => acc + transaction.donated_amount,
-        0
-    );
+    const progress = listing.Transaction.filter(
+        (transaction) => transaction.completed_at
+    ).reduce((acc, transaction) => acc + transaction.donated_amount, 0);
+
     console.log(progress);
     return (
         <div
@@ -72,7 +72,7 @@ const ListingItem = ({ listing, showDescription }: ListingItemProps) => {
                 {listing.header}
             </div>
             {showDescription && (
-                <div className="font-light text-sm mt-1 line-clamp-3 w-36 mb-1 h-16">
+                <div className="font-light text-sm mt-1 line-clamp-2 w-36 mb-1">
                     {listing.body}
                 </div>
             )}
