@@ -29,6 +29,34 @@ export function daysBetween(
     return Math.round(Math.abs(dayDifference));
 }
 
+export function getRandomOffsetLocation(
+  location: { latitude: number; longitude: number },
+  minDistance: number = 50,
+  maxDistance: number = 100
+) {
+  console.log(location)
+  const earthRadius = 6371000; // radius of Earth in meters
+  const randomDistance =
+      Math.random() * (maxDistance - minDistance) + minDistance;
+  const randomAngle = Math.random() * 2 * Math.PI;
+
+  const offsetLatitude =
+      (randomDistance * Math.cos(randomAngle)) / earthRadius;
+  const offsetLongitude =
+      (randomDistance * Math.sin(randomAngle)) /
+      (earthRadius * Math.cos((location.latitude * Math.PI) / 180));
+
+  const newLatitude = location.latitude + (offsetLatitude * 180) / Math.PI;
+  const newLongitude = location.longitude + (offsetLongitude * 180) / Math.PI;
+  console.log(newLatitude, newLongitude)
+
+  return {
+      latitude: newLatitude,
+      longitude: newLongitude,
+  };
+}
+
+
 // haversine euclidean distance from coordinates
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const toRad = (value: number) => (value * Math.PI) / 180;

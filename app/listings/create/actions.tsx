@@ -38,8 +38,6 @@ export async function getSignedURL(
         { expiresIn: 60 } // 60 seconds
     );
 
-    console.log(url);
-
     await fetch(url, {
         method: "PUT",
         headers: {

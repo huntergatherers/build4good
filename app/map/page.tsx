@@ -129,7 +129,9 @@ const MapPage = () => {
     return (
         <div className="relative min-h-screen w-screen flex justify-center items-center">
             {/* <MapItem /> */}
-            <GoogleMapsItem />
+            {/* <GoogleMapsItem markers={} /> */}
+            {/* <GoogleMapsItem /> */}
+
             <Drawer>
                 <DrawerTrigger
                     style={{

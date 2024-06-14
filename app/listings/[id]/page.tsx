@@ -72,9 +72,11 @@ export default async function ListingPage({
                 {listing.total_amount}kg of {listing.listing_item_type}
             </p>
             <div className="my-4">
-                <GoogleMaps />
+                <GoogleMaps location={{
+                  lat: listing.coords_lat,
+                  lng: listing.coords_long
+                }} listing={listing}/>
             </div>
-
             {/* <ListingMap /> */}
             <div className="flex justify-between items-center">
                 <p className="text-xl font-semibold w-[80%] overflow-hidden text-ellipsis">

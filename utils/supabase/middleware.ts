@@ -53,7 +53,20 @@ export async function updateSession(request: NextRequest, headers: Headers) {
         }
     );
 
-    await supabase.auth.getUser();
+    const {data, error} = await supabase.auth.getUser();
+    
+    const user = data?.user;
+
+    if ((request.nextUrl.pathname === '/listings/create' || request.nextUrl.pathname === '/profile' ||  request.nextUrl.pathname === '/community/new') && !user) {
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    if (request.nextUrl.pathname === '/login'  && user) {
+        return NextResponse.redirect(new URL('/listings', request.url));
+
+    }
+
+
 
     if (request.nextUrl.pathname === '/') {
           return NextResponse.redirect(new URL('/listings', request.url));

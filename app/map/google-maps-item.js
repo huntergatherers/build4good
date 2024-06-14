@@ -17,7 +17,8 @@ const center = {
     lng: 103.8185,
 };
 
-function GoogleMapsItem() {
+
+function GoogleMapsItem({markers}) {
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS,
@@ -36,7 +37,7 @@ function GoogleMapsItem() {
         setMap(null);
     }, []);
 
-    const latlng = { lat: 1.4491, lng: 103.8185 };
+    const latlng = { lat: lat, lng: lng };
 
     return isLoaded ? (
         <GoogleMap
@@ -55,17 +56,7 @@ function GoogleMapsItem() {
             onLoad={onLoad}
             onUnmount={onUnmount}
         >
-            <Marker
-                position={latlng}
-                icon={{
-                    url: "/icons/donors.svg",
-                }}
-            >
-                <InfoWindow>
-                    <h3>hello</h3>
-                </InfoWindow>
-            </Marker>
-
+          <Marker position={markers[0]}></Marker>
             {/* Child components, such as markers, info windows, etc. */}
             <></>
         </GoogleMap>

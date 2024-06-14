@@ -14,7 +14,6 @@ import {
     getUserProfileFromUserId,
 } from "./auth";
 import { redirect } from "next/navigation";
-import { revalidatePath, revalidateTag } from "next/cache";
 import { en } from "@faker-js/faker";
 import { z } from "zod";
 import { CreateListingFormSchema } from "@/app/listings/create/page";
@@ -22,6 +21,7 @@ import { calculateDistance } from "./utils";
 
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { cookies } from "next/headers";
 
 // Functions related to Current User
 // --------------------------------------------------------
@@ -45,6 +45,7 @@ async function getCurrentUserCoords(): Promise<{
     }
     return null;
 }
+
 
 export async function getCurrentDistanceToInstance(instance: {
     coords_lat: number | null;
@@ -610,17 +611,49 @@ export async function checkListingStatus(listingId: number): Promise<void> {
 // }
 //approve transaction
 export async function approveTransaction(transactionId: string) {
+    const user = await getCurrentUser();
+    if (!user) {
+        return {
+            error: "User not found",
+        };
+    }
     try {
         const transaction = await prisma.transaction.update({
             where: { id: transactionId },
             data: { approved_at: new Date() },
         });
-        return transaction;
+        return {success: transaction};
     } catch (error) {
         console.error("Error approving transaction:", error);
-        throw error;
+        return {
+          error: "Error approving transaction",
+      };
     }
 }
+
+//reject transaction
+export async function rejectTransaction(transactionId: string) {
+    const user = await getCurrentUser();
+    if (!user) {
+        return {
+            error: "User not found",
+        };
+    }
+    try {
+        const transaction = await prisma.transaction.update({
+            where: { id: transactionId },
+            data: { completed_at: new Date() },
+        });
+        return {success: transaction};
+    } catch (error) {
+        console.error("Error rejecting transaction:", error);
+        return {
+          error: "Error rejecting transaction",
+      };
+    }
+}
+
+
 //mark transaction as completed
 export async function completeTransaction(transactionId: string) {
     // ensure transactionId is approved

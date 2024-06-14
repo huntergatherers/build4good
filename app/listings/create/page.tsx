@@ -31,16 +31,11 @@ import { Input } from "@/components/ui/input";
 import { toast, useToast } from "@/components/ui/use-toast";
 import { ImagePlus, Minus, Package, PackageOpen, Plus } from "lucide-react";
 import { useState } from "react";
-import GreensImage from "./assets/greens.png";
-import BrownsImage from "./assets/browns.png";
-import CompostImage from "./assets/compost.png";
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn, getRandomOffsetLocation } from "@/lib/utils";
 import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
-import { createListing } from "@/lib/actions";
 import { listing_item_type_enum, listing_type_enum } from "@prisma/client";
-import { useRouter } from "next/navigation";
 import CreationBreadcrumbs from "./creation-breadcrumbs";
 import crypto from "crypto";
 import { getSignedURL as getSignedURLAndCreateListing } from "./actions";
@@ -192,16 +187,17 @@ export default function CreateListing() {
         const fileName = uniqueFileName();
         const newData = {
             ...data,
+            location: getRandomOffsetLocation(data.location),
             image: "",
         };
         const formData = new FormData();
         formData.append("image", data.image);
         await getSignedURLAndCreateListing(fileName, newData, formData);
-        toast({
-            className: "bg-green-600 text-white",
-            title: "Listing Created",
-            description: "Your listing has been successfully created",
-        });
+        // toast({
+        //     className: "bg-green-600 text-white",
+        //     title: "Listing Created",
+        //     description: "Your listing has been successfully created",
+        // });
         setIsSubmitting(false);
     }
 
@@ -735,7 +731,7 @@ export default function CreateListing() {
                                                     <Image
                                                         src={preview as string}
                                                         alt="Uploaded image"
-                                                        layout="fill"
+                                                        fill
                                                         objectFit="cover"
                                                         className="rounded-lg"
                                                     />

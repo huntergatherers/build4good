@@ -57,7 +57,7 @@ export default async function Index() {
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="text-xl font-bold mt-6">
-                            Looking for...
+                            People are looking for...
                         </div>
                         <p className="text-xs text-gray-400 mb-4">
                             Check out what other people are requesting for!
@@ -75,7 +75,7 @@ export default async function Index() {
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="text-xl font-bold mt-6">
-                            Giving away...
+                            People are giving away...
                         </div>
                         <p className="text-xs text-gray-400 mb-4">
                             Check out what other people are giving away!
