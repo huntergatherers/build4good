@@ -1,10 +1,20 @@
 import ListingHorizontalScroll from "@/components/listing-horizontal-scroll";
-import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/server";
 import { ChevronRight, Filter, Search } from "lucide-react";
 import { redirect } from "next/navigation";
 import prisma, { listing_type_enum } from "@/lib/db";
 import Link from "next/link";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 export default async function Index() {
     // const supabase = createClient();
     // const { data, error } = await supabase.auth.getUser();
@@ -51,7 +61,72 @@ export default async function Index() {
                         />
                     </div>
                     <div className="flex items-center justify-center h-10 w-10 bg-gray-100 rounded-md">
-                        <Filter size={18} />
+                       
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="ghost"> <Filter size={18} /></Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-fit mr-6 ">
+                               <div>
+                                <h1 className="font-medium text-lg mb-2"> I am looking for...</h1>
+                                <div className = "flex justify-between">
+                                    <Button variant="ghost" className="w-fit h-fit p-0">
+                                        <Badge className="m-0 hover:bg-gray-500 text-[0.8rem]">Receivers</Badge>
+                                    </Button>
+                                    <Button variant="ghost" className="w-fit h-fit p-0">
+                                    <Badge className="m-0 hover:bg-gray-500 text-[0.8rem] ml-4">Givers</Badge>
+                                    </Button>
+                                       
+                                </div>
+                                <Separator className="my-4"/>
+
+                                <div className="items-top flex space-x-2">
+                                    <Checkbox id="greens" />
+                                    <div className="grid gap-1.5 leading-none">
+                                        <label
+                                        htmlFor="terms1"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                        Greens
+                                        </label>
+                                        <p className="text-xs text-muted-foreground">
+                                        Vegetables
+                                        </p>
+                                </div>
+                              </div>
+
+                              <div className="items-top flex space-x-2 mt-2">
+                                    <Checkbox id="browns" />
+                                    <div className="grid gap-1.5 leading-none">
+                                        <label
+                                        htmlFor="terms1"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                        Browns
+                                        </label>
+                                        <p className="text-xs text-muted-foreground">
+                                        Coffee Grounds...
+                                        </p>
+                                </div>
+                              </div>
+
+                              <div className="items-top flex space-x-2 mt-2">
+                                    <Checkbox id="greens" />
+                                    <div className="grid gap-1.5 leading-none">
+                                        <label
+                                        htmlFor="others"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                        Others
+                                        </label>
+                                        <p className="text-xs text-muted-foreground">
+                                        Fungible Worms etc.
+                                        </p>
+                                </div>
+                              </div>
+                               </div>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 </div>
                 <div className="flex items-center justify-between">

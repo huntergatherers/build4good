@@ -25,12 +25,12 @@ const ListingItem = ({ listing, showDescription }: ListingItemProps) => {
         >
             <div className="relative w-36 h-36">
                 <div
-                    className={`text-[0.6rem] text-white absolute -left-[1px] top-2 p-1 rounded-r-sm z-10 ${
+                    className={`text-[0.6rem] text-white absolute -left-[1px] top-2 p-1 rounded-r-md z-10 ${
                         listing.listing_item_type === "greens"
-                            ? "bg-green-600"
+                            ? "bg-green-600 bg-opacity-90 "
                             : listing.listing_item_type === "browns"
-                            ? "bg-amber-600"
-                            : "bg-blue-800"
+                            ? "bg-amber-700 bg-opacity-90"
+                            : "bg-cyan-700 bg-opacity-90"
                     }`}
                 >
                     {listing.listing_item_type}
