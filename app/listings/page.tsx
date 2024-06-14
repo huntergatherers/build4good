@@ -66,19 +66,17 @@ export default async function Index() {
                             <PopoverTrigger asChild>
                                 <Button variant="ghost"> <Filter size={18} /></Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80 mr-6">
+                            <PopoverContent className="w-fit mr-6 ">
                                <div>
                                 <h1 className="font-medium text-lg mb-2"> I am looking for...</h1>
                                 <div className = "flex justify-between">
                                     <Button variant="ghost" className="w-fit h-fit p-0">
-                                        <Badge className="m-0 hover:bg-gray-500">Scraps</Badge>
+                                        <Badge className="m-0 hover:bg-gray-500 text-[0.8rem]">Receivers</Badge>
                                     </Button>
                                     <Button variant="ghost" className="w-fit h-fit p-0">
-                                    <Badge className="m-0 hover:bg-gray-500">Compost Makers</Badge>
-                                        </Button>
-                                        <Button variant="ghost" className="w-fit h-fit p-0">
-                                        <Badge className="m-0 hover:bg-gray-500">Compost</Badge>
-                                        </Button>
+                                    <Badge className="m-0 hover:bg-gray-500 text-[0.8rem] ml-4">Givers</Badge>
+                                    </Button>
+                                       
                                 </div>
                                 <Separator className="my-4"/>
 
