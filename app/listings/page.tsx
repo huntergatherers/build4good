@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import Pills from "@/components/(navbar)/pills";
 export default async function Index({
     searchParams,
 }: {
@@ -48,7 +49,8 @@ export default async function Index({
         },
     });
     return (
-        <div className="flex flex-col items-center w-full">
+        <div className="flex flex-col items-center w-full p-6">
+            <Pills />
             <main className="flex-1 flex flex-col w-full">
                 <div className="flex justify-center items-center space-x-2">
                     <div className="relative w-full ml-auto">

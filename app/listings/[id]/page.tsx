@@ -14,7 +14,8 @@ import TransactionBtn from "./components/transaction-btn";
 import { useLoginDialog } from "@/app/login/login-dialog-context";
 import LoginButton from "@/app/login/login-button";
 import GoogleMaps from "./components/google-maps";
-import { Loader } from "lucide-react";
+import { ChevronLeft, Loader } from "lucide-react";
+import BackBtn from "./components/back-btn";
 
 export default async function ListingPage({
     params,
@@ -60,8 +61,9 @@ export default async function ListingPage({
 
     const user = await getCurrentUser();
     return (
-        <div className="w-full p-6 relative">
-            <h1 className="font-bold text-xl">
+        <div className="w-full min-h-screen px-6 pt-6 pb-20 relative bg-white overflow-auto">
+            <BackBtn />
+            <h1 className="font-bold text-xl mt-4">
                 {username}{" "}
                 {listingType == "donate"
                     ? "is contributing"
@@ -72,10 +74,13 @@ export default async function ListingPage({
                 {listing.total_amount}kg of {listing.listing_item_type}
             </p>
             <div className="my-4">
-                <GoogleMaps location={{
-                  lat: listing.coords_lat,
-                  lng: listing.coords_long
-                }} listing={listing}/>
+                <GoogleMaps
+                    location={{
+                        lat: listing.coords_lat,
+                        lng: listing.coords_long,
+                    }}
+                    listing={listing}
+                />
             </div>
             {/* <ListingMap /> */}
             <div className="flex justify-between items-center">
@@ -159,13 +164,15 @@ export default async function ListingPage({
                 user={user}
                 listingId={listingId}
             />
-            <div className="sticky bottom-0 p-4 -mx-6 bg-white rounded-t-lg border-t-2 border-t-gray-200 drop-shadow-2xl">
-                {user ? user.id === owner.id ? null :    (
-                    <TransactionBtn
-                        user={user}
-                        listing={listing}
-                        listingOwner={owner}
-                    />
+            <div className="fixed bottom-0 p-4 -mx-6 w-full bg-white rounded-t-lg border-t-2 border-t-gray-200 drop-shadow-2xl">
+                {user ? (
+                    user.id === owner.id ? null : (
+                        <TransactionBtn
+                            user={user}
+                            listing={listing}
+                            listingOwner={owner}
+                        />
+                    )
                 ) : (
                     <LoginButton
                         text={

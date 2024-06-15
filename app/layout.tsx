@@ -27,14 +27,12 @@ export default async function RootLayout({
     const { data } = await supabase.auth.getUser();
     return (
         <html lang="en" className={GeistSans.className}>
-            <body className="bg-background text-foreground">
+            <body className="bg-white text-foreground">
                 <LoginDialogProvider>
                     <LoginDialog />
-                    <main className="min-h-screen max-h-screen flex flex-col items-center safe-bottom">
+                    <main className="min-h-screen flex flex-col items-center safe-bottom">
                         {children}
-                        <Navbar user={data.user}>
-                            <Notifications />
-                        </Navbar>
+                        <Navbar />
                     </main>
                     <Toaster />
                 </LoginDialogProvider>

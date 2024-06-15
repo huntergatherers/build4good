@@ -13,7 +13,7 @@ export default function Pills() {
             : "text-black bg-gray-100 p-2 px-4 opacity-100";
 
     return (
-        <div className="space-x-2 mb-6">
+        <div className="space-x-2 mb-6 self-start">
             <Link href="/listings?type=requests">
                 <Badge
                     className={getIconColor("/listings", "type", "requests")}

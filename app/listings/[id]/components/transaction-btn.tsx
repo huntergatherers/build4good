@@ -128,7 +128,7 @@ export default function TransactionBtn({
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
                 <Button
-                    className={`mt-4 w-full px-6 ${
+                    className={`w-full px-6 ${
                         hasPendingTransaction &&
                         listing.listing_type === "donate"
                             ? "bg-blue-700"
