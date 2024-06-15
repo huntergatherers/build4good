@@ -4,9 +4,9 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function updateSession(request: NextRequest, headers: Headers) {
     headers.set("x-current-path", request.nextUrl.pathname);
     let response = NextResponse.next({
-      request: {
-        headers: headers,
-      },
+        request: {
+            headers: headers,
+        },
     });
 
     const supabase = createServerClient(
@@ -55,24 +55,31 @@ export async function updateSession(request: NextRequest, headers: Headers) {
         }
     );
 
-    const {data, error} = await supabase.auth.getUser();
-    
+    const { data, error } = await supabase.auth.getUser();
+
     const user = data?.user;
-
-    if ((request.nextUrl.pathname === '/listings/create' || request.nextUrl.pathname === '/profile' ||  request.nextUrl.pathname === '/community/new') && !user) {
-        return NextResponse.redirect(new URL('/login', request.url));
+    if (
+        (request.nextUrl.pathname === "/listings/create" ||
+            request.nextUrl.pathname === "/profile" ||
+            request.nextUrl.pathname === "/community/new") &&
+        !user
+    ) {
+        return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    if (request.nextUrl.pathname === '/login'  && user) {
-        return NextResponse.redirect(new URL('/listings', request.url));
-
+    if (request.nextUrl.pathname === "/login" && user) {
+        return NextResponse.redirect(new URL("/listings", request.url));
     }
 
-
-
-    if (request.nextUrl.pathname === '/') {
-          return NextResponse.redirect(new URL('/listings', request.url));
-      }
+    if (
+        request.nextUrl.pathname === "/" ||
+        (request.nextUrl.pathname === "/listings" &&
+            request.nextUrl.searchParams.get("type") === null)
+    ) {
+        return NextResponse.redirect(
+            new URL("/listings?type=requests", request.url)
+        );
+    }
 
     return response;
 }
