@@ -4,7 +4,6 @@ import {
     GoogleMap,
     Marker,
     useJsApiLoader,
-    InfoWindow,
 } from "@react-google-maps/api";
 
 const containerStyle = {
@@ -17,8 +16,7 @@ const center = {
     lng: 103.8185,
 };
 
-
-function GoogleMapsItem({markers}) {
+function GoogleMapsItem({ markers = [] }) {
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS,
@@ -37,8 +35,6 @@ function GoogleMapsItem({markers}) {
         setMap(null);
     }, []);
 
-    const latlng = { lat: lat, lng: lng };
-
     return isLoaded ? (
         <GoogleMap
             options={{
@@ -56,9 +52,9 @@ function GoogleMapsItem({markers}) {
             onLoad={onLoad}
             onUnmount={onUnmount}
         >
-          <Marker position={markers[0]}></Marker>
-            {/* Child components, such as markers, info windows, etc. */}
-            <></>
+            {markers.length > 0 && markers.map((marker, index) => (
+                <Marker key={index} position={marker} />
+            ))}
         </GoogleMap>
     ) : (
         <></>
