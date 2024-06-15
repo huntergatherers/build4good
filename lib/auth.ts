@@ -12,7 +12,6 @@ export async function getCurrentUserId() {
 export async function getCurrentUser() {
     const supabase = createClient();
     const { data } = await supabase.auth.getUser();
-    console.log(data.user);
     return data.user;
 }
 

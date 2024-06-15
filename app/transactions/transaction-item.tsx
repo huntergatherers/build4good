@@ -3,9 +3,12 @@ import { Prisma, Transaction } from "@prisma/client";
 import { Check, X } from "lucide-react";
 import Image from "next/image";
 import TransactionStatusTag from "./transaction-status-tag";
-import { useApproveTransaction } from "@/lib/hooks/useApproveTransaction";
-import { approveTransaction, rejectTransaction } from "@/lib/actions";
+// import { useApproveTransaction } from "@/lib/hooks/useApproveTransaction";
+// import { approveTransaction, rejectTransaction } from "@/lib/actions";
 import { useRouter } from "next/navigation";
+import { useAction } from "next-safe-action/hooks";
+// import { useApproveTransaction } from "@/lib/hooks/useApproveTransaction";
+import { approveTransaction } from "@/lib/actions";
 
 export type TransactionWithDetails = Prisma.TransactionGetPayload<{
     include: {
@@ -29,14 +32,15 @@ export default function TransactionItem({
 }: TransactionItemProps) {
   const router = useRouter();
     const handleApproveTransaction = async () => {
-      await approveTransaction(transaction.id);
-      router.refresh();
+      const data = await approveTransaction(transaction.id);
+      console.log(data)
     }
 
-    const handleRejectTransaction = async () => {
-        await rejectTransaction(transaction.id);
-        router.refresh();
-    }
+    // const handleRejectTransaction = async () => {
+    //     await rejectTransaction(transaction.id);
+    // }
+    // const { execute, result } = useAction(useApproveTransaction);
+    // console.log(result)
     return (
         <div
             key={transaction.id}
@@ -77,19 +81,20 @@ export default function TransactionItem({
                     </p>
                 </div>
             </div>
+
             {type === "receive" ? (
                 <div className="flex items-center justify-center self-center space-x-2">
                     <Check
-                        onClick={async () => {
-                            await handleApproveTransaction();
+                        onClick={async() => {
+                           await handleApproveTransaction();
                         }}
                         color="white"
                         className="bg-orange-400 w-10 h-10 rounded-full p-2"
                     />
                     <X
-                        onClick={async () => {
-                            await handleRejectTransaction();
-                        }}
+                        // onClick={async () => {
+                        //     await handleRejectTransaction();
+                        // }}
                         color="white"
                         className="bg-gray-400 w-10 h-10 rounded-full p-2"
                     />

@@ -160,7 +160,7 @@ export default async function ListingPage({
                 listingId={listingId}
             />
             <div className="sticky bottom-0 p-4 -mx-6 bg-white rounded-t-lg border-t-2 border-t-gray-200 drop-shadow-2xl">
-                {user ? (
+                {user ? user.id === owner.id ? null :    (
                     <TransactionBtn
                         user={user}
                         listing={listing}

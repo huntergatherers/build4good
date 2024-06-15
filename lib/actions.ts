@@ -22,6 +22,7 @@ import { calculateDistance } from "./utils";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 // Functions related to Current User
 // --------------------------------------------------------
@@ -622,6 +623,9 @@ export async function approveTransaction(transactionId: string) {
             where: { id: transactionId },
             data: { approved_at: new Date() },
         });
+        revalidatePath("/transactions");
+        revalidatePath("/transactions", "page");
+        revalidatePath("/transactions", "layout");
         return {success: transaction};
     } catch (error) {
         console.error("Error approving transaction:", error);
@@ -630,6 +634,8 @@ export async function approveTransaction(transactionId: string) {
       };
     }
 }
+
+
 
 //reject transaction
 export async function rejectTransaction(transactionId: string) {

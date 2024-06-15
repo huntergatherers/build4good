@@ -29,27 +29,33 @@ const transactionTypes = [
 ];
 
 interface TransactionDropdownProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  value: string;
-  setValue: (value: string) => void;
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    value: string;
+    setValue: (value: string) => void;
 }
 
-export function TransactionDropdown({ open, setOpen, value, setValue }: TransactionDropdownProps) {
-
+export function TransactionDropdown({
+    open,
+    setOpen,
+    value,
+    setValue,
+}: TransactionDropdownProps) {
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
+                    variant="outline"
+                    role="combobox"
                     aria-expanded={open}
-                    className="w-[200px] justify-between border-none bg-transparent hover:bg-none text-black text-xl font-semibold"
+                    className="w-[200px] justify-between"
                 >
-                    {
-                        transactionTypes.find(
-                            (transactionType) => transactionType.value === value
-                        )?.label
-                    }
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50 border rounded-full border-black" />
+                    {value
+                        ? transactionTypes.find(
+                              (transaction) => transaction.value === value
+                          )?.label
+                        : "Select framework..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0">
