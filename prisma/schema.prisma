@@ -364,7 +364,7 @@ model Listing {
 }
 
 model ListingComment {
-  id                   String           @id @default(cuid())
+  id                   String           @id
   listing_id           Int
   profile_id           String           @db.Uuid
   parent_id            String?
@@ -382,7 +382,7 @@ model ListingComment {
 }
 
 model ListingImage {
-  id         String  @id @default(cuid())
+  id         String  @id
   listing_id Int
   url        String
   Listing    Listing @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -402,7 +402,7 @@ model ListingTag {
 }
 
 model Notification {
-  id                String                 @id @default(cuid())
+  id                String                 @id
   profile_id        String                 @db.Uuid
   created_at        DateTime               @default(now())
   header            String
@@ -434,7 +434,7 @@ model Post {
 }
 
 model PostComment {
-  id          String   @id @default(cuid())
+  id          String   @id
   post_id     Int
   profile_id  String   @db.Uuid
   created_at  DateTime @default(now())
@@ -457,7 +457,7 @@ model PostImage {
 }
 
 model Transaction {
-  id             String    @id @default(cuid())
+  id             String    @id
   listing_id     Int
   donated_amount Float
   created_at     DateTime  @default(now())
