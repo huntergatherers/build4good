@@ -8,6 +8,7 @@ export async function updateSession(request: NextRequest, headers: Headers) {
             headers: headers,
         },
     });
+    
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -58,6 +59,9 @@ export async function updateSession(request: NextRequest, headers: Headers) {
     const { data, error } = await supabase.auth.getUser();
 
     const user = data?.user;
+
+
+
     if (
         (request.nextUrl.pathname === "/listings/create" ||
             request.nextUrl.pathname === "/profile" ||
@@ -80,6 +84,19 @@ export async function updateSession(request: NextRequest, headers: Headers) {
             new URL("/listings?type=requests", request.url)
         );
     }
+    // if (
+    //     request.nextUrl.pathname === "/profile"
+        
+    // ) {
+    //     if (user == null) {
+    //         return NextResponse.redirect(
+    //             new URL("/login", request.url)
+    //         ); 
+    //     } 
+    //     return NextResponse.redirect(
+    //         new URL(`/profile/${userdb?.profiles?.username}`, request.url)
+    //     ); 
+    // }
 
     return response;
 }
