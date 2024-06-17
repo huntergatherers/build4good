@@ -21,13 +21,11 @@ const ListingVerticalScrollOne = async ({
 }: ListingVerticleScrollProps) => {
   return (
     <ScrollArea className="">
-      <div className="flex justify-center">
         <div className="grid grid-cols-1 gap-y-6">
           {listings.map((listing, index: number) => (
             <ListingItemOne key={index} listing={listing} showDescription={true} />
           ))}
         </div>
-      </div>
       <ScrollBar orientation="vertical" className="opacity-0" />
     </ScrollArea>
   );

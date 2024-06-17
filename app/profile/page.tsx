@@ -152,12 +152,12 @@ export default async function Profile() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="Requests">
-          <ScrollArea className="h-[15rem]">
+          <ScrollArea className="h-[18rem]">
             <ListingVerticalScroll listings={requestListings} />
             </ScrollArea>
           </TabsContent>
           <TabsContent value="Offers">
-            <ScrollArea className="h-[15rem]">
+            <ScrollArea className="h-[18rem]">
               <ListingVerticalScroll listings={donateListings} />
             </ScrollArea>
           </TabsContent>
