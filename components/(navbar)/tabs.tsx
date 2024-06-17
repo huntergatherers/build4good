@@ -69,7 +69,7 @@ export default function Tabs() {
             </div>
           </Link>
           <Link href="/listings/create" className="flex-1 flex justify-center">
-            <div className="bg-[#47A36E] rounded-full shadow-2xl p-2 shadow-black">
+            <div className="bg-[#47A36E] rounded-full shadow-2xl p-2 shadow-black w-10 h-10 flex justify-center items-center">
               {getCreateColor('/listings/create')}
             </div>
           </Link>

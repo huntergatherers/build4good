@@ -67,7 +67,9 @@ export const CreateListingFormSchema = z.object({
     deadline: z.date({
         required_error: "Please select a deadline",
     }),
-    description: z.string(),
+    description: z.string().min(10, {
+      message: "Description must be at least 10 characters.",
+  }),
 });
 
 const uniqueFileName = (bytes = 32) =>
@@ -920,11 +922,11 @@ export default function CreateListing() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="font-normal text-md">
-                                        Description (optional)
+                                        Description<span className="text-red-500">*</span>
                                     </FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="Include any additional information or custom instructions you may have"
+                                            placeholder="Include some additional information or custom instructions you may have"
                                             className="resize-none text-md"
                                             {...field}
                                         />
