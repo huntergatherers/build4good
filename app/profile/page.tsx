@@ -4,6 +4,8 @@ import prisma, { listing_type_enum } from '@/lib/db';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ListingVerticalScroll from '@/components/listing-vertical-scroll';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default async function Profile() {
   const userId = await getCurrentUserId();
@@ -45,7 +47,7 @@ export default async function Profile() {
 
   return (
     <div className="w-full flex flex-col items-center justify-center">
-      <div className="rounded-2xl shadow-xl p-6 text-center h-fit w-80 mt-10 flex flex-col items-center justify-center space-y-4">
+      <div className="border border-gray-100 rounded-2xl shadow-xl p-6 text-center h-fit w-80 mt-10 flex flex-col items-center justify-center space-y-4">
         <div className=" w-20 h-20 relative">
           <Image
             className="border-4 border-gray-100 rounded-full shadow-xl"
@@ -66,7 +68,7 @@ export default async function Profile() {
         <Button className="w-full">Edit Profile</Button>
       </div>
       <div className="text-center flex flex-col items-center justify-center mt-6 w-full">
-        <Tabs defaultValue="Requests" className="w-full">
+        <Tabs defaultValue="Offers" className="w-full">
           <TabsList className=" w-[22rem]">
             <TabsTrigger className=" w-44" value="Requests">
               Requests
@@ -75,8 +77,14 @@ export default async function Profile() {
               Offers
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="Requests">All request listings</TabsContent>
-          <TabsContent value="Offers">All offer listings</TabsContent>
+          <TabsContent value="Requests">
+            <ListingVerticalScroll listings={requestListings} />
+          </TabsContent>
+          <TabsContent value="Offers">
+            <ScrollArea className="h-[25rem]">
+              <ListingVerticalScroll listings={donateListings} />
+            </ScrollArea>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
