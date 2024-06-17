@@ -71,11 +71,11 @@ const ListingItem = ({ listing, showDescription }: ListingItemProps) => {
                     {/* <p className="text-right"><Apple/></p> */}
                 </label>
             </div>
-            <div className="font-medium text-base mt-1 line-clamp-2 w-36">
+            <div className="font-medium text-base mt-1 line-clamp-2 w-36 text-left">
                 {listing.header}
             </div>
             {showDescription && (
-                <div className="font-light text-sm line-clamp-2 w-36 mb-1">
+                <div className="font-light text-sm line-clamp-2 w-36 mb-1 text-left">
                     {listing.body}
                 </div>
             )}

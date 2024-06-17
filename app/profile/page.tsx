@@ -10,8 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { BookHeart, Medal, PartyPopper, Trophy } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-const UserPage = async ({ params }: { params: { username: string } }) => {
+export default async function Profile() {
   const userId = await getCurrentUserId();
+  if (!userId) redirect('/login');
   const user = await prisma.users.findUnique({
     where: {
       id: userId,
@@ -20,30 +21,11 @@ const UserPage = async ({ params }: { params: { username: string } }) => {
       profiles: true,
     },
   });
-  if (params.username === user?.profiles?.username) {
-    redirect('/profile');
-  }
-  // other users
-  const profile = await prisma.profiles.findUnique({
-    where: {
-      username: params.username,
-    },
-    include: {
-      users: true,
-    },
-  });
-
-  if (!profile) {
-    redirect('/error');
-  }
-
-  console.log(profile);
-  // {params.username}
 
   const requestListings = await prisma.listing.findMany({
     where: {
       profiles: {
-        username: params.username,
+        username: user?.profiles?.username,
       },
       listing_type: listing_type_enum.receive,
     },
@@ -56,7 +38,7 @@ const UserPage = async ({ params }: { params: { username: string } }) => {
   const donateListings = await prisma.listing.findMany({
     where: {
       profiles: {
-        username: params.username,
+        username: user?.profiles?.username,
       },
       listing_type: listing_type_enum.donate,
     },
@@ -81,12 +63,12 @@ const UserPage = async ({ params }: { params: { username: string } }) => {
           />
         </div>
 
-        <p className="text-xl font-semibold">{params.username}</p>
-        <p className="text-sm font-normal text-gray-700 text-left mx-auto">
-          Hi my name is {params.username} and i am a compostor. I like collecting trash and
+        <p className="text-xl font-semibold">{user?.profiles?.username}</p>
+        <p className="text-sm font-normal text-gray-700 text-left">
+          Hi my name is aden and i am a compostor. I like collecting trash and
           eating them as a hobby. heheheheh
         </p>
-        <Button className="w-full">Chat</Button>
+        <Button className="w-full">Edit Profile</Button>
       </div>
      
 
@@ -97,30 +79,52 @@ const UserPage = async ({ params }: { params: { username: string } }) => {
         <Popover>
           <PopoverTrigger className="border-none bg-transparent w-fit h-fit"><Badge className="bg-green-400"><Trophy/></Badge></PopoverTrigger>
           <PopoverContent className="ml-2"> 
-            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Celebrate!</span> <span className="ml-2"><PartyPopper/></span></h1>
-            <p className="font-normal text-sm mt-2">{params.username} is in the top 15% of users who saved the most amount of food scraps from going to waste this month!  </p>
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You are in the top 5% of users who saved the most amount of food scraps from going to waste this month!  </p>
             </PopoverContent>
         </Popover>
 
         <Popover>
           <PopoverTrigger className="border-none bg-transparent w-fit h-fit"><Badge className="bg-blue-400"><Medal/></Badge></PopoverTrigger>
           <PopoverContent className="ml-2"> 
-            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Celebrate!</span> <span className="ml-2"><PartyPopper/></span></h1>
-            <p className="font-normal text-sm mt-2">{params.username} is in the top 20% most active users this week!  </p>
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You are in the top 1% most active users this week! Keep it up! </p>
             </PopoverContent>
         </Popover>
 
         <Popover>
           <PopoverTrigger className="border-none bg-transparent w-fit h-fit"> <Badge className="bg-red-300"><BookHeart/></Badge></PopoverTrigger>
           <PopoverContent className="ml-2"> 
-            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Celebrate!</span> <span className="ml-2"><PartyPopper/></span></h1>
-            <p className="font-normal text-sm mt-2">{params.username} has been contributing to a cleaner environment for 5 months!</p>
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You have been contributing to a cleaner environment for 1 year!</p>
             </PopoverContent>
         </Popover>
        
         
        
-       
+        <Popover>
+          <PopoverTrigger className="border-none bg-transparent w-fit h-fit"><Badge className="bg-green-400"><Trophy/></Badge></PopoverTrigger>
+          <PopoverContent className="ml-2"> 
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You are in the top 5% of users who saved the most amount of food scraps from going to waste this month!  </p>
+            </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger className="border-none bg-transparent w-fit h-fit"><Badge className="bg-blue-400"><Medal/></Badge></PopoverTrigger>
+          <PopoverContent className="ml-2"> 
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You are in the top 1% most active users this week! Keep it up! </p>
+            </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger className="border-none bg-transparent w-fit h-fit"> <Badge className="bg-red-300"><BookHeart/></Badge></PopoverTrigger>
+          <PopoverContent className="ml-2"> 
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You have been contributing to a cleaner environment for 1 year!</p>
+            </PopoverContent>
+        </Popover>
        
       <ScrollBar orientation="horizontal" />
       </div>
@@ -128,11 +132,11 @@ const UserPage = async ({ params }: { params: { username: string } }) => {
       </div>
       <div className="flex justify-content text-center items-center my-2 px-6 ">
       <div className="px-3">
-        <h1 className="font-semibold text-2xl">20kg</h1>
+        <h1 className="font-semibold text-2xl">80kg</h1>
         <p className="text-sm text-gray-400">of food scraps redirected from landfills</p>
         </div>
         <div className="px-4">
-        <h1 className="font-semibold text-2xl">10kg</h1>
+        <h1 className="font-semibold text-2xl">40kg</h1>
         <p className="text-sm text-gray-400">of CO2-equivalent emissions saved</p>
         </div>
        
@@ -162,6 +166,3 @@ const UserPage = async ({ params }: { params: { username: string } }) => {
     </div>
   );
 }
-export default UserPage;
-
-
