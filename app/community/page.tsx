@@ -1,7 +1,11 @@
 'use client';
+import ListingVerticalScroll from '@/components/listing-vertical-scroll';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@radix-ui/react-scroll-area';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { FacebookEmbed, LinkedInEmbed } from 'react-social-media-embed';
+import MapPage from '../map/page';
 
 // const FacebookEmbed = dynamic(
 //     import("react-social-media-embed").then((mod) => mod.FacebookEmbed),
@@ -20,7 +24,24 @@ const CommunityPage = () => {
   }
 
   return (
-    <div className="p-6 flex flex-col space-y-6 z-10">
+    <div className="">
+       <Tabs defaultValue="Community Map" className="w-full">
+          <TabsList className=" w-full">
+            <TabsTrigger className=" w-44" value="Community Map">
+              Community Map
+            </TabsTrigger>
+            <TabsTrigger className=" w-44" value="Forum">
+              Forum
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="Community Map">
+            
+            <MapPage/>
+          
+           
+          </TabsContent>
+          <TabsContent value="Forum">
+          <div className="p-6 flex flex-col space-y-6 z-10">
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <FacebookEmbed
           className="w-full h-80 z-0"
@@ -41,6 +62,10 @@ const CommunityPage = () => {
         />
       </div> */}
     </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    
   );
 };
 

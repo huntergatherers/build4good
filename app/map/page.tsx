@@ -136,7 +136,7 @@ const MapPage = () => {
                 <DrawerTrigger
                     style={{
                         position: "absolute",
-                        bottom: 100,
+                        bottom: 150,
                         zIndex: 402,
                         backgroundColor: "black",
                         borderRadius: "15px",

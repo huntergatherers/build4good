@@ -5,7 +5,10 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ListingVerticalScroll from '@/components/listing-vertical-scroll';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { BookHeart, Medal, PartyPopper, Trophy } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export default async function Profile() {
   const userId = await getCurrentUserId();
@@ -47,7 +50,7 @@ export default async function Profile() {
 
   return (
     <div className="w-full flex flex-col items-center justify-center">
-      <div className="border border-gray-100 rounded-2xl shadow-xl p-6 text-center h-fit w-80 mt-10 flex flex-col items-center justify-center space-y-4">
+      <div className="border border-slate-200 bg-slate-100 rounded-2xl shadow-xl p-6 text-center h-fit w-80 mt-10 flex flex-col items-center justify-center space-y-4">
         <div className=" w-20 h-20 relative">
           <Image
             className="border-4 border-gray-100 rounded-full shadow-xl"
@@ -67,7 +70,78 @@ export default async function Profile() {
         </p>
         <Button className="w-full">Edit Profile</Button>
       </div>
-      <div className="text-center flex flex-col items-center justify-center mt-6 w-full">
+     
+
+      <div className="mt-2">
+      <ScrollArea className="w-80 whitespace-nowrap rounded-md ">
+      <div className="flex w-max space-x-8 p-4">
+       
+        <Popover>
+          <PopoverTrigger className="border-none bg-transparent w-fit h-fit"><Badge className="bg-green-400"><Trophy/></Badge></PopoverTrigger>
+          <PopoverContent className="ml-2"> 
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You are in the top 5% of users who saved the most amount of food scraps from going to waste this month!  </p>
+            </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger className="border-none bg-transparent w-fit h-fit"><Badge className="bg-blue-400"><Medal/></Badge></PopoverTrigger>
+          <PopoverContent className="ml-2"> 
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You are in the top 1% most active users this week! Keep it up! </p>
+            </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger className="border-none bg-transparent w-fit h-fit"> <Badge className="bg-red-300"><BookHeart/></Badge></PopoverTrigger>
+          <PopoverContent className="ml-2"> 
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You have been contributing to a cleaner environment for 1 year!</p>
+            </PopoverContent>
+        </Popover>
+       
+        
+       
+        <Popover>
+          <PopoverTrigger className="border-none bg-transparent w-fit h-fit"><Badge className="bg-green-400"><Trophy/></Badge></PopoverTrigger>
+          <PopoverContent className="ml-2"> 
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You are in the top 5% of users who saved the most amount of food scraps from going to waste this month!  </p>
+            </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger className="border-none bg-transparent w-fit h-fit"><Badge className="bg-blue-400"><Medal/></Badge></PopoverTrigger>
+          <PopoverContent className="ml-2"> 
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You are in the top 1% most active users this week! Keep it up! </p>
+            </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger className="border-none bg-transparent w-fit h-fit"> <Badge className="bg-red-300"><BookHeart/></Badge></PopoverTrigger>
+          <PopoverContent className="ml-2"> 
+            <h1 className="text-md font-semibold flex text-center"><span className="mt-[0.1rem]">Congratulations!</span> <span className="ml-2"><PartyPopper/></span></h1>
+            <p className="font-normal text-sm mt-2">You have been contributing to a cleaner environment for 1 year!</p>
+            </PopoverContent>
+        </Popover>
+       
+      <ScrollBar orientation="horizontal" />
+      </div>
+      </ScrollArea>
+      </div>
+      <div className="flex justify-content text-center items-center my-2 px-6 ">
+      <div className="px-3">
+        <h1 className="font-semibold text-2xl">80kg</h1>
+        <p className="text-sm text-gray-400">of food scraps redirected from landfills</p>
+        </div>
+        <div className="px-4">
+        <h1 className="font-semibold text-2xl">40kg</h1>
+        <p className="text-sm text-gray-400">of CO2-equivalent emissions saved</p>
+        </div>
+       
+      </div>
+      <div className="text-center flex flex-col items-center justify-center mt-4 w-full">
         <Tabs defaultValue="Offers" className="w-full">
           <TabsList className=" w-[22rem]">
             <TabsTrigger className=" w-44" value="Requests">
@@ -78,10 +152,12 @@ export default async function Profile() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="Requests">
+          <ScrollArea className="h-[15rem]">
             <ListingVerticalScroll listings={requestListings} />
+            </ScrollArea>
           </TabsContent>
           <TabsContent value="Offers">
-            <ScrollArea className="h-[25rem]">
+            <ScrollArea className="h-[15rem]">
               <ListingVerticalScroll listings={donateListings} />
             </ScrollArea>
           </TabsContent>
