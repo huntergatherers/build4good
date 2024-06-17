@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import {
     createTransaction,
@@ -40,7 +41,6 @@ export default function TransactionBtn({
     listingOwner: profiles;
 }) {
     const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
     const hasPendingTransaction = listing.Transaction.some(
         (transaction) => transaction.other_id === user?.id
     );
@@ -54,7 +54,9 @@ export default function TransactionBtn({
             (transaction) => transaction.completed_at
         ).reduce((acc, transaction) => acc + transaction.donated_amount, 0);
     const [goal, setGoal] = useState(
-        hasPendingTransaction ? matchingTransaction!.donated_amount : 0
+        hasPendingTransaction
+            ? matchingTransaction!.donated_amount
+            : remainingAmount
     );
     const { toast } = useToast();
 
@@ -75,51 +77,81 @@ export default function TransactionBtn({
     }
 
     async function handleCreateTransaction() {
-        console.log("Creating transaction...");
         setIsLoading(true);
-        await createTransaction(listing.id, goal);
-        toast({
-            className: "bg-green-500 text-white border-none",
-            title: "Successfully created",
-            description: `Your ${
-                listing.listing_type === "donate" ? "request" : "offer"
-            } has been created. You will be notified when it is accepted.`,
-        });
+        const transaction = await createTransaction(listing.id, goal);
+        if (transaction.success) {
+            toast({
+                duration: 3000,
+                title: "Successfully created",
+                action: <ToastAction altText="Close">Close</ToastAction>,
+                description: `Your ${
+                    listing.listing_type === "donate" ? "request" : "offer"
+                } has been created. You will be notified when it is accepted.`,
+            });
+        } else {
+            toast({
+                action: <ToastAction altText="Close">Close</ToastAction>,
+                duration: 2000,
+                variant: "destructive",
+                title: "Error occurred",
+                description: transaction.error,
+            });
+        }
         setOpen(false);
         setIsLoading(false);
-        router.refresh();
     }
 
     async function handleDeleteTransaction() {
         setIsLoading(true);
-        console.log("Deleting transaction...");
-        await deleteTransaction(matchingTransaction?.id);
-        toast({
-            className: "bg-green-500 text-white border-none",
-            title: "Successfully deleted",
-            description: `Your ${
-                listing.listing_type === "donate" ? "request" : "offer"
-            } has been deleted.`,
-        });
+        const response = await deleteTransaction(matchingTransaction?.id);
+        if (response.success) {
+            toast({
+                duration: 2000,
+                title: "Successfully deleted",
+                action: <ToastAction altText="Close">Close</ToastAction>,
+                description: `Your ${
+                    listing.listing_type === "donate" ? "request" : "offer"
+                } has been deleted.`,
+            });
+        } else {
+            toast({
+                duration: 2000,
+                action: <ToastAction altText="Close">Close</ToastAction>,
+                variant: "destructive",
+                title: "Error occurred",
+                description: response.error,
+            });
+        }
         setOpen(false);
         setIsLoading(false);
-        router.refresh();
     }
 
     async function handleEditTransaction() {
         setIsLoading(true);
-        console.log("Editing transaction...");
-        await editTransaction(matchingTransaction?.id, goal);
-        toast({
-            className: "bg-green-500 text-white border-none",
-            title: "Successfully updated",
-            description: `Your ${
-                listing.listing_type === "donate" ? "request" : "offer"
-            } has been updated to ${goal}kg.`,
-        });
+        const transaction = await editTransaction(
+            matchingTransaction?.id,
+            goal
+        );
+        if (transaction.success) {
+            toast({
+                duration: 2000,
+                action: <ToastAction altText="Close">Close</ToastAction>,
+                title: "Successfully updated",
+                description: `Your ${
+                    listing.listing_type === "donate" ? "request" : "offer"
+                } has been updated to ${goal}kg.`,
+            });
+        } else {
+            toast({
+                duration: 2000,
+                action: <ToastAction altText="Close">Close</ToastAction>,
+                variant: "destructive",
+                title: "Error occurred",
+                description: transaction.error,
+            });
+        }
         setOpen(false);
         setIsLoading(false);
-        router.refresh();
     }
 
     const [open, setOpen] = useState(false);
