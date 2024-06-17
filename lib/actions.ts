@@ -47,7 +47,6 @@ async function getCurrentUserCoords(): Promise<{
     return null;
 }
 
-
 export async function getCurrentDistanceToInstance(instance: {
     coords_lat: number | null;
     coords_long: number | null;
@@ -191,7 +190,9 @@ export async function createTransaction(
     try {
         const userId = await getCurrentUserId();
         if (!userId) {
-            throw new Error("User not found");
+            return {
+                error: "User not found",
+            };
         }
         const transaction = await prisma.transaction.create({
             data: {
@@ -200,9 +201,13 @@ export async function createTransaction(
                 other_id: userId,
             },
         });
+        revalidatePath("/listings/" + listingId);
+        return { success: transaction };
     } catch (error) {
         console.error("Error creating transaction:", error);
-        throw error;
+        return {
+            error: "Error creating transaction",
+        };
     }
 }
 // get active posts by profile
@@ -299,11 +304,15 @@ export async function editTransaction(
 ) {
     try {
         if (!transactionId) {
-            throw new Error("Transaction ID not found");
+            return {
+                error: "Transaction ID not found",
+            };
         }
         const userId = await getCurrentUserId();
         if (!userId) {
-            throw new Error("User not found");
+            return {
+                error: "User not found",
+            };
         }
         const transaction = await prisma.transaction.update({
             where: {
@@ -313,29 +322,41 @@ export async function editTransaction(
                 donated_amount: donatedAmount,
             },
         });
+        revalidatePath("/listings/" + transactionId);
+        return { success: transaction };
     } catch (error) {
         console.error("Error editing transaction:", error);
-        throw error;
+        return {
+            error: "Error editing transaction",
+        };
     }
 }
 
 export async function deleteTransaction(transactionId: string | undefined) {
     try {
         if (!transactionId) {
-            throw new Error("Transaction ID not found");
+            return {
+                error: "Transaction ID not found",
+            };
         }
         const userId = await getCurrentUserId();
         if (!userId) {
-            throw new Error("User not found");
+            return {
+                error: "User not found",
+            };
         }
         await prisma.transaction.delete({
             where: {
                 id: transactionId,
             },
         });
+        revalidatePath("/listings/" + transactionId);
+        return { success: "Transaction deleted" };
     } catch (error) {
         console.error("Error deleting transaction:", error);
-        throw error;
+        return {
+            error: "User not found",
+        };
     }
 }
 
@@ -626,16 +647,14 @@ export async function approveTransaction(transactionId: string) {
         revalidatePath("/transactions");
         revalidatePath("/transactions", "page");
         revalidatePath("/transactions", "layout");
-        return {success: transaction};
+        return { success: transaction };
     } catch (error) {
         console.error("Error approving transaction:", error);
         return {
-          error: "Error approving transaction",
-      };
+            error: "Error approving transaction",
+        };
     }
 }
-
-
 
 //reject transaction
 export async function rejectTransaction(transactionId: string) {
@@ -650,15 +669,14 @@ export async function rejectTransaction(transactionId: string) {
             where: { id: transactionId },
             data: { completed_at: new Date() },
         });
-        return {success: transaction};
+        return { success: transaction };
     } catch (error) {
         console.error("Error rejecting transaction:", error);
         return {
-          error: "Error rejecting transaction",
-      };
+            error: "Error rejecting transaction",
+        };
     }
 }
-
 
 //mark transaction as completed
 export async function completeTransaction(transactionId: string) {

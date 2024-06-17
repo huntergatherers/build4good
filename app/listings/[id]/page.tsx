@@ -62,34 +62,40 @@ export default async function ListingPage({
     const user = await getCurrentUser();
     return (
         <div className="w-full min-h-screen px-6 pt-6 pb-20 relative bg-white overflow-auto">
-            <BackBtn />
-            <h1 className="font-bold text-xl mt-4">
+            <BackBtn label="Back" />
+            <h1 className="font-semibold text-xl mt-4 text-gray-500">
                 {username}{" "}
                 {listingType == "donate"
                     ? "is contributing"
                     : "is requesting for"}
                 ...
             </h1>
-            <p className="font-semibold">
-                {listing.total_amount}kg of {listing.listing_item_type}
-            </p>
-            <div className="my-4">
-                <GoogleMaps
-                    location={{
-                        lat: listing.coords_lat,
-                        lng: listing.coords_long,
-                    }}
-                    listing={listing}
-                />
-            </div>
-            {/* <ListingMap /> */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mt-4">
                 <p className="text-xl font-semibold w-[80%] overflow-hidden text-ellipsis">
                     {listing.header}
                 </p>
                 <Badge>2.1km</Badge>
             </div>
             <p className="text-gray-400 my-2">{listing.body}</p>
+            <Separator className="my-4" />
+            <div className="relative w-full h-56 mt-4">
+                <Image
+                    className="rounded-2xl mb-4 w-full h-56 object-cover"
+                    src={
+                        listing.ListingImage.length > 0
+                            ? listing.ListingImage[0].url
+                            : "https://images.unsplash.com/photo-1594498653385-d5172c532c00?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    }
+                    fill
+                    alt="Picture of the author"
+                />
+            </div>
+            <Separator className="my-4" />
+            <div className="mb-4 text-lg font-semibold">
+                {listing.listing_type === "donate"
+                    ? "Community Requests"
+                    : "Community Contributions"}
+            </div>
             <>
                 <Progress
                     value={(totalDonation / listing.total_amount) * 100}
@@ -134,24 +140,19 @@ export default async function ListingPage({
             </>
 
             <Separator className="my-4" />
-            <div className="text-md font-semibold mt-4 mb-1">
-                {listingType == "receive"
-                    ? "Your food scraps will be going to..."
-                    : "What you will be receiving..."}
-            </div>
-            <div className="relative w-full h-56">
-                <Image
-                    className="rounded-2xl mb-4 w-full h-56 object-cover"
-                    src={
-                        listing.ListingImage.length > 0
-                            ? listing.ListingImage[0].url
-                            : "https://images.unsplash.com/photo-1594498653385-d5172c532c00?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    }
-                    fill
-                    alt="Picture of the author"
+
+            <div className="my-4">
+                <h2 className="text-xl font-semibold mb-4">
+                    {username}'s meet-up location
+                </h2>
+                <GoogleMaps
+                    location={{
+                        lat: listing.coords_lat,
+                        lng: listing.coords_long,
+                    }}
+                    listing={listing}
                 />
             </div>
-
             <Separator className="my-4" />
             <div className="text-xl font-bold flex">
                 Comments

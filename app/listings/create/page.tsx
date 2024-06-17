@@ -39,6 +39,7 @@ import { listing_item_type_enum, listing_type_enum } from "@prisma/client";
 import CreationBreadcrumbs from "./creation-breadcrumbs";
 import crypto from "crypto";
 import { getSignedURL as getSignedURLAndCreateListing } from "./actions";
+import BackBtn from "../[id]/components/back-btn";
 
 interface UserLocation {
     latitude: number;
@@ -81,7 +82,6 @@ export default function CreateListing() {
     const [goalCompost, setGoalCompost] = useState(0);
     const [location, setLocation] =
         useState<google.maps.places.Autocomplete | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [step, setStep] = useState(1);
     const { toast } = useToast();
@@ -155,6 +155,7 @@ export default function CreateListing() {
 
     function handleActionClick(action: listing_type_enum) {
         setSelectedAction(action); // Toggle the selected action
+        setStep(2);
         form.setValue("action", action); // Update the form value for the action field
     }
 
@@ -203,6 +204,9 @@ export default function CreateListing() {
 
     return (
         <Form {...form}>
+            <div className="self-start p-6">
+                <BackBtn label="Quit" />
+            </div>
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="px-6 space-y-6 w-screen"
@@ -212,7 +216,6 @@ export default function CreateListing() {
                 {/* FIRST STEP: SELECT DONATE/RECEIVE */}
                 {step === 1 && (
                     <div className="h-[70vh]">
-                        {error && <p>Error: {error}</p>}
                         <div className="flex flex-col justify-evenly h-full space-y-5">
                             <Button
                                 className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/2 break-words whitespace-normal text-left items-start space-y-1 hover:bg-none ${
@@ -298,13 +301,6 @@ export default function CreateListing() {
                                 </p>
                             )}
                         </FormMessage>
-                        <Button
-                            className="w-full mt-6"
-                            disabled={!selectedAction}
-                            onClick={() => setStep(2)}
-                        >
-                            Next
-                        </Button>
                     </div>
                 )}
 
@@ -316,13 +312,16 @@ export default function CreateListing() {
                                 ? "What will you be contributing?"
                                 : "What do you want to receive?"}
                         </h1>
+                        <p className="text-sm text-blue-500">
+                            What category does my item belong to?
+                        </p>
                         <p className="mb-4 text-red-500 font-semibold">
                             Pick one only.
                         </p>
                         <div>
                             <div className="flex flex-col space-y-4">
                                 <div
-                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left ${
+                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex w-full break-words whitespace-normal text-left ${
                                         selectedType !== "greens" &&
                                         selectedType
                                             ? "opacity-25"
@@ -339,87 +338,91 @@ export default function CreateListing() {
                                     }}
                                 >
                                     <Image
-                                        className="rounded-xs my-2 w-full h-[20vh] rounded-md object-cover"
+                                        className="rounded-xs my-2 w-36 h-36 rounded-md object-cover"
                                         src="https://images.unsplash.com/photo-1597362925123-77861d3fbac7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                         width={500}
                                         height={500}
                                         alt="Picture Uploaded"
                                     />
-                                    <p className="text-2xl font-semibold">
-                                        Greens
-                                    </p>
-                                    <p className="text-xl">
-                                        Vegetables and/or fruit scraps, grass
-                                        clippings
-                                    </p>
-                                    <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
-                                        <Button
-                                            size="icon"
-                                            className={`h-10 w-10 shrink-0 rounded-full bg-black ${
-                                                selectedType !== "greens" &&
-                                                selectedType
-                                                    ? "opacity-50 pointer-events-none"
-                                                    : ""
-                                            }`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onClickGreens(-1);
-                                            }}
-                                            disabled={goalGreens <= 0}
-                                            type="button"
-                                        >
-                                            <Minus
-                                                className="h-4 w-4"
-                                                color="white"
-                                            />
-                                        </Button>
-                                        <div className="flex text-center">
-                                            <input
-                                                type="text"
-                                                value={goalGreens}
-                                                onChange={(e) => {
-                                                    const value = parseInt(
-                                                        e.target.value
-                                                    );
-                                                    if (!isNaN(value)) {
-                                                        setGoalGreens(value);
-                                                        form.setValue(
-                                                            "amount",
-                                                            value
-                                                        ); // Update form value
-                                                    } else {
-                                                        setGoalGreens(0);
-                                                        form.setValue(
-                                                            "amount",
-                                                            0
-                                                        );
-                                                    }
+                                    <div className="ml-4 flex flex-col justify-center items-center">
+                                        <p className="text-xl font-semibold">
+                                            Greens
+                                        </p>
+                                        <p className="text-base">
+                                            Vegetables and/or fruit scraps,
+                                            grass clippings
+                                        </p>
+                                        <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
+                                            <Button
+                                                size="icon"
+                                                className={`h-10 w-10 shrink-0 rounded-full bg-black ${
+                                                    selectedType !== "greens" &&
+                                                    selectedType
+                                                        ? "opacity-50 pointer-events-none"
+                                                        : ""
+                                                }`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClickGreens(-1);
                                                 }}
-                                                className="text-xl font-bold w-full text-center bg-gray-100"
-                                            />
+                                                disabled={goalGreens <= 0}
+                                                type="button"
+                                            >
+                                                <Minus
+                                                    className="h-4 w-4"
+                                                    color="white"
+                                                />
+                                            </Button>
+                                            <div className="flex text-center">
+                                                <input
+                                                    type="text"
+                                                    value={goalGreens}
+                                                    onChange={(e) => {
+                                                        const value = parseInt(
+                                                            e.target.value
+                                                        );
+                                                        if (!isNaN(value)) {
+                                                            setGoalGreens(
+                                                                value
+                                                            );
+                                                            form.setValue(
+                                                                "amount",
+                                                                value
+                                                            ); // Update form value
+                                                        } else {
+                                                            setGoalGreens(0);
+                                                            form.setValue(
+                                                                "amount",
+                                                                0
+                                                            );
+                                                        }
+                                                    }}
+                                                    className="text-xl font-bold w-full text-center bg-gray-100 border-gray-800 border-2"
+                                                />
+                                            </div>
+                                            <Button
+                                                size="icon"
+                                                className="h-10 w-10 shrink-0 rounded-full bg-black"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClickGreens(1);
+                                                }}
+                                                type="button"
+                                                // disabled={goal >= 400}
+                                            >
+                                                <Plus
+                                                    className="h-4 w-4"
+                                                    color="white"
+                                                />
+                                            </Button>
                                         </div>
-                                        <Button
-                                            size="icon"
-                                            className="h-10 w-10 shrink-0 rounded-full bg-black"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onClickGreens(1);
-                                            }}
-                                            type="button"
-                                            // disabled={goal >= 400}
-                                        >
-                                            <Plus
-                                                className="h-4 w-4"
-                                                color="white"
-                                            />
-                                        </Button>
+                                        <span className="font-normal self-center pb-2">
+                                            kg
+                                        </span>
                                     </div>
-                                    <span className="font-normal self-center pb-2">
-                                        kg
-                                    </span>
                                 </div>
                                 <div
-                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left ${
+                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex w-full break-words whitespace-normal text-left ${
                                         selectedType !== "browns" &&
                                         selectedType
                                             ? "opacity-25"
@@ -436,86 +439,90 @@ export default function CreateListing() {
                                     }}
                                 >
                                     <Image
-                                        className="rounded-xs my-2 w-full h-[20vh] rounded-md object-cover"
+                                        className="rounded-xs my-2 w-36 h-36 rounded-md object-cover"
                                         src="https://images.unsplash.com/photo-1517424340038-3c3972e627d5?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                         width={500}
                                         height={500}
                                         alt="Picture of the author"
                                     />
-                                    <p className="text-2xl font-semibold">
-                                        Browns
-                                    </p>
-                                    <p className="text-xl">
-                                        Dry leaves, newspaper, dead plant
-                                        clippings
-                                    </p>
-                                    <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
-                                        <Button
-                                            size="icon"
-                                            className={`h-10 w-10 shrink-0 rounded-full bg-black ${
-                                                selectedType !== "browns" &&
-                                                selectedType
-                                                    ? "opacity-50 pointer-events-none"
-                                                    : ""
-                                            }`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onClickBrowns(-1);
-                                            }}
-                                            disabled={goalBrowns <= 0}
-                                            type="button"
-                                        >
-                                            <Minus
-                                                className="h-4 w-4"
-                                                color="white"
-                                            />
-                                        </Button>
-                                        <div className="flex text-center">
-                                            <input
-                                                type="text"
-                                                value={goalBrowns}
-                                                onChange={(e) => {
-                                                    const value = parseInt(
-                                                        e.target.value
-                                                    );
-                                                    if (!isNaN(value)) {
-                                                        setGoalBrowns(value);
-                                                        form.setValue(
-                                                            "amount",
-                                                            value
-                                                        ); // Update form value
-                                                    } else {
-                                                        setGoalBrowns(0);
-                                                        form.setValue(
-                                                            "amount",
-                                                            0
-                                                        );
-                                                    }
+                                    <div className="flex flex-col justify-center items-center ml-4">
+                                        <p className="text-xl font-semibold">
+                                            Browns
+                                        </p>
+                                        <p className="text-base">
+                                            Dry leaves, newspaper, dead plant
+                                            clippings
+                                        </p>
+                                        <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
+                                            <Button
+                                                size="icon"
+                                                className={`h-10 w-10 shrink-0 rounded-full bg-black ${
+                                                    selectedType !== "browns" &&
+                                                    selectedType
+                                                        ? "opacity-50 pointer-events-none"
+                                                        : ""
+                                                }`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClickBrowns(-1);
                                                 }}
-                                                className="text-xl font-bold w-full text-center bg-gray-100"
-                                            />
+                                                disabled={goalBrowns <= 0}
+                                                type="button"
+                                            >
+                                                <Minus
+                                                    className="h-4 w-4"
+                                                    color="white"
+                                                />
+                                            </Button>
+                                            <div className="flex text-center">
+                                                <input
+                                                    type="text"
+                                                    value={goalBrowns}
+                                                    onChange={(e) => {
+                                                        const value = parseInt(
+                                                            e.target.value
+                                                        );
+                                                        if (!isNaN(value)) {
+                                                            setGoalBrowns(
+                                                                value
+                                                            );
+                                                            form.setValue(
+                                                                "amount",
+                                                                value
+                                                            ); // Update form value
+                                                        } else {
+                                                            setGoalBrowns(0);
+                                                            form.setValue(
+                                                                "amount",
+                                                                0
+                                                            );
+                                                        }
+                                                    }}
+                                                    className="text-xl font-bold w-full text-center bg-gray-100 border-2 border-gray-800"
+                                                />
+                                            </div>
+                                            <Button
+                                                size="icon"
+                                                className="h-10 w-10 shrink-0 rounded-full bg-black"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClickBrowns(1);
+                                                }}
+                                                type="button"
+                                            >
+                                                <Plus
+                                                    className="h-4 w-4"
+                                                    color="white"
+                                                />
+                                            </Button>
                                         </div>
-                                        <Button
-                                            size="icon"
-                                            className="h-10 w-10 shrink-0 rounded-full bg-black"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onClickBrowns(1);
-                                            }}
-                                            type="button"
-                                        >
-                                            <Plus
-                                                className="h-4 w-4"
-                                                color="white"
-                                            />
-                                        </Button>
+                                        <span className="font-normal self-center pb-2">
+                                            kg
+                                        </span>
                                     </div>
-                                    <span className="font-normal self-center pb-2">
-                                        kg
-                                    </span>
                                 </div>
                                 <div
-                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex flex-col w-full break-words whitespace-normal text-left ${
+                                    className={`p-4 bg-gray-100 rounded-lg text-black h-70 flex w-full break-words whitespace-normal text-left ${
                                         selectedType !== "compost" &&
                                         selectedType
                                             ? "opacity-25"
@@ -532,83 +539,88 @@ export default function CreateListing() {
                                     }}
                                 >
                                     <Image
-                                        className="rounded-xs my-2 w-full h-[20vh] object-cover rounded-md"
+                                        className="rounded-xs my-2 w-36 h-36 object-cover rounded-md"
                                         src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                         width={500}
                                         height={500}
                                         alt="Picture of the author"
                                     />
-                                    <p className="text-2xl font-semibold">
-                                        Compost
-                                    </p>
-                                    <p className="text-xl">
-                                        Plant fertiliser to improve soil's
-                                        properties
-                                    </p>
-                                    <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
-                                        <Button
-                                            size="icon"
-                                            className={`h-10 w-10 shrink-0 rounded-full bg-black ${
-                                                selectedType !== "compost" &&
-                                                selectedType
-                                                    ? "opacity-50 pointer-events-none"
-                                                    : ""
-                                            }`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onClickCompost(-1);
-                                            }}
-                                            disabled={goalCompost <= 0}
-                                            type="button"
-                                        >
-                                            <Minus
-                                                className="h-4 w-4"
-                                                color="white"
-                                            />
-                                        </Button>
-                                        <div className="flex text-center">
-                                            <input
-                                                type="text"
-                                                value={goalCompost}
-                                                onChange={(e) => {
-                                                    const value = parseInt(
-                                                        e.target.value
-                                                    );
-                                                    if (!isNaN(value)) {
-                                                        setGoalCompost(value);
-                                                        form.setValue(
-                                                            "amount",
-                                                            value
-                                                        ); // Update form value
-                                                    } else {
-                                                        setGoalCompost(0);
-                                                        form.setValue(
-                                                            "amount",
-                                                            0
-                                                        );
-                                                    }
+                                    <div className="flex flex-col justify-center items-center ml-4">
+                                        <p className="text-xl font-semibold">
+                                            Compost
+                                        </p>
+                                        <p className="text-base">
+                                            Plant fertiliser to improve soil's
+                                            properties
+                                        </p>
+                                        <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
+                                            <Button
+                                                size="icon"
+                                                className={`h-10 w-10 shrink-0 rounded-full bg-black ${
+                                                    selectedType !==
+                                                        "compost" &&
+                                                    selectedType
+                                                        ? "opacity-50 pointer-events-none"
+                                                        : ""
+                                                }`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClickCompost(-1);
                                                 }}
-                                                className="text-xl font-bold w-full text-center bg-gray-100"
-                                            />
+                                                disabled={goalCompost <= 0}
+                                                type="button"
+                                            >
+                                                <Minus
+                                                    className="h-4 w-4"
+                                                    color="white"
+                                                />
+                                            </Button>
+                                            <div className="flex text-center">
+                                                <input
+                                                    type="text"
+                                                    value={goalCompost}
+                                                    onChange={(e) => {
+                                                        const value = parseInt(
+                                                            e.target.value
+                                                        );
+                                                        if (!isNaN(value)) {
+                                                            setGoalCompost(
+                                                                value
+                                                            );
+                                                            form.setValue(
+                                                                "amount",
+                                                                value
+                                                            ); // Update form value
+                                                        } else {
+                                                            setGoalCompost(0);
+                                                            form.setValue(
+                                                                "amount",
+                                                                0
+                                                            );
+                                                        }
+                                                    }}
+                                                    className="text-xl font-bold w-full text-center bg-gray-100 border-2 border-gray-800"
+                                                />
+                                            </div>
+                                            <Button
+                                                size="icon"
+                                                className="h-10 w-10 shrink-0 rounded-full bg-black"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onClickCompost(1);
+                                                }}
+                                                type="button"
+                                            >
+                                                <Plus
+                                                    className="h-4 w-4"
+                                                    color="white"
+                                                />
+                                            </Button>
                                         </div>
-                                        <Button
-                                            size="icon"
-                                            className="h-10 w-10 shrink-0 rounded-full bg-black"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onClickCompost(1);
-                                            }}
-                                            type="button"
-                                        >
-                                            <Plus
-                                                className="h-4 w-4"
-                                                color="white"
-                                            />
-                                        </Button>
+                                        <span className="font-normal self-center pb-2">
+                                            kg
+                                        </span>
                                     </div>
-                                    <span className="font-normal self-center pb-2">
-                                        kg
-                                    </span>
                                 </div>
                             </div>
                             <FormMessage>
