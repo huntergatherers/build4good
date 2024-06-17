@@ -25,7 +25,7 @@ const CommunityPage = () => {
 
   return (
     <div className="">
-       <Tabs defaultValue="Community Map" className="w-full">
+       <Tabs defaultValue="Community Map" className="w-full mt-4">
           <TabsList className=" w-full">
             <TabsTrigger className=" w-44" value="Community Map">
               Community Map

@@ -2,11 +2,13 @@ import { Listing, Prisma } from '@prisma/client';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
 import ListingItemVertical from './listing-item-one';
 import ListingItem from './listing-item';
+import ListingItemOne from './listing-item-one';
 
 export type ListingWithTransactionAndImage = Prisma.ListingGetPayload<{
   include: {
     Transaction: true;
     ListingImage: true;
+    profiles: true
   };
 }>;
 
@@ -14,15 +16,15 @@ interface ListingVerticleScrollProps {
   listings: ListingWithTransactionAndImage[];
 }
 
-const ListingVerticalScroll = async ({
+const ListingVerticalScrollOne = async ({
   listings,
 }: ListingVerticleScrollProps) => {
   return (
     <ScrollArea className="">
       <div className="flex justify-center">
-        <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+        <div className="grid grid-cols-1 gap-y-6">
           {listings.map((listing, index: number) => (
-            <ListingItem key={index} listing={listing} showDescription={true} />
+            <ListingItemOne key={index} listing={listing} showDescription={true} />
           ))}
         </div>
       </div>
@@ -31,4 +33,4 @@ const ListingVerticalScroll = async ({
   );
 };
 
-export default ListingVerticalScroll;
+export default ListingVerticalScrollOne;
