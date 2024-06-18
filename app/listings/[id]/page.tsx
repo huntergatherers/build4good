@@ -34,6 +34,7 @@ export default async function ListingPage({
         include: {
             ListingComment: {
                 include: {
+                    profiles: true,
                     other_ListingComment: {
                         include: {
                             profiles: true,

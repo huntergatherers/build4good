@@ -5,10 +5,13 @@ import { ListingComment, Prisma } from "@prisma/client";
 import { hasUserLikedComment } from "@/lib/actions";
 
 type commentsWithReplies = Prisma.ListingCommentGetPayload<{
-  include: { other_ListingComment: {
-    include: { profiles: true }
-  } };
-}>
+    include: {
+        profiles: true;
+        other_ListingComment: {
+            include: { profiles: true };
+        };
+    };
+}>;
 
 interface CommentSectionProps {
     listingId: number;
@@ -26,7 +29,9 @@ export default async function CommentSection({
             <div className="flex flex-col gap-4 my-4">
                 {comments.map(async (comment) => {
                     if (comment.parent_id !== null) return null;
-                    const isLiked = user ? await hasUserLikedComment(comment.id) : false;
+                    const isLiked = user
+                        ? await hasUserLikedComment(comment.id)
+                        : false;
                     return (
                         <ListingCommentItem
                             key={comment.id}

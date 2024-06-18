@@ -31,7 +31,6 @@ export default async function RootLayout({
             <body className="bg-white text-foreground">
                 <LoginDialogProvider>
                     <LoginDialog />
-                    <AboutUsPopUp />
                     <main className="min-h-screen flex flex-col items-center safe-bottom">
                         {children}
                         <Navbar />

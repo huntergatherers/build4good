@@ -26,7 +26,6 @@ export default function CommentBox({
                     try {
                         setIsPending(true);
                         await createComment(newComment, listingId, parentId);
-                        router.refresh();
                         setNewComment("");
                     } catch (error) {
                         console.error(error);

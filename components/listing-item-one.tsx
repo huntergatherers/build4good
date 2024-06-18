@@ -12,23 +12,15 @@ import { getCurrentDistanceToInstance } from "@/lib/actions";
 interface ListingItemProps {
     listing: ListingWithTransactionAndImage;
     showDescription?: boolean;
+    distance: number | null;
 }
 
-const ListingItemOne = ({ listing, showDescription }: ListingItemProps) => {
+const ListingItemOne = ({
+    listing,
+    showDescription,
+    distance,
+}: ListingItemProps) => {
     const router = useRouter();
-    const [distance, setDistance] = useState<number | null>(null);
-
-    useEffect(() => {
-        const fetchDistance = async () => {
-            const dist = await getCurrentDistanceToInstance({
-                coords_lat: listing.coords_lat,
-                coords_long: listing.coords_long,
-            });
-            setDistance(dist);
-        };
-
-        fetchDistance();
-    }, [listing.coords_lat, listing.coords_long]);
 
     const progress = listing.Transaction.filter(
         (transaction) => transaction.completed_at
@@ -82,7 +74,9 @@ const ListingItemOne = ({ listing, showDescription }: ListingItemProps) => {
                     <div className="flex items-center">
                         <MapPinned size={15} className="text-gray-400" />
                         <div className="ml-1 text-xs font-semibold text-gray-400">
-                            {distance !== null ? `${distance.toFixed(1)} km` : "Calculating..."}
+                            {distance !== null
+                                ? `${distance.toFixed(1)} km`
+                                : "Calculating..."}
                         </div>
                     </div>
                     <p className="text-xs font-medium text-gray-400">

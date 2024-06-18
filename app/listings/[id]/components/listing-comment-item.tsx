@@ -6,10 +6,13 @@ import CommentReplyForm from "./comment-reply-form";
 import { User } from "@supabase/supabase-js";
 
 type commentsWithReplies = Prisma.ListingCommentGetPayload<{
-  include: { other_ListingComment: {
-    include: { profiles: true }
-  } };
-}>
+    include: {
+        profiles: true;
+        other_ListingComment: {
+            include: { profiles: true };
+        };
+    };
+}>;
 
 interface ListingCommentItemProps {
     user: User | null;
@@ -19,7 +22,7 @@ interface ListingCommentItemProps {
 }
 
 export default function ListingCommentItem({
-  user,
+    user,
     isLiked,
     comment,
     listingId,
@@ -29,6 +32,8 @@ export default function ListingCommentItem({
         "MMMM dd, yyyy p"
     );
 
+    console.log(comment);
+
     const replies = comment.other_ListingComment;
 
     return (
@@ -36,7 +41,7 @@ export default function ListingCommentItem({
             <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gray-100"></div>
                 <div>
-                    <p className="font-semibold">{}</p>
+                    <p className="font-semibold">{comment.profiles.username}</p>
                     <p className="text-gray-400 text-xs">{formattedDate}</p>
                 </div>
             </div>
@@ -47,7 +52,9 @@ export default function ListingCommentItem({
                 initialLikeCount={comment.like_count}
                 replies={replies}
             />
-            {user && <CommentReplyForm parentId={comment.id} listingId={listingId} />}
+            {user && (
+                <CommentReplyForm parentId={comment.id} listingId={listingId} />
+            )}
         </div>
     );
 }
