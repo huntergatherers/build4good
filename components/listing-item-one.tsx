@@ -1,4 +1,5 @@
 "use client";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Progress } from "./ui/progress";
 import { useRouter } from "next/navigation";
@@ -6,6 +7,7 @@ import { ListingWithTransactionAndImage } from "./listing-vertical-scroll-one";
 import { MapPinned } from "lucide-react";
 import ProfilePic from "./profile.png";
 import { formatDateTimeAgo } from "@/lib/utils";
+import { getCurrentDistanceToInstance } from "@/lib/actions";
 
 interface ListingItemProps {
     listing: ListingWithTransactionAndImage;
@@ -14,6 +16,20 @@ interface ListingItemProps {
 
 const ListingItemOne = ({ listing, showDescription }: ListingItemProps) => {
     const router = useRouter();
+    const [distance, setDistance] = useState<number | null>(null);
+
+    useEffect(() => {
+        const fetchDistance = async () => {
+            const dist = await getCurrentDistanceToInstance({
+                coords_lat: listing.coords_lat,
+                coords_long: listing.coords_long,
+            });
+            setDistance(dist);
+        };
+
+        fetchDistance();
+    }, [listing.coords_lat, listing.coords_long]);
+
     const progress = listing.Transaction.filter(
         (transaction) => transaction.completed_at
     ).reduce((acc, transaction) => acc + transaction.donated_amount, 0);
@@ -65,8 +81,8 @@ const ListingItemOne = ({ listing, showDescription }: ListingItemProps) => {
                     </div>
                     <div className="flex items-center">
                         <MapPinned size={15} className="text-gray-400" />
-                        <div className="ml-1 text-xs font-normal text-gray-400">
-                            2.4km
+                        <div className="ml-1 text-xs font-semibold text-gray-400">
+                            {distance !== null ? `${distance.toFixed(1)} km` : "Calculating..."}
                         </div>
                     </div>
                     <p className="text-xs font-medium text-gray-400">
