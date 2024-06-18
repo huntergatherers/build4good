@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { FacebookEmbed, LinkedInEmbed } from "react-social-media-embed";
 import MapPage from "../map/page";
+import { createDummyData } from "@/lib/dummy";
+
 
 // const FacebookEmbed = dynamic(
 //     import("react-social-media-embed").then((mod) => mod.FacebookEmbed),
@@ -22,6 +24,15 @@ const CommunityPage = () => {
     if (!isClient) {
         return null;
     }
+    // const handleCreateDummyData = async () => {
+    //     try {
+    //         await createDummyData();
+    //         alert('Dummy data created successfully');
+    //     } catch (error) {
+    //         console.error('Error creating dummy data:', error);
+    //         alert('Failed to create dummy data');
+    //     }
+    // };
 
     return (
         <div className="relative w-screen">
@@ -73,6 +84,12 @@ const CommunityPage = () => {
                                 postUrl="https://www.linkedin.com/posts/cuifenpui_compost-compostmakers-meetup-activity-7203565663011889152-El34?utm_source=share&utm_medium=member_desktop"
                             />
                         </div>
+                        {/* <button
+                            onClick={handleCreateDummyData}
+                            className="mt-4 p-2 bg-blue-500 text-white rounded"
+                        >
+                            Create Dummy Data
+                        </button> */}
                     </div>
                 </TabsContent>
             </Tabs>

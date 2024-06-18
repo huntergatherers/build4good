@@ -349,6 +349,7 @@ model Listing {
   coords_lat        Float?
   coords_long       Float?
   total_amount      Int
+  current_amount    Int                    @default(0)
   deadline          DateTime
   is_active         Boolean                @default(true)
   has_progress      Boolean                @default(false)
