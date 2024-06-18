@@ -59,6 +59,7 @@ export default function AuthForm({
                     Email
                 </label>
                 <Input
+                    defaultValue="johnlee@test.com"
                     className="rounded-md px-4 py-2 bg-inherit border mb-4 text-md"
                     name="email"
                     placeholder="you@example.com"
@@ -68,6 +69,7 @@ export default function AuthForm({
                     Password
                 </label>
                 <Input
+                    defaultValue="123456"
                     className="rounded-md px-4 py-2 bg-inherit border mb-6 text-md"
                     type="password"
                     name="password"
@@ -100,6 +102,10 @@ export default function AuthForm({
                             </button>
                         </span>
                     )}
+                </div>
+                <div className="bg-blue-100 p-2 rounded-md">
+                    For demonstration purposes, username and password is
+                    pre-filled. Click the button to login.
                 </div>
                 {searchParams?.message && (
                     <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">

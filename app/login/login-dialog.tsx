@@ -15,7 +15,7 @@ export default function LoginDialog() {
 
     return (
         <Drawer open={isOpen} onClose={closeDialog}>
-            <DrawerContent className="z-[500] h-1/2">
+            <DrawerContent className="z-[500]">
                 <AuthForm
                     searchParams={{
                         message: "",

@@ -40,10 +40,10 @@ export default function AboutUsPopUp() {
                 </DialogTrigger>
                 <DialogContent>
                     <div className="max-w-4xl mx-auto text-center max-h-[75vh] overflow-auto">
-                        <h1 className="text-4xl font-bold text-green-700 mb-8">
+                        <h1 className="text-4xl font-bold text-green-700 mb-2">
                             About Us
                         </h1>
-                        <div className="space-y-8">
+                        <div className="space-y-2">
                             <p className="text-lg text-gray-700">
                                 Welcome to{" "}
                                 <span className="text-green-500 font-semibold">

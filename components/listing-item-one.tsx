@@ -71,14 +71,15 @@ const ListingItemOne = ({
                         </div>
                         <h1 className="text-xs">{listing.profiles.username}</h1>
                     </div>
-                    <div className="flex items-center">
-                        <MapPinned size={15} className="text-gray-400" />
-                        <div className="ml-1 text-xs font-semibold text-gray-400">
-                            {distance !== null
-                                ? `${distance.toFixed(1)} km`
-                                : "Calculating..."}
+                    {distance !== null && (
+                        <div className="flex items-center">
+                            <MapPinned size={15} className="text-gray-400" />
+                            <div className="ml-1 text-xs font-semibold text-gray-400">
+                                {distance.toFixed(1)} km
+                            </div>
                         </div>
-                    </div>
+                    )}
+
                     <p className="text-xs font-medium text-gray-400">
                         {formatDateTimeAgo(listing.created_at)}
                     </p>
