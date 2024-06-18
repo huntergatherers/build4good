@@ -21,7 +21,7 @@ const ListingVerticalScrollOne = async ({
 }: ListingVerticleScrollProps) => {
   return (
     <ScrollArea className="">
-        <div className="grid grid-cols-1 gap-y-6">
+        <div className="grid grid-cols-1 gap-y-8">
           {listings.map((listing, index: number) => (
             <ListingItemOne key={index} listing={listing} showDescription={true} />
           ))}

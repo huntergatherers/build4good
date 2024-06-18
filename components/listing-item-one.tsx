@@ -85,7 +85,7 @@ const ListingItemOne = ({ listing, showDescription }: ListingItemProps) => {
                             {distance !== null ? `${distance.toFixed(1)} km` : "Calculating..."}
                         </div>
                     </div>
-                    <p className="text-xs font-semibold text-gray-400">
+                    <p className="text-xs font-medium text-gray-400">
                         {formatDateTimeAgo(listing.created_at)}
                     </p>
                 </div>

@@ -49,7 +49,7 @@ const CommunityPage = () => {
                     <MapPage />
                 </TabsContent>
                 <TabsContent value="Forum" className="mt-14">
-                    <div className="p-6 flex flex-col space-y-6 z-10">
+                    <div className="p-6 flex flex-col space-y-8 z-10">
                         <div
                             style={{
                                 display: "flex",
@@ -57,7 +57,7 @@ const CommunityPage = () => {
                             }}
                         >
                             <FacebookEmbed
-                                className="w-full h-80 z-0"
+                                className="w-full h-fit z-0"
                                 url="https://www.facebook.com/projectblackgold.sg/posts/pfbid08PNHcipgqX6s45NUYv9DYedhcquwQAZiHedZiJENqZsmowdkZaXvoRjRb5Xc5Lnfl"
                             />
                         </div>
