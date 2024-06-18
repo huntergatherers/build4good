@@ -11,7 +11,16 @@ import { z } from "zod";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useDropzone } from "react-dropzone";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Info } from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import {
     Form,
     FormControl,
@@ -40,6 +49,7 @@ import CreationBreadcrumbs from "./creation-breadcrumbs";
 import crypto from "crypto";
 import { getSignedURL as getSignedURLAndCreateListing } from "./actions";
 import BackBtn from "../[id]/components/back-btn";
+import { Label } from "@/components/ui/label";
 
 interface UserLocation {
     latitude: number;
@@ -307,14 +317,70 @@ export default function CreateListing() {
                 {/* SECOND STEP: SELECT CATEGORY */}
                 {step === 2 && (
                     <div>
-                        <h1 className="text-xl font-semibold">
-                            {selectedAction === "donate"
-                                ? "What will you be contributing?"
-                                : "What do you want to receive?"}
+                        <h1 className="text-xl font-semibold flex items-center">
+                            Pick a category
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <p className="text-sm text-blue-500 ml-2 ">
+                                        <Info size={20} />
+                                    </p>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[425px]">
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            What can be composted
+                                        </DialogTitle>
+                                        <DialogDescription className="text-start text-black">
+                                            <div className="text-xl font-semibold">
+                                                Greens
+                                            </div>
+                                            <div className="text-green-600">
+                                                <br />
+                                                Fruits and vegetables
+                                                <br />
+                                                Eggshells
+                                                <br />
+                                                Coffee grounds and filters
+                                                <br />
+                                                Tea bags (with staples removed)
+                                                <br />
+                                            </div>
+                                            <div className="text-xl font-semibold mt-4">
+                                                Browns
+                                            </div>
+                                            <div className="text-orange-800">
+                                                <br />
+                                                Nutshells
+                                                <br />
+                                                Shredded newspaper and paper
+                                                towels
+                                                <br />
+                                                Cardboard
+                                                <br />
+                                                Paper
+                                                <br />
+                                                Yard trimmings
+                                                <br />
+                                                Grass clippings
+                                                <br />
+                                                House plants
+                                                <br />
+                                                Hay and straw
+                                                <br />
+                                                Dried leaves
+                                                <br />
+                                                Sawdust
+                                                <br />
+                                                Wood chips
+                                                <br />
+                                                Cotton and wool rags
+                                            </div>
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
                         </h1>
-                        <p className="text-sm text-blue-500">
-                            What category does my item belong to?
-                        </p>
+
                         <p className="mb-4 text-red-500 font-semibold">
                             Pick one only.
                         </p>
@@ -723,13 +789,6 @@ export default function CreateListing() {
                                                 }
                                             ></p>
                                         </div>
-                                        {selectedAction && (
-                                            <p className="text-xs text-gray-400 font-normal mt-1">
-                                                {selectedAction === "donate"
-                                                    ? "Show the community what you are contributing"
-                                                    : "Show the community what they will be contributing to"}
-                                            </p>
-                                        )}
                                     </FormLabel>
                                     <FormControl>
                                         <div
@@ -906,7 +965,7 @@ export default function CreateListing() {
                                                     "formatted_address",
                                                 ]}
                                             >
-                                                <Input placeholder="Enter your address" />
+                                                <Input placeholder="Search address" />
                                             </Autocomplete>
                                         )}
                                     </FormControl>
