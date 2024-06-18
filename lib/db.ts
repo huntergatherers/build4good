@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, Post, listing_type_enum, tag_type_enum , scrap_type_enum, compost_type_enum, listing_item_type_enum } from '@prisma/client';
+import { PrismaClient, Prisma, Post, listing_type_enum, tag_type_enum , scrap_type_enum, compost_type_enum, listing_item_type_enum , Listing } from '@prisma/client';
 
 const prismaClientSingleton = () => {
   return new PrismaClient();
@@ -15,5 +15,5 @@ if (process.env.NODE_ENV !== 'production') {
 }
 export default prisma;
 export { Prisma , listing_type_enum, tag_type_enum , scrap_type_enum, compost_type_enum, listing_item_type_enum};
-export type { Post };
+export type { Post, Listing};
 

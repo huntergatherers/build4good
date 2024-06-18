@@ -7,6 +7,7 @@ import prisma, {
     scrap_type_enum,
     compost_type_enum,
     Post,
+    Listing
 } from "./db";
 import {
     getCurrentUser,
@@ -466,76 +467,68 @@ export async function addTagsToListing(data: AddTagsToListingData) {
     }
 }
 //listings search
-interface SearchListingsParams {
-    tags?: Prisma.ListingTagWhereInput[];
+export interface SearchListingsParams {
+    tags?: string[];
     isActive?: boolean;
     listingType?: listing_type_enum;
-    listingItemType?: listing_item_type_enum;
+    listingItemType?: listing_item_type_enum[];
     withinKm?: number;
     currentUserCoords?: { lat: number; lng: number };
-    orderBy?: "created_at" | "deadline";
-    orderDirection?: "asc" | "desc";
+    orderBy?: keyof Listing;
+    orderDirection?: 'asc' | 'desc';
     topK?: number;
-}
-export async function searchListings(params: SearchListingsParams) {
+  }
+  
+  export async function searchListings(params: SearchListingsParams) {
     try {
-        const {
-            tags,
-            isActive,
-            listingType,
-            listingItemType,
-            withinKm,
-            currentUserCoords,
-            orderBy = "created_at",
-            orderDirection = "asc",
-            topK = 10,
-        } = params;
-
-        // Building the where clause dynamically
-        const where: Prisma.ListingWhereInput = {
-            AND: [
-                ...(tags ? [{ ListingTag: { every: { OR: tags } } }] : []),
-                ...(isActive !== undefined ? [{ is_active: isActive }] : []),
-                ...(listingType ? [{ listing_type: listingType }] : []),
-                ...(listingItemType
-                    ? [{ listing_item_type: listingItemType }]
-                    : []),
-            ],
-        };
-
-        // Fetch listings
-        let listings = await prisma.listing.findMany({
-            where,
-            include: { ListingTag: true },
-            orderBy: { [orderBy]: orderDirection },
-            take: topK,
+      const {
+        tags,
+        isActive,
+        listingType,
+        listingItemType,
+        withinKm,
+        currentUserCoords,
+        orderBy = 'created_at',
+        orderDirection = 'asc',
+        topK = 10,
+      } = params;
+  
+      const where: Prisma.ListingWhereInput = {
+        AND: [
+          ...(isActive !== undefined ? [{ is_active: isActive }] : []),
+          ...(listingType ? [{ listing_type: listingType }] : []),
+          ...(listingItemType ? [{ listing_item_type: { in: listingItemType } }] : []),
+        ],
+      };
+  
+      let listings = await prisma.listing.findMany({
+        where,
+        include: { Transaction: true, ListingImage: true, profiles: true },
+        orderBy: { [orderBy]: orderDirection },
+        take: topK,
+      });
+  
+      if (withinKm && currentUserCoords) {
+        listings = listings.filter((listing) => {
+          if (listing.coords_lat !== null && listing.coords_long !== null) {
+            const distance = calculateDistance(
+              listing.coords_lat,
+              listing.coords_long,
+              currentUserCoords.lat,
+              currentUserCoords.lng,
+            );
+            return distance <= withinKm;
+          }
+          return false;
         });
-
-        // Filter by distance if withinKm and currentUserCoords are provided
-        if (withinKm && currentUserCoords) {
-            listings = listings.filter((listing) => {
-                if (
-                    listing.coords_lat !== null &&
-                    listing.coords_long !== null
-                ) {
-                    const distance = calculateDistance(
-                        listing.coords_lat,
-                        listing.coords_long,
-                        currentUserCoords.lat,
-                        currentUserCoords.lng
-                    );
-                    return distance <= withinKm;
-                }
-                return false;
-            });
-        }
-
-        return listings;
+      }
+  
+      return listings;
     } catch (error) {
-        console.error("Error searching listings:", error);
-        throw error;
+      console.error('Error searching listings:', error);
+      throw error;
     }
-}
+  }
 
 //check and mark listing as fulfilled or expired
 export async function checkListingStatus(listingId: number): Promise<void> {
