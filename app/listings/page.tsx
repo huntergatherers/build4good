@@ -127,14 +127,14 @@ export default async function Index({
                     </div>
                 </div>
                 {searchParams["type"] === "requests" ? (
-                    <div className="">
+                    <div className="mb-4">
                         <h1 className="text-md font-semibold my-4">
                             Check out what people are requesting for
                         </h1>
                         <ListingVerticalScrollOne listings={requestListings} />
                     </div>
                 ) : (
-                    <div className="">
+                    <div className="mb-4">
                         <h1 className="text-md font-semibold my-4">
                             Check out what people are giving away
                         </h1>

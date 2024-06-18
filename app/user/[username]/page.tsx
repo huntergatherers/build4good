@@ -82,9 +82,8 @@ const UserPage = async ({ params }: { params: { username: string } }) => {
         </div>
 
         <p className="text-xl font-semibold">{params.username}</p>
-        <p className="text-sm font-normal text-gray-700 text-left mx-auto">
-          Hi my name is {params.username} and i am a compostor. I like collecting trash and
-          eating them as a hobby. heheheheh
+        <p className="text-sm font-normal text-gray-700 text-start mx-auto">
+          Hi my name is {params.username} and i am an avid compostor. I am interested in green living and enjoy caring for the environment!
         </p>
         <Button className="w-full">Chat</Button>
       </div>
@@ -138,7 +137,7 @@ const UserPage = async ({ params }: { params: { username: string } }) => {
        
       </div>
       <div className="text-center flex flex-col items-center justify-center mt-4 w-full">
-        <Tabs defaultValue="Offers" className="w-full">
+        <Tabs defaultValue="Requests" className="w-full">
           <TabsList className=" w-[22rem]">
             <TabsTrigger className=" w-44" value="Requests">
               Requests

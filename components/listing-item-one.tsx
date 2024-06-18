@@ -65,11 +65,11 @@ const ListingItemOne = ({ listing, showDescription }: ListingItemProps) => {
                     </div>
                     <div className="flex items-center">
                         <MapPinned size={15} className="text-gray-400" />
-                        <div className="ml-1 text-xs font-semibold text-gray-400">
+                        <div className="ml-1 text-xs font-normal text-gray-400">
                             2.4km
                         </div>
                     </div>
-                    <p className="text-xs font-semibold text-gray-400">
+                    <p className="text-xs font-medium text-gray-400">
                         {formatDateTimeAgo(listing.created_at)}
                     </p>
                 </div>

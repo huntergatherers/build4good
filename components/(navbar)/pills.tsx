@@ -26,11 +26,11 @@ export default function Pills() {
                     Offers
                 </Badge>
             </Link>
-            <Link href="/community">
+            {/* <Link href="/community">
                 <Badge className={getIconColor("/community", "", "")}>
                     My Listings
                 </Badge>
-            </Link>
+            </Link> */}
         </div>
     );
 }

@@ -7,8 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ListingVerticalScroll from '@/components/listing-vertical-scroll';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { BookHeart, Medal, PartyPopper, Trophy } from 'lucide-react';
+import { BookHeart, Info, Medal, PartyPopper, Trophy } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import Link from 'next/link';
 
 export default async function Profile() {
   const userId = await getCurrentUserId();
@@ -49,8 +50,14 @@ export default async function Profile() {
   });
 
   return (
-    <div className="w-full flex flex-col items-center justify-center">
-      <div className="border border-slate-200 bg-slate-100 rounded-2xl shadow-xl p-6 text-center h-fit w-80 mt-10 flex flex-col items-center justify-center space-y-4">
+    <div>
+    <div className="mt-3 px-3">
+    <Link href="/about-us">
+    <Button variant="ghost" className="w-fit h-fit rounded-full p-0 hover:bg-gray-200"><Info color="#4d4c4c"/></Button>
+    </Link>
+    </div>
+    <div className="w-full flex flex-col items-center justify-center"> 
+      <div className="border border-slate-200 bg-slate-100 rounded-2xl shadow-xl p-6 text-center h-fit w-80 mt-2 flex flex-col items-center justify-center space-y-4">
         <div className=" w-20 h-20 relative">
           <Image
             className="border-4 border-gray-100 rounded-full shadow-xl"
@@ -65,8 +72,7 @@ export default async function Profile() {
 
         <p className="text-xl font-semibold">{user?.profiles?.username}</p>
         <p className="text-sm font-normal text-gray-700 text-left">
-          Hi my name is aden and i am a compostor. I like collecting trash and
-          eating them as a hobby. heheheheh
+          My name is aden and i usually give food scraps. However i occasionally compost and would sometimes like to receive too.
         </p>
         <Button className="w-full">Edit Profile</Button>
       </div>
@@ -152,17 +158,27 @@ export default async function Profile() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="Requests">
-          <ScrollArea className="h-[18rem]">
-            <ListingVerticalScroll listings={requestListings} />
-            </ScrollArea>
+          {requestListings && requestListings.length > 0 ? (
+                <ScrollArea className="h-[17rem]">
+                    <ListingVerticalScroll listings={requestListings} />
+                </ScrollArea>
+            ) : (
+                <p className="text-sm text-gray-400 font-medium mt-4">No active listings</p>
+            )}
           </TabsContent>
           <TabsContent value="Offers">
-            <ScrollArea className="h-[18rem]">
-              <ListingVerticalScroll listings={donateListings} />
-            </ScrollArea>
+          {donateListings && donateListings.length > 0 ? (
+               <ScrollArea className="h-[17rem]">
+               <ListingVerticalScroll listings={donateListings} />
+             </ScrollArea>
+            ) : (
+                <p className="text-sm text-gray-400 font-medium mt-4">No active listings</p>
+            )}
+            
           </TabsContent>
         </Tabs>
       </div>
+    </div>
     </div>
   );
 }
