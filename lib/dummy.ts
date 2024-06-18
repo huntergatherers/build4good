@@ -50,27 +50,6 @@ const getListingHeaderAndBody = (listingType: listing_type_enum, listingItemType
   throw new Error('Invalid listing type or item type');
 };
 
-// Function to get listing header and body
-const getListingHeaderAndBody = (listingType: listing_type_enum, listingItemType: listing_item_type_enum): { header: string, body: string } => {
-  if (listingType === 'donate') {
-    if (listingItemType === 'greens') {
-      return { header: 'Want to Donate Greens', body: 'I have greens available for donation. Feel free to submit a request.' };
-    } else if (listingItemType === 'browns') {
-      return { header: 'Wish to Donate Browns', body: 'I have browns available for donation. Feel free to submit a request.' };
-    } else if (listingItemType === 'compost') {
-      return { header: 'Have Compost to Give', body: 'I have compost available for donation. Feel free to submit a request.' };
-    }
-  } else if (listingType === 'receive') {
-    if (listingItemType === 'greens') {
-      return { header: 'Need Fruit Peels', body: 'I am looking for greens for my compost. Please contribute if you can help! Thanks.' };
-    } else if (listingItemType === 'browns') {
-      return { header: 'Want Wood Chips', body: 'I am looking for browns for my compost. Please contribute if you can help! Thanks.' };
-    } else if (listingItemType === 'compost') {
-      return { header: 'Anyone Have Compost?', body: 'I am looking for compost. Please contribute if you can help! Thanks.' };
-    }
-  }
-  throw new Error('Invalid listing type or item type');
-};
 
 export async function createDummyData() {
   try {
