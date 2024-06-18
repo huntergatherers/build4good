@@ -27,7 +27,7 @@ import { revalidatePath } from "next/cache";
 // Functions related to Current User
 // --------------------------------------------------------
 
-async function getCurrentUserCoords(): Promise<{
+export async function getCurrentUserCoords(): Promise<{
     lat: number;
     lon: number;
 } | null> {
