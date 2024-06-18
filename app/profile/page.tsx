@@ -10,6 +10,15 @@ import { Badge } from '@/components/ui/badge';
 import { BookHeart, Info, Medal, PartyPopper, Trophy } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import Link from 'next/link';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
 
 export default async function Profile() {
   const userId = await getCurrentUserId();
@@ -51,11 +60,7 @@ export default async function Profile() {
 
   return (
     <div>
-    <div className="mt-3 px-3">
-    <Link href="/about-us">
-    <Button variant="ghost" className="w-fit h-fit rounded-full p-0 hover:bg-gray-200"><Info color="#4d4c4c"/></Button>
-    </Link>
-    </div>
+   
     <div className="w-full flex flex-col items-center justify-center"> 
       <div className="border border-slate-200 bg-slate-100 rounded-2xl shadow-xl p-6 text-center h-fit w-80 mt-2 flex flex-col items-center justify-center space-y-4">
         <div className=" w-20 h-20 relative">
@@ -67,6 +72,7 @@ export default async function Profile() {
             //   src={user?.profiles.}
             fill
             alt="Picture of the author"
+            sizes='100'
           />
         </div>
 

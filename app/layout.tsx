@@ -6,6 +6,7 @@ import { LoginDialogProvider } from "./login/login-dialog-context";
 import { Toaster } from "@/components/ui/toaster";
 import { createClient } from "@/utils/supabase/server";
 import LoginDialog from "./login/login-dialog";
+import AboutUsPopUp from "@/components/aboutus-popup";
 
 const defaultUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
@@ -30,6 +31,7 @@ export default async function RootLayout({
             <body className="bg-white text-foreground">
                 <LoginDialogProvider>
                     <LoginDialog />
+                    <AboutUsPopUp />
                     <main className="min-h-screen flex flex-col items-center safe-bottom">
                         {children}
                         <Navbar />
