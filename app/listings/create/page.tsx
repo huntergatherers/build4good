@@ -431,7 +431,7 @@ export default function CreateListing() {
                                                 }`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onClickGreens(-0.1);
+                                                    onClickGreens(-1);
                                                 }}
                                                 disabled={goalGreens <= 0}
                                                 type="button"
@@ -473,7 +473,7 @@ export default function CreateListing() {
                                                 className="h-10 w-10 shrink-0 rounded-full bg-black"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onClickGreens(0.1);
+                                                    onClickGreens(1);
                                                 }}
                                                 type="button"
                                                 // disabled={goal >= 400}
@@ -532,7 +532,7 @@ export default function CreateListing() {
                                                 }`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onClickBrowns(-0.1);
+                                                    onClickBrowns(-1);
                                                 }}
                                                 disabled={goalBrowns <= 0}
                                                 type="button"
@@ -574,7 +574,7 @@ export default function CreateListing() {
                                                 className="h-10 w-10 shrink-0 rounded-full bg-black"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onClickBrowns(0.1);
+                                                    onClickBrowns(1);
                                                 }}
                                                 type="button"
                                             >
@@ -633,7 +633,7 @@ export default function CreateListing() {
                                                 }`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onClickCompost(-0.1);
+                                                    onClickCompost(-1);
                                                 }}
                                                 disabled={goalCompost <= 0}
                                                 type="button"
@@ -675,7 +675,7 @@ export default function CreateListing() {
                                                 className="h-10 w-10 shrink-0 rounded-full bg-black"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onClickCompost(0.1);
+                                                    onClickCompost(1);
                                                 }}
                                                 type="button"
                                             >
