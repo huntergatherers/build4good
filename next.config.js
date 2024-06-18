@@ -19,6 +19,10 @@ module.exports = {
                 protocol: "https",
                 hostname: "loremflickr.com",
             },
+            {
+                protocol: "https",
+                hostname: "img.daisyui.com",
+            },
         ],
     },
 };

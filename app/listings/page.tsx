@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import Pills from "@/components/(navbar)/pills";
+import ListingVerticalScrollOne from "@/components/listing-vertical-scroll-one";
 export default async function Index({
     searchParams,
 }: {
@@ -32,6 +33,7 @@ export default async function Index({
         include: {
             Transaction: true,
             ListingImage: true,
+            profiles: true
         },
     });
 
@@ -46,6 +48,7 @@ export default async function Index({
         include: {
             Transaction: true,
             ListingImage: true,
+            profiles: true
         },
     });
     return (
@@ -128,14 +131,14 @@ export default async function Index({
                         <h1 className="text-md font-semibold my-4">
                             Check out what people are requesting for
                         </h1>
-                        <ListingVerticalScroll listings={requestListings} />
+                        <ListingVerticalScrollOne listings={requestListings} />
                     </div>
                 ) : (
                     <div className="">
                         <h1 className="text-md font-semibold my-4">
                             Check out what people are giving away
                         </h1>
-                        <ListingVerticalScroll listings={donationListings} />
+                        <ListingVerticalScrollOne listings={donationListings} />
                     </div>
                 )}
             </main>
