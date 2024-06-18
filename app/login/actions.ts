@@ -92,5 +92,5 @@ export async function signup(formData: FormData): Promise<void> {
     }
 
     revalidatePath("/", "layout");
-    redirect("/login?message=Your+account+has+been+created.+Please+sign+in.");
+    redirect("/");
 }
