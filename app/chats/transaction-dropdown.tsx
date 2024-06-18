@@ -19,11 +19,11 @@ import {
 
 const transactionTypes = [
     {
-        value: "receive",
-        label: "Items I'm receiving",
+        value: "me",
+        label: "Created by me",
     },
     {
-        value: "give",
+        value: "others",
         label: "Items I'm giving away",
     },
 ];
@@ -54,7 +54,7 @@ export function TransactionDropdown({
                         ? transactionTypes.find(
                               (transaction) => transaction.value === value
                           )?.label
-                        : "Select framework..."}
+                        : "Select type..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>

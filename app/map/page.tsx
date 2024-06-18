@@ -20,11 +20,14 @@ import Link from "next/link";
 const MapItem = dynamic(() => import("./map-item"), { ssr: false });
 
 const MapPage = () => {
-    const [filter, setFilter] = useState<"All Users" | "Giver" | "Receiver">("All Users");
+    const [filter, setFilter] = useState<"All Users" | "Giver" | "Receiver">(
+        "All Users"
+    );
     const userData = [
         {
             id: 1,
             name: "user7",
+            about: "I am a compost enthusiast",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 150,
@@ -38,6 +41,7 @@ const MapPage = () => {
         {
             id: 2,
             name: "user15",
+            about: "I have my own farm and I love to recycle waste",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 200,
@@ -51,6 +55,7 @@ const MapPage = () => {
         {
             id: 3,
             name: "user4",
+            about: "I am a compost enthusiast",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 100,
@@ -62,8 +67,9 @@ const MapPage = () => {
             longitude: 103.8202,
         },
         {
-            id: 1,
+            id: 4,
             name: "user18",
+            about: "I am a compost enthusiast",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 150,
@@ -75,8 +81,9 @@ const MapPage = () => {
             longitude: 103.8004,
         },
         {
-            id: 2,
+            id: 5,
             name: "user9",
+            about: "I am a compost enthusiast",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 200,
@@ -88,8 +95,9 @@ const MapPage = () => {
             longitude: 103.8406,
         },
         {
-            id: 3,
+            id: 6,
             name: "user12",
+            about: "I am a compost enthusiast",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 100,
@@ -101,6 +109,14 @@ const MapPage = () => {
             longitude: 103.8318,
         },
     ];
+
+    const markers = userData.map((user) => ({
+        id: user.id,
+        latitude: user.latitude,
+        longitude: user.longitude,
+    }));
+
+    console.log(markers);
 
     const calculateFoodScrappingDuration = (startDate: Date) => {
         const today = new Date();
@@ -135,7 +151,7 @@ const MapPage = () => {
     return (
         <div className="relative min-h-screen w-screen flex justify-center items-center">
             {/* <MapItem /> */}
-            <GoogleMapsItem markers={[]} />
+            <GoogleMapsItem markers={markers} users={userData} />
             {/* <GoogleMapsItem /> */}
 
             <Drawer>
@@ -171,16 +187,24 @@ const MapPage = () => {
                         </DrawerTitle>
                     </DrawerHeader>
                     <div className="flex justify-between pl-6 pr-6 mb-6 z-50">
-                    <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white" onClick={() => setFilter("All Users")}>
+                        <Button
+                            className="rounded-3xl text-black bg-white hover:bg-black hover:text-white"
+                            onClick={() => setFilter("All Users")}
+                        >
                             All Users
                         </Button>
-                        <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white" onClick={() => setFilter("Giver")}>
+                        <Button
+                            className="rounded-3xl text-black bg-white hover:bg-black hover:text-white"
+                            onClick={() => setFilter("Giver")}
+                        >
                             Donors
                         </Button>
-                        <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white" onClick={() => setFilter("Receiver")}>
+                        <Button
+                            className="rounded-3xl text-black bg-white hover:bg-black hover:text-white"
+                            onClick={() => setFilter("Receiver")}
+                        >
                             Composters
                         </Button>
-                       
                     </div>
 
                     <ScrollArea className="bg-gray-100 h-full">
@@ -191,7 +215,6 @@ const MapPage = () => {
                                     className="flex text-sm text-center mb-4 p-6 bg-white"
                                     href={`/user/${user.name}`}
                                 >
-                                   
                                     <div className="text-center mr-4 flex flex-col justify-center items-center">
                                         <img
                                             src={user.profilePicture}

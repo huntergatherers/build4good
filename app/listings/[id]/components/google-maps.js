@@ -24,7 +24,7 @@ function GoogleMaps({ location, listing }) {
     const [map, setMap] = React.useState(null);
 
     const onLoad = React.useCallback(function callback(map) {
-        const bufferDistance = 0.01; // Adjust this value to set how far the bounds are from the location
+        const bufferDistance = 0.02; // Adjust this value to set how far the bounds are from the location
 
         const bounds = new window.google.maps.LatLngBounds(
             new window.google.maps.LatLng(
@@ -62,7 +62,7 @@ function GoogleMaps({ location, listing }) {
             }}
             mapContainerStyle={containerStyle}
             center={location}
-            zoom={20}
+            zoom={10}
             onLoad={onLoad}
             onUnmount={onUnmount}
         >

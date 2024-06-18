@@ -78,6 +78,11 @@ export default async function ListingPage({
                 <Badge>2.1km</Badge>
             </div>
             <p className="text-gray-400 my-2">{listing.body}</p>
+            {listing.listing_type === "donate" && (
+                <div className="mt-2 text-green-600 text-xl font-semibold">
+                    {listing.total_amount}kg available
+                </div>
+            )}
             <Separator className="my-4" />
             <div className="relative w-full h-56 mt-4">
                 <Image
@@ -91,54 +96,51 @@ export default async function ListingPage({
                     alt="Picture of the author"
                 />
             </div>
-            <Separator className="my-4" />
-            <div className="mb-4 text-lg font-semibold">
-                {listing.listing_type === "donate"
-                    ? "Community Requests"
-                    : "Community Contributions"}
-            </div>
-            <>
-                <Progress
-                    value={(totalDonation / listing.total_amount) * 100}
-                    className={`h-[10px] ${
-                        listing.listing_type === "donate"
-                            ? "[&>*]:bg-blue-700"
-                            : "[&>*]:bg-green-700"
-                    }`}
-                />
-                <div className="flex justify-between items-center mt-2">
-                    <div
-                        className={`${
-                            listing.listing_type === "donate"
-                                ? "text-blue-700"
-                                : "text-green-700"
-                        }`}
-                    >
-                        <p className="font-semibold">{totalDonation}kg</p>
-                        {listingType === "donate"
-                            ? "claimed"
-                            : "contributed"}{" "}
-                        of {listing.total_amount}kg
+            {listing.listing_type === "receive" && (
+                <>
+                    <Separator className="my-4" />
+                    <div className="mb-4 text-lg font-semibold">
+                        Community Contributions
                     </div>
-                    <div className="text-gray-400">
-                        <p className="font-semibold">
-                            {
-                                listing.Transaction.filter(
-                                    (transaction) => transaction.completed_at
-                                ).length
-                            }
-                        </p>
-                        {listingType === "donate" ? "claimed" : "contributors"}
-                    </div>
+                    <Progress
+                        value={(totalDonation / listing.total_amount) * 100}
+                        className={`h-[10px] [&>*]:bg-green-700
+                        `}
+                    />
+                    <div className="flex justify-between items-center mt-2">
+                        <div className="text-green-700">
+                            <p className="font-semibold">{totalDonation}kg</p>
+                            {listingType === "donate"
+                                ? "claimed"
+                                : "contributed"}{" "}
+                            of {listing.total_amount}kg
+                        </div>
+                        <div className="text-gray-400">
+                            <p className="font-semibold">
+                                {
+                                    listing.Transaction.filter(
+                                        (transaction) =>
+                                            transaction.completed_at
+                                    ).length
+                                }
+                            </p>
+                            {listingType === "donate"
+                                ? "claimed"
+                                : "contributors"}
+                        </div>
 
-                    <div className="text-gray-400">
-                        <p className="font-semibold">
-                            {daysBetween(listing.created_at, listing.deadline)}
-                        </p>
-                        Days to go
+                        <div className="text-gray-400">
+                            <p className="font-semibold">
+                                {daysBetween(
+                                    listing.created_at,
+                                    listing.deadline
+                                )}
+                            </p>
+                            Days to go
+                        </div>
                     </div>
-                </div>
-            </>
+                </>
+            )}
 
             <Separator className="my-4" />
 

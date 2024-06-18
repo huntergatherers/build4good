@@ -1,5 +1,5 @@
 "use client";
-import { Prisma, Transaction } from "@prisma/client";
+import { Prisma, Transaction, profiles } from "@prisma/client";
 import { Check, X } from "lucide-react";
 import Image from "next/image";
 import TransactionStatusTag from "./transaction-status-tag";
@@ -12,6 +12,12 @@ import { approveTransaction } from "@/lib/actions";
 
 export type TransactionWithDetails = Prisma.TransactionGetPayload<{
     include: {
+        profiles: true;
+        conversation: {
+            include: {
+                message: true;
+            };
+        };
         Listing: {
             include: {
                 ListingImage: true;
@@ -24,18 +30,15 @@ export type TransactionWithDetails = Prisma.TransactionGetPayload<{
 interface TransactionItemProps {
     transaction: TransactionWithDetails;
     type: "receive" | "give";
+    profile: profiles;
 }
 
 export default function TransactionItem({
     transaction,
     type,
+    profile,
 }: TransactionItemProps) {
-  const router = useRouter();
-    const handleApproveTransaction = async () => {
-      const data = await approveTransaction(transaction.id);
-      console.log(data)
-    }
-
+    const router = useRouter();
     // const handleRejectTransaction = async () => {
     //     await rejectTransaction(transaction.id);
     // }
@@ -43,11 +46,14 @@ export default function TransactionItem({
     // console.log(result)
     return (
         <div
+            onClick={() => {
+                router.push(`/chats/${transaction.conversation?.id}`);
+            }}
             key={transaction.id}
-            className ="w-full flex items-start border-2 rounded-md p-2 justify-between"
+            className="w-full flex items-start border-2 rounded-md p-2 justify-between"
         >
             <div className="flex justify-start items-start">
-                <div className="relative w-24 h-24">
+                <div className="relative w-24 h-24 flex-shrink-0">
                     <div
                         className={`text-[0.6rem] text-white absolute -left-[1px] top-2 p-1 rounded-r-sm z-10 ${
                             transaction.Listing.listing_item_type === "greens"
@@ -72,21 +78,25 @@ export default function TransactionItem({
                     />
                 </div>
                 <div className="flex flex-col items-start ml-2">
-                    <p className="font-bold">
-                        {transaction.Listing.profiles.username}
+                    {/* if listing created by me, show other person's username. If not created by me then just show listing creator */}
+                    <p className="">
+                        {transaction.Listing.profiles.username ==
+                        profile.username // listing created by me
+                            ? transaction.profiles.username // other person's username
+                            : transaction.Listing.profiles.username}
                     </p>
-                    <p>{transaction.Listing.header}</p>
-                    <p className="text-xl font-semibold">
-                        {transaction.donated_amount} kg
+                    <p className="font-bold">{transaction.Listing.header}</p>
+                    <p className="text-b">
+                        {transaction.conversation?.message[0].content}
                     </p>
                 </div>
             </div>
 
-            {type === "receive" ? (
+            {/* {type === "receive" ? (
                 <div className="flex items-center justify-center self-center space-x-2">
                     <Check
-                        onClick={async() => {
-                           await handleApproveTransaction();
+                        onClick={async () => {
+                            await handleApproveTransaction();
                         }}
                         color="white"
                         className="bg-orange-400 w-10 h-10 rounded-full p-2"
@@ -101,7 +111,7 @@ export default function TransactionItem({
                 </div>
             ) : (
                 <TransactionStatusTag transaction={transaction} />
-            )}
+            )} */}
         </div>
     );
 }

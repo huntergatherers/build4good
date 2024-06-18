@@ -23,13 +23,15 @@ model audit_log_entries {
 }
 
 model conversation {
-  id        String    @id @db.Uuid
-  createdAt DateTime  @default(now())
-  updatedAt DateTime
-  message   message[]
-  users     users[]   @relation("UserChats")
+  id            String       @id @default(cuid())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime?    @updatedAt
+  message       message[]
+  users         users[]      @relation("UserChats")
+  transactionId String?      @unique
+  transaction   Transaction? @relation(fields: [transactionId], references: [id])
 
-  @@schema("auth")
+  @@schema("public")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -85,15 +87,15 @@ model instances {
 }
 
 model message {
-  id             String       @id @db.Uuid
+  id             String       @id @default(cuid())
   content        String
   createdAt      DateTime     @default(now())
-  conversationId String       @db.Uuid
+  conversationId String
   senderId       String       @db.Uuid
   conversation   conversation @relation(fields: [conversationId], references: [id])
   users          users        @relation(fields: [senderId], references: [id])
 
-  @@schema("auth")
+  @@schema("public")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -458,15 +460,16 @@ model PostImage {
 }
 
 model Transaction {
-  id             String    @id @default(cuid())
+  id             String        @id @default(cuid())
   listing_id     Int
   donated_amount Float
-  created_at     DateTime  @default(now())
+  created_at     DateTime      @default(now())
   approved_at    DateTime?
   completed_at   DateTime?
-  other_id       String    @db.Uuid
-  Listing        Listing   @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  profiles       profiles  @relation(fields: [other_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  other_id       String        @db.Uuid
+  Listing        Listing       @relation(fields: [listing_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profiles       profiles      @relation(fields: [other_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  conversation   conversation?
 
   @@schema("public")
 }

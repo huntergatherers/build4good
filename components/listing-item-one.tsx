@@ -87,34 +87,43 @@ const ListingItemOne = ({
                     {listing.header}
                 </div>
                 {showDescription && (
-                    <div className="font-light text-sm line-clamp-2 w-full mb-1 text-left h-6">
+                    <div className="font-light text-sm line-clamp-2 w-full mb-1 text-left text-ellipsis">
                         {listing.body}
                     </div>
                 )}
-                <Progress
-                    value={(progress / listing.total_amount) * 100}
-                    className={`mt-1 h-[6px] ${
-                        listing.listing_type === "donate"
-                            ? "[&>*]:bg-blue-700"
-                            : "[&>*]:bg-green-700"
-                    }`}
-                />
-                <div className="flex justify-between w-full">
-                    <label
-                        className={`text-xs mt-1 ${
-                            listing.listing_type === "donate"
-                                ? "text-blue-700"
-                                : "text-green-700"
-                        }`}
-                    >
-                        <span className="font-bold">
-                            {progress}/{listing.total_amount}kg
-                        </span>{" "}
-                        {listing.listing_type === "donate"
-                            ? "claimed"
-                            : "contributed"}
-                    </label>
-                </div>
+                {listing.listing_type === "receive" && (
+                    <>
+                        <Progress
+                            value={(progress / listing.total_amount) * 100}
+                            className={`mt-1 h-[6px] [&>*]:bg-green-700`}
+                        />
+
+                        <div className="flex justify-between w-full">
+                            <label
+                                className={`text-xs mt-1 text-green-700
+                                `}
+                            >
+                                <span className="font-bold">
+                                    {progress}/{listing.total_amount}kg
+                                </span>{" "}
+                                contributed
+                            </label>
+                        </div>
+                    </>
+                )}
+                {listing.listing_type === "donate" && (
+                    <div className="flex justify-between w-full">
+                        <label
+                            className={`text-xs mt-1 text-green-700
+                                `}
+                        >
+                            <span className="font-bold">
+                                {listing.total_amount}kg
+                            </span>{" "}
+                            available
+                        </label>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -8,16 +8,30 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
+import { Checkbox } from "./ui/checkbox"; // Import your Checkbox component
 import { Info } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function AboutUsPopUp() {
     const [isOpen, setIsOpen] = useState(false);
+    const [dontShowAgain, setDontShowAgain] = useState(false);
 
     useEffect(() => {
-        // Open the dialog when the component mounts
-        setIsOpen(true);
+        // Check if the dialog has been shown before
+        const hasShownDialog = localStorage.getItem("hasShownAboutUsDialog");
+        if (!hasShownDialog) {
+            // Open the dialog if it hasn't been shown before
+            setIsOpen(true);
+        }
     }, []);
+
+    const handleDialogClose = () => {
+        setIsOpen(false);
+        if (dontShowAgain) {
+            localStorage.setItem("hasShownAboutUsDialog", "true");
+        }
+    };
+
     return (
         <div className="mt-3 px-3">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -77,13 +91,34 @@ export default function AboutUsPopUp() {
                                     !
                                 </p>
                             </div>
+                            <div className="mt-4 flex justify-center items-center">
+                                <Checkbox
+                                    id="dont-show-again"
+                                    onCheckedChange={() => {
+                                        setDontShowAgain(!dontShowAgain);
+                                    }}
+                                />
+                                <label
+                                    htmlFor="dont-show-again"
+                                    className="ml-2 text-gray-500 text-xs"
+                                >
+                                    Don't show this again
+                                </label>
+                            </div>
+                            <div className="mt-4 flex justify-center">
+                                <Button onClick={handleDialogClose}>
+                                    Close
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </DialogContent>
             </Dialog>
             {/* <Link href="/about-us">
-    <Button variant="ghost" className="w-fit h-fit rounded-full p-0 hover:bg-gray-200"><Info color="#4d4c4c"/></Button>
-    </Link> */}
+                <Button variant="ghost" className="w-fit h-fit rounded-full p-0 hover:bg-gray-200">
+                    <Info color="#4d4c4c"/>
+                </Button>
+            </Link> */}
         </div>
     );
 }

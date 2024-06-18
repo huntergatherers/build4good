@@ -183,9 +183,65 @@ export async function updateProfile(id: string, data: UpdateProfileData) {
     }
 }
 
+// export async function createChat(transactionId: string) {
+//     try {
+//         const userId = await getCurrentUserId();
+//         if (!userId) {
+//             return {
+//                 error: "User not found",
+//             };
+//         }
+//         const conversation = await prisma.conversation.create({
+//             data: {
+//                 transactionId: "hi",
+//                 message: {
+//                     create: {
+//                         content: "Hello",
+//                         senderId: userId,
+//                     },
+//                 }
+//             },
+//         });
+//         return conversation;
+//     } catch (error) {
+//         console.error("Error creating conversation:", error);
+//         return {
+//             error: "Error creating conversation",
+//         };
+//     }
+// }
+
+export async function sendMessage(content: string, conversationId: string) {
+    try {
+        const userId = await getCurrentUserId();
+        if (!userId) {
+            return {
+                error: "User not found",
+            };
+        }
+        const message = await prisma.message.create({
+            data: {
+                content: content,
+                senderId: userId,
+                conversationId: conversationId,
+            },
+        });
+        revalidatePath("/chats/" + conversationId);
+        return {
+            success: message,
+        };
+    } catch (error) {
+        console.error("Error sending message:", error);
+        return {
+            error: "Error sending message",
+        };
+    }
+}
+
 export async function createTransaction(
     listingId: number,
-    donatedAmount: number
+    donatedAmount: number,
+    message: string
 ) {
     try {
         const userId = await getCurrentUserId();
@@ -201,8 +257,19 @@ export async function createTransaction(
                 other_id: userId,
             },
         });
+        const conversation = await prisma.conversation.create({
+            data: {
+                transactionId: transaction.id,
+                message: {
+                    create: {
+                        content: message,
+                        senderId: userId,
+                    },
+                },
+            },
+        });
         revalidatePath("/listings/" + listingId);
-        return { success: transaction };
+        return { success: conversation };
     } catch (error) {
         console.error("Error creating transaction:", error);
         return {
@@ -632,7 +699,10 @@ export async function checkListingStatus(listingId: number): Promise<void> {
 //     }
 // }
 //approve transaction
-export async function approveTransaction(transactionId: string) {
+export async function approveTransaction(
+    transactionId: string,
+    conversationId: string
+) {
     const user = await getCurrentUser();
     if (!user) {
         return {
@@ -644,9 +714,7 @@ export async function approveTransaction(transactionId: string) {
             where: { id: transactionId },
             data: { approved_at: new Date() },
         });
-        revalidatePath("/transactions");
-        revalidatePath("/transactions", "page");
-        revalidatePath("/transactions", "layout");
+        revalidatePath("/chats/" + conversationId);
         return { success: transaction };
     } catch (error) {
         console.error("Error approving transaction:", error);

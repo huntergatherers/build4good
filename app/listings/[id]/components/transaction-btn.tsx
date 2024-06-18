@@ -78,7 +78,10 @@ export default function TransactionBtn({
 
     async function handleCreateTransaction() {
         setIsLoading(true);
-        const transaction = await createTransaction(listing.id, goal);
+        const message = `Hi, I would like to ${
+            listingType === "receive" ? "offer" : "request"
+        } ${goal} kg of ${listing.listing_item_type}`;
+        const transaction = await createTransaction(listing.id, goal, message);
         if (transaction.success) {
             toast({
                 duration: 3000,
@@ -183,56 +186,70 @@ export default function TransactionBtn({
                             <DrawerTitle>
                                 {listingOwner.username}{" "}
                                 {listing.listing_type === "donate"
-                                    ? "is contributing"
+                                    ? "is offering"
                                     : "is requesting for"}{" "}
                                 {listing.total_amount}kg of{" "}
                                 {listing.listing_item_type}
                             </DrawerTitle>
                         </DrawerHeader>
                         <Separator />
-                        <div className="mt-2 text-center">
-                            You are{" "}
-                            {listingType === "receive"
-                                ? "offering..."
-                                : "requesting..."}{" "}
-                        </div>
-                        <div className="p-4 pb-0">
-                            <div className="flex items-center justify-center space-x-2">
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8 shrink-0 rounded-full"
-                                    onClick={() => onClick(-1)}
-                                    disabled={goal <= 0}
-                                >
-                                    <MinusIcon className="h-4 w-4" />
-                                    <span className="sr-only">Decrease</span>
-                                </Button>
-                                <div className="flex-1 text-center">
-                                    <input
-                                        pattern="\d*"
-                                        type="text"
-                                        className="text-5xl font-bold tracking-tighter text-center w-full"
-                                        value={goal}
-                                        onChange={onInputChange}
-                                    />
-                                    <div className="text-[0.70rem] uppercase text-muted-foreground">
-                                        kg
+                        <div className="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner">
+                            <div className="text-left">
+                                <div className="bg-white p-3 rounded-lg shadow mb-2">
+                                    <div className="text-sm text-gray-700">
+                                        Hi, I would like to{" "}
+                                        {listingType === "receive"
+                                            ? "offer"
+                                            : "request"}{" "}
+                                        <span className="font-bold">
+                                            {goal} kg
+                                        </span>{" "}
+                                        of {listing.listing_item_type}
                                     </div>
                                 </div>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8 shrink-0 rounded-full"
-                                    onClick={() => onClick(1)}
-                                    disabled={goal >= listing.total_amount}
-                                >
-                                    <PlusIcon className="h-4 w-4" />
-                                    <span className="sr-only">Increase</span>
-                                </Button>
                             </div>
+                            {listingType === "receive" && (
+                                <div className="flex items-center justify-center space-x-2 mt-4">
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-8 w-8 shrink-0 rounded-full"
+                                        onClick={() => onClick(-1)}
+                                        disabled={goal <= 1}
+                                    >
+                                        <MinusIcon className="h-4 w-4" />
+                                        <span className="sr-only">
+                                            Decrease
+                                        </span>
+                                    </Button>
+                                    <div className="flex-1 text-center">
+                                        <input
+                                            pattern="\d*"
+                                            type="text"
+                                            className="text-5xl font-bold tracking-tighter text-center w-full"
+                                            value={goal}
+                                            onChange={onInputChange}
+                                        />
+                                        <div className="text-[0.70rem] uppercase text-muted-foreground">
+                                            kg
+                                        </div>
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-8 w-8 shrink-0 rounded-full"
+                                        onClick={() => onClick(1)}
+                                        disabled={goal >= listing.total_amount}
+                                    >
+                                        <PlusIcon className="h-4 w-4" />
+                                        <span className="sr-only">
+                                            Increase
+                                        </span>
+                                    </Button>
+                                </div>
+                            )}
                         </div>
-                        <DrawerFooter>
+                        <DrawerFooter className="mt-4">
                             {hasPendingTransaction ? (
                                 <div className="space-y-2 flex flex-col">
                                     <Button
@@ -265,9 +282,7 @@ export default function TransactionBtn({
                                     disabled={goal < 1 || isLoading}
                                     onClick={handleCreateTransaction}
                                 >
-                                    {listing.listing_type === "donate"
-                                        ? "Create Request"
-                                        : "Create Offer"}
+                                    Start Chat
                                 </Button>
                             )}
                         </DrawerFooter>
