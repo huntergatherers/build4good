@@ -5,6 +5,7 @@ import { TransactionDropdown } from "./transaction-dropdown";
 import TransactionItem from "./transaction-item";
 import { HandHelping, Handshake } from "lucide-react";
 import { Prisma, profiles } from "@prisma/client";
+import { Separator } from "@/components/ui/separator";
 
 type TransactionWithData = Prisma.TransactionGetPayload<{
     include: {
@@ -35,16 +36,18 @@ export default function TransactionDisplay({
     return (
         <div className="w-full">
             <div className="mt-4"></div>
-            <div className="space-y-4">
+            <div>
                 {transactions.length > 0 ? (
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                         {transactions.map((transaction) => (
-                            <TransactionItem
-                                transaction={transaction}
-                                type="receive"
-                                key={transaction.id}
-                                profile={profile}
-                            />
+                            <>
+                                <TransactionItem
+                                    transaction={transaction}
+                                    type="receive"
+                                    key={transaction.id}
+                                    profile={profile}
+                                />
+                            </>
                         ))}
                     </div>
                 ) : (

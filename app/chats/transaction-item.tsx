@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
 // import { useApproveTransaction } from "@/lib/hooks/useApproveTransaction";
 import { approveTransaction } from "@/lib/actions";
+import { Separator } from "@/components/ui/separator";
 
 export type TransactionWithDetails = Prisma.TransactionGetPayload<{
     include: {
@@ -50,7 +51,7 @@ export default function TransactionItem({
                 router.push(`/chats/${transaction.conversation?.id}`);
             }}
             key={transaction.id}
-            className="w-full flex items-start border-2 rounded-md p-2 justify-between"
+            className="w-full flex items-start border-2 p-2 justify-between"
         >
             <div className="flex justify-start items-start">
                 <div className="relative w-24 h-24 flex-shrink-0">
@@ -91,7 +92,6 @@ export default function TransactionItem({
                     </p>
                 </div>
             </div>
-
             {/* {type === "receive" ? (
                 <div className="flex items-center justify-center self-center space-x-2">
                     <Check
