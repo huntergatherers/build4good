@@ -28,55 +28,42 @@ const getListingItemType = (profile: any, listingType: listing_type_enum): listi
   throw new Error('Invalid profile role');
 };
 
+// Function to get listing header and body
+const getListingHeaderAndBody = (listingType: listing_type_enum, listingItemType: listing_item_type_enum): { header: string, body: string } => {
+  if (listingType === 'donate') {
+    if (listingItemType === 'greens') {
+      return { header: 'Want to Donate Greens', body: 'I have greens available for donation. Feel free to submit a request.' };
+    } else if (listingItemType === 'browns') {
+      return { header: 'Wish to Donate Browns', body: 'I have browns available for donation. Feel free to submit a request.' };
+    } else if (listingItemType === 'compost') {
+      return { header: 'Have Compost to Give', body: 'I have compost available for donation. Feel free to submit a request.' };
+    }
+  } else if (listingType === 'receive') {
+    if (listingItemType === 'greens') {
+      return { header: 'Need Fruit Peels', body: 'I am looking for greens for my compost. Please contribute if you can help! Thanks.' };
+    } else if (listingItemType === 'browns') {
+      return { header: 'Want Wood Chips', body: 'I am looking for browns for my compost. Please contribute if you can help! Thanks.' };
+    } else if (listingItemType === 'compost') {
+      return { header: 'Anyone Have Compost?', body: 'I am looking for compost. Please contribute if you can help! Thanks.' };
+    }
+  }
+  throw new Error('Invalid listing type or item type');
+};
+
 export async function createDummyData() {
   try {
-    const profiles: { id: string; username: string; coords_lat: number; coords_long: number; is_composter: boolean; is_donor: boolean; is_gardener: boolean; }[] = [];
+    const profiles = await prisma.profiles.findMany();
     const listings: { id: number; profile_id: string; created_at: Date; header: string; body: string; coords_lat: number | null; coords_long: number | null; total_amount: number; deadline: Date; is_active: boolean; has_progress: boolean; listing_item_type: listing_item_type_enum; listing_type: listing_type_enum; }[] = [];
-
-    for (let i = 0; i < 30; i++) {
-      const userId = uuidv4();
-
-      // Generate coordinates
-      const coords = generateSingaporeCoordinates();
-
-      // Create User and Profile
-      const user = await prisma.users.create({
-        data: {
-          id: userId,
-          email: faker.internet.email(),
-          encrypted_password: faker.internet.password(),
-          created_at: faker.date.recent(),
-          updated_at: faker.date.recent(),
-        },
-      });
-
-      const profileData = {
-        username: faker.internet.userName(),
-        coords_lat: coords.lat,
-        coords_long: coords.lon,
-        is_composter: faker.datatype.boolean(),
-        is_donor: faker.datatype.boolean(),
-        is_gardener: faker.datatype.boolean(),
-        last_activity: faker.date.recent(),
-        social_media_url: faker.internet.url(),
-      };
-
-      const profile = await prisma.profiles.create({
-        data: {
-          ...profileData,
-          users: {
-            connect: { id: user.id },
-          },
-        },
-      });
-
-      profiles.push({ id: user.id, ...profileData });
-      console.log(`User and profile created for iteration ${i + 1}`);
-    }
 
     for (let i = 0; i < 40; i++) {
       // Select a random profile
       const profile = profiles[Math.floor(Math.random() * profiles.length)];
+
+      // Ensure the profile has a valid role
+      if (!profile.is_donor && !profile.is_gardener && !profile.is_composter) {
+        console.log(`Skipping profile ${profile.username} as it has no valid roles`);
+        continue;
+      }
 
       // Create Listings for Profile
       const listingTypes: listing_type_enum[] = ['receive', 'donate'];
@@ -84,12 +71,15 @@ export async function createDummyData() {
 
       const listingItemType = getListingItemType(profile, selectedListingType);
 
+      // Get listing header and body
+      const { header, body } = getListingHeaderAndBody(selectedListingType, listingItemType);
+
       const coords = generateSingaporeCoordinates();
       const listing = await prisma.listing.create({
         data: {
           profile_id: profile.id,
-          header: faker.commerce.productName(),
-          body: faker.commerce.productDescription(),
+          header,
+          body,
           total_amount: faker.datatype.number({ min: 100, max: 1000 }),
           deadline: faker.date.soon(30),
           listing_type: selectedListingType,
@@ -145,7 +135,7 @@ export async function createDummyData() {
           created_at: transactionDate,
           approved_at: approvedAt,
           completed_at: completedAt,
-          other_id: uuidv4(), // havent figure out how to make this an actual other profile
+          other_id: profiles[Math.floor(Math.random() * profiles.length)].id, // Selecting another random profile
         },
       });
 
@@ -154,9 +144,39 @@ export async function createDummyData() {
       // Check and update listing status after adding transactions
       await checkListingStatus(listing.id);
     }
+
+    for (let i = 0; i < 40; i++) {
+      // Select a random profile
+      const profile = profiles[Math.floor(Math.random() * profiles.length)];
+
+      // Generate random coordinates within Singapore boundaries
+      const coords = generateSingaporeCoordinates();
+
+      // Insert into posts table
+      await prisma.post.create({
+        data: {
+          profile_id: profile.id,
+          created_at: new Date(),
+          is_embedded: false,
+          is_archived: false,
+          header: 'Interesting post',
+          body: 'This is an interesting post about sustainability and composting.',
+          coords_lat: coords.lat,
+          coords_long: coords.lon,
+          embedded_url: null,
+        },
+      });
+
+      console.log(`Post created for profile ${profile.username}`);
+    }
   } catch (error) {
     console.error('Error creating dummy data:', error);
   } finally {
     console.log('Dummy data creation complete');
   }
 }
+
+createDummyData().catch((error) => {
+  console.error('Error creating dummy data:', error);
+  process.exit(1);
+});
