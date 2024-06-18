@@ -1,31 +1,53 @@
 "use server";
-import prisma, {
-  listing_item_type_enum,
-  listing_type_enum,
-} from "./db";
+import prisma, { listing_item_type_enum, listing_type_enum } from "./db";
 import { checkListingStatus } from "./actions";
-import { v4 as uuidv4 } from 'uuid';
-import { faker } from '@faker-js/faker';
+import { v4 as uuidv4 } from "uuid";
+import { faker } from "@faker-js/faker";
 
 // Ensure coordinates are within Singapore boundaries
 const generateSingaporeCoordinates = () => {
-  const lat = (Math.random() * (1.493 - 1.129) + 1.129).toFixed(6);
-  const lon = (Math.random() * (104.131 - 103.557) + 103.557).toFixed(6);
-  return { lat: parseFloat(lat), lon: parseFloat(lon) };
+    const lat = (Math.random() * (1.493 - 1.129) + 1.129).toFixed(6);
+    const lon = (Math.random() * (104.131 - 103.557) + 103.557).toFixed(6);
+    return { lat: parseFloat(lat), lon: parseFloat(lon) };
 };
 
 // Function to determine listing item type based on profile's role
-const getListingItemType = (profile: any, listingType: listing_type_enum): listing_item_type_enum => {
-  if (profile.is_donor) {
-    return listingType === 'donate' ? 'greens' : 'browns';
+const getListingItemType = (
+    profile: any,
+    listingType: listing_type_enum
+): listing_item_type_enum => {
+    if (profile.is_donor) {
+        return listingType === "donate" ? "greens" : "browns";
+    }
+    if (profile.is_gardener) {
+        return "compost";
+    }
+    if (profile.is_composter) {
+        return listingType === "donate" ? "compost" : "greens";
+    }
+    throw new Error("Invalid profile role");
+};
+
+// Function to get listing header and body
+const getListingHeaderAndBody = (listingType: listing_type_enum, listingItemType: listing_item_type_enum): { header: string, body: string } => {
+  if (listingType === 'donate') {
+    if (listingItemType === 'greens') {
+      return { header: 'Want to Donate Greens', body: 'I have greens available for donation. Feel free to submit a request.' };
+    } else if (listingItemType === 'browns') {
+      return { header: 'Wish to Donate Browns', body: 'I have browns available for donation. Feel free to submit a request.' };
+    } else if (listingItemType === 'compost') {
+      return { header: 'Have Compost to Give', body: 'I have compost available for donation. Feel free to submit a request.' };
+    }
+  } else if (listingType === 'receive') {
+    if (listingItemType === 'greens') {
+      return { header: 'Need Fruit Peels', body: 'I am looking for greens for my compost. Please contribute if you can help! Thanks.' };
+    } else if (listingItemType === 'browns') {
+      return { header: 'Want Wood Chips', body: 'I am looking for browns for my compost. Please contribute if you can help! Thanks.' };
+    } else if (listingItemType === 'compost') {
+      return { header: 'Anyone Have Compost?', body: 'I am looking for compost. Please contribute if you can help! Thanks.' };
+    }
   }
-  if (profile.is_gardener) {
-    return 'compost';
-  }
-  if (profile.is_composter) {
-    return listingType === 'donate' ? 'compost' : 'greens';
-  }
-  throw new Error('Invalid profile role');
+  throw new Error('Invalid listing type or item type');
 };
 
 // Function to get listing header and body
@@ -65,9 +87,10 @@ export async function createDummyData() {
         continue;
       }
 
-      // Create Listings for Profile
-      const listingTypes: listing_type_enum[] = ['receive', 'donate'];
-      const selectedListingType = listingTypes[Math.floor(Math.random() * listingTypes.length)];
+            // Create Listings for Profile
+            const listingTypes: listing_type_enum[] = ["receive", "donate"];
+            const selectedListingType =
+                listingTypes[Math.floor(Math.random() * listingTypes.length)];
 
       const listingItemType = getListingItemType(profile, selectedListingType);
 
@@ -96,37 +119,47 @@ export async function createDummyData() {
         },
       });
 
-      listings.push({
-        id: listing.id,
-        profile_id: profile.id,
-        created_at: listing.created_at,
-        header: listing.header,
-        body: listing.body,
-        coords_lat: listing.coords_lat,
-        coords_long: listing.coords_long,
-        total_amount: listing.total_amount,
-        deadline: listing.deadline,
-        is_active: listing.is_active,
-        has_progress: listing.has_progress,
-        listing_item_type: listing.listing_item_type,
-        listing_type: listing.listing_type,
-      });
-      console.log(`Listing created for profile ${profile.username}`);
-    }
+            listings.push({
+                id: listing.id,
+                profile_id: profile.id,
+                created_at: listing.created_at,
+                header: listing.header,
+                body: listing.body,
+                coords_lat: listing.coords_lat,
+                coords_long: listing.coords_long,
+                total_amount: listing.total_amount,
+                deadline: listing.deadline,
+                is_active: listing.is_active,
+                has_progress: listing.has_progress,
+                listing_item_type: listing.listing_item_type,
+                listing_type: listing.listing_type,
+            });
+            console.log(`Listing created for profile ${profile.username}`);
+        }
 
-    for (let i = 0; i < 60; i++) {
-      // Select a random listing
-      const listing = listings[Math.floor(Math.random() * listings.length)];
+        for (let i = 0; i < 10; i++) {
+            // Select a random listing
+            const listing =
+                listings[Math.floor(Math.random() * listings.length)];
 
-      // Create Transactions for Listings
-      const transactionStatuses = ['pending', 'approved', 'completed'];
-      const status = transactionStatuses[Math.floor(Math.random() * transactionStatuses.length)];
-      const transactionDate = faker.date.between(new Date(), listing.deadline);
-      const approvedAt = status === 'approved' || status === 'completed' ? transactionDate : null;
-      const completedAt = status === 'completed' ? transactionDate : null;
+            // Create Transactions for Listings
+            const transactionStatuses = ["pending", "approved", "completed"];
+            const status =
+                transactionStatuses[
+                    Math.floor(Math.random() * transactionStatuses.length)
+                ];
+            const transactionDate = faker.date.between(
+                new Date(),
+                listing.deadline
+            );
+            const approvedAt =
+                status === "approved" || status === "completed"
+                    ? transactionDate
+                    : null;
+            const completedAt = status === "completed" ? transactionDate : null;
 
-      if (completedAt && completedAt > listing.deadline) continue;
-      if (approvedAt && approvedAt > listing.deadline) continue;
+            if (completedAt && completedAt > listing.deadline) continue;
+            if (approvedAt && approvedAt > listing.deadline) continue;
 
       const transaction = await prisma.transaction.create({
         data: {
@@ -139,7 +172,9 @@ export async function createDummyData() {
         },
       });
 
-      console.log(`Transaction ${status} created for listing ${listing.header}`);
+            console.log(
+                `Transaction ${status} created for listing ${listing.header}`
+            );
 
       // Check and update listing status after adding transactions
       await checkListingStatus(listing.id);
