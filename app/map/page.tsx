@@ -15,86 +15,88 @@ import Broccoli from "./assets/broccoli";
 import Apple from "./assets/apple";
 import dynamic from "next/dynamic";
 import GoogleMapsItem from "./google-maps-item";
+import Link from "next/link";
 
 const MapItem = dynamic(() => import("./map-item"), { ssr: false });
 
 const MapPage = () => {
+    const [filter, setFilter] = useState<"All Users" | "Giver" | "Receiver">("All Users");
     const userData = [
         {
             id: 1,
-            name: "John Doe",
+            name: "user7",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 150,
             wasteDonated: 75,
             startDate: new Date("2023-05-15"),
             freeDays: ["Monday", "Wednesday", "Friday"],
-            role: "Gardener",
+            role: "Receiver",
             latitude: 1.3521,
             longitude: 103.8198,
         },
         {
             id: 2,
-            name: "Jane Smith",
+            name: "user15",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 200,
             wasteDonated: 100,
             startDate: new Date("2023-03-20"),
             freeDays: ["Tuesday", "Thursday"],
-            role: "Compostor",
+            role: "Receiver",
             latitude: 1.3422,
             longitude: 103.82,
         },
         {
             id: 3,
-            name: "Tim Poon",
+            name: "user4",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 100,
             wasteDonated: 50,
             startDate: new Date("2024-05-15"),
             freeDays: ["Saturday", "Sunday"],
-            role: "Donor",
+            role: "Giver",
             latitude: 1.3623,
             longitude: 103.8202,
         },
         {
             id: 1,
-            name: "Lay Bay",
+            name: "user18",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 150,
             wasteDonated: 75,
             startDate: new Date("2023-01-15"),
             freeDays: ["Monday", "Wednesday", "Friday"],
-            role: "Gardener",
+            role: "Giver",
             latitude: 1.3524,
             longitude: 103.8004,
         },
         {
             id: 2,
-            name: "Sean Tane",
+            name: "user9",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 200,
             wasteDonated: 100,
             startDate: new Date("2023-05-15"),
             freeDays: ["Tuesday", "Thursday"],
-            role: "Compostor",
+            role: "Receiver",
             latitude: 1.3525,
             longitude: 103.8406,
         },
         {
             id: 3,
-            name: "Tom Lee",
+            name: "user12",
             profilePicture:
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
             wasteReceived: 100,
             wasteDonated: 50,
             startDate: new Date("2023-05-15"),
             freeDays: ["Saturday", "Sunday"],
-            role: "Donor",
+            role: "Receiver",
             latitude: 1.3526,
             longitude: 103.8318,
         },
@@ -125,6 +127,10 @@ const MapPage = () => {
 
         return duration.trim();
     };
+
+    const filteredUserData = userData.filter(
+        (user) => filter === "All Users" || user.role === filter
+    );
 
     return (
         <div className="relative min-h-screen w-screen flex justify-center items-center">
@@ -165,24 +171,27 @@ const MapPage = () => {
                         </DrawerTitle>
                     </DrawerHeader>
                     <div className="flex justify-between pl-6 pr-6 mb-6 z-50">
-                        <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white">
+                    <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white" onClick={() => setFilter("All Users")}>
+                            All Users
+                        </Button>
+                        <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white" onClick={() => setFilter("Giver")}>
                             Donors
                         </Button>
-                        <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white">
+                        <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white" onClick={() => setFilter("Receiver")}>
                             Composters
                         </Button>
-                        <Button className="rounded-3xl text-black bg-white hover:bg-black hover:text-white">
-                            Gardeners
-                        </Button>
+                       
                     </div>
 
-                    <ScrollArea className="bg-gray-100">
-                        <div className="">
-                            {userData.map((user, index) => (
-                                <div
+                    <ScrollArea className="bg-gray-100 h-full">
+                        <div>
+                            {filteredUserData.map((user, index) => (
+                                <Link
                                     key={index}
                                     className="flex text-sm text-center mb-4 p-6 bg-white"
+                                    href={`/user/${user.name}`}
                                 >
+                                   
                                     <div className="text-center mr-4 flex flex-col justify-center items-center">
                                         <img
                                             src={user.profilePicture}
@@ -260,7 +269,7 @@ const MapPage = () => {
                                             </Button>
                                         </div> */}
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </ScrollArea>
