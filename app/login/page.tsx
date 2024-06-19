@@ -15,6 +15,7 @@ export default function AuthForm({
     closeDialog?: () => void;
 }) {
     const [isSignup, setIsSignup] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const pathname = usePathname();
 
     const toggleForm = () => {
@@ -23,6 +24,7 @@ export default function AuthForm({
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        setIsLoading(true);
         const form = event.currentTarget as HTMLFormElement;
         const formData = new FormData(form);
 
@@ -34,6 +36,7 @@ export default function AuthForm({
         if (closeDialog) {
             closeDialog();
         }
+        setIsLoading(false);
     };
 
     return (
@@ -77,7 +80,9 @@ export default function AuthForm({
                     required
                 />
                 <input type="hidden" name="redirect" value={pathname} />
-                <SubmitButton isSignup={isSignup} />
+                <Button type="submit" disabled={isLoading}>
+                    {isSignup ? "Sign Up" : "Sign In"}
+                </Button>
                 <div>
                     {isSignup ? (
                         <span>

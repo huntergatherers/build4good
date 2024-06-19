@@ -78,8 +78,8 @@ export const CreateListingFormSchema = z.object({
         required_error: "Please select a deadline",
     }),
     description: z.string().min(10, {
-      message: "Description must be at least 10 characters.",
-  }),
+        message: "Description must be at least 10 characters.",
+    }),
 });
 
 const uniqueFileName = (bytes = 32) =>
@@ -230,7 +230,7 @@ export default function CreateListing() {
                     <div className="h-[60vh]">
                         <div className="flex flex-col justify-start h-full space-y-5 px-4 mt-12">
                             <Button
-                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/3 break-words whitespace-normal text-left items-start space-y-1 hover:bg-none ${
+                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-[40%] break-words whitespace-normal text-left items-start space-y-1 hover:bg-none ${
                                     selectedAction === "donate"
                                         ? "bg-primary"
                                         : ""
@@ -268,7 +268,7 @@ export default function CreateListing() {
                                 </p>
                             </Button>
                             <Button
-                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/3 break-words whitespace-normal text-left items-start space-y-1 ${
+                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-[40%] break-words whitespace-normal text-left items-start space-y-1 ${
                                     selectedAction === "receive"
                                         ? "bg-primary"
                                         : ""
@@ -981,7 +981,8 @@ export default function CreateListing() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="font-normal text-md">
-                                        Description<span className="text-red-500">*</span>
+                                        Description
+                                        <span className="text-red-500">*</span>
                                     </FormLabel>
                                     <FormControl>
                                         <Textarea
