@@ -11,7 +11,11 @@ export default async function ChatId({ params }: { params: { id: string } }) {
             id: params.id,
         },
         include: {
-            transaction: true,
+            transaction: {
+                include: {
+                    Listing: true
+                },
+            },
             message: true,
         },
     });

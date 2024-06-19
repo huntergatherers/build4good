@@ -51,7 +51,7 @@ export default function TransactionItem({
                 router.push(`/chats/${transaction.conversation?.id}`);
             }}
             key={transaction.id}
-            className="w-full flex items-start border-2 p-2 justify-between"
+            className="w-full flex items-start shadow-xl rounded-md p-2 justify-between"
         >
             <div className="flex justify-start items-start">
                 <div className="relative w-24 h-24 flex-shrink-0">

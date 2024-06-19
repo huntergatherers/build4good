@@ -4,11 +4,16 @@ import { Button } from "@/components/ui/button";
 import { approveTransaction, sendMessage } from "@/lib/actions";
 import { Prisma } from "@prisma/client";
 import { useState } from "react";
+import Image from "next/image";
 
 type conversation = Prisma.conversationGetPayload<{
     include: {
+        transaction: {
+            include: {
+                Listing: true;
+            };
+        };
         message: true;
-        transaction: true;
     };
 }>;
 
@@ -57,53 +62,58 @@ export default function ChatMessages({
 
     return (
         <div className="flex flex-col h-full w-full">
-            <div className="fixed top-0 left-0 w-full bg-white z-10 p-4 flex justify-between items-center">
-                <BackBtn label="Back" />
-                {conversation.transaction?.other_id === userId ? (
-                    <div
-                        className={`p-2 px-3 rounded-xl text-white ${
-                            conversation.transaction?.completed_at
-                                ? "bg-green-500"
+            <div className="fixed top-0 left-0 w-full bg-white z-10 p-4 flex flex-col items-center border-b">
+                <div className="flex justify-between items-center w-full">
+                    <BackBtn label="Back" />
+                    {conversation.transaction?.other_id === userId ? (
+                        <div
+                            className={`p-2 px-3 text-white ${
+                                conversation.transaction?.completed_at
+                                    ? "bg-green-500"
+                                    : conversation.transaction?.approved_at
+                                    ? "bg-orange-500"
+                                    : "bg-blue-500"
+                            }`}
+                        >
+                            {conversation.transaction?.completed_at
+                                ? "Completed"
                                 : conversation.transaction?.approved_at
-                                ? "bg-orange-500"
-                                : "bg-blue-500"
-                        }`}
-                    >
-                        {conversation.transaction?.completed_at
-                            ? "Completed"
-                            : conversation.transaction?.approved_at
-                            ? "Awaiting completion"
-                            : "Pending accept"}
-                    </div>
-                ) : (
-                    <div>
-                        {conversation.transaction?.approved_at ? (
-                            <div>
-                                <Button className="bg-green-500">
-                                    Exchange completed
-                                </Button>
-                            </div>
-                        ) : (
-                            <div className="flex space-x-2">
-                                <Button
-                                    className="bg-green-500 text-white font-bold"
-                                    onClick={handleApprove}
-                                >
-                                    Approve
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className="font-bold"
-                                    onClick={handleReject}
-                                >
-                                    Reject
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                )}
+                                ? "Awaiting completion"
+                                : "Pending accept"}
+                        </div>
+                    ) : (
+                        <div>
+                            {conversation.transaction?.approved_at ? (
+                                <div>
+                                    <Button className="bg-green-500">
+                                        Exchange completed
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="flex space-x-2">
+                                    <Button
+                                        className="bg-green-500 text-white font-bold"
+                                        onClick={handleApprove}
+                                    >
+                                        Approve
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="font-bold"
+                                        onClick={handleReject}
+                                    >
+                                        Reject
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+                <div className="self-end flex justify-center items-center font-semibold mt-2">
+                       {conversation.transaction?.donated_amount}kg of {conversation.transaction?.Listing.listing_item_type}
+                </div>
             </div>
-            <div className="flex-1 overflow-y-auto pt-16 pb-16 p-4">
+            <div className="flex-1 overflow-y-auto pt-28 pb-16 p-4">
                 {conversation.message.map((message) => (
                     <div
                         key={message.id}

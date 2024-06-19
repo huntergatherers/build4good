@@ -227,8 +227,8 @@ export default function CreateListing() {
                 <CreationBreadcrumbs step={step} totalSteps={3} />
                 {/* FIRST STEP: SELECT DONATE/RECEIVE */}
                 {step === 1 && (
-                    <div className="h-[70vh]">
-                        <div className="flex flex-col justify-start h-full space-y-5 px-4">
+                    <div className="h-[60vh]">
+                        <div className="flex flex-col justify-start h-full space-y-5 px-4 mt-12">
                             <Button
                                 className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/3 break-words whitespace-normal text-left items-start space-y-1 hover:bg-none ${
                                     selectedAction === "donate"

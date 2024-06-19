@@ -20,6 +20,9 @@ export default async function Transactions() {
         return <div>Profile not found</div>;
     }
     let transactions = await prisma.transaction.findMany({
+        orderBy: {
+          created_at: "desc"
+        },
         where: {
             OR: [
                 {
