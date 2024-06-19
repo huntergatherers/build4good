@@ -16,6 +16,7 @@ import LoginButton from "@/app/login/login-button";
 import GoogleMaps from "./components/google-maps";
 import { ChevronLeft, Loader } from "lucide-react";
 import BackBtn from "./components/back-btn";
+import ViewChatButton from "./view-chat-btn";
 
 export default async function ListingPage({
     params,
@@ -42,7 +43,11 @@ export default async function ListingPage({
                     }, // Include the replies of the comment
                 },
             },
-            Transaction: true,
+            Transaction: {
+                include: {
+                    conversation: true,
+                },
+            },
             profiles: true,
             ListingImage: true,
         },
@@ -61,6 +66,11 @@ export default async function ListingPage({
         .reduce((acc, transaction) => acc + transaction.donated_amount, 0);
 
     const user = await getCurrentUser();
+
+    const matchingTransaction = listing.Transaction.find(
+        (transaction) => transaction.other_id === user?.id
+    );
+
     return (
         <div className="w-full min-h-screen px-6 pt-6 pb-20 relative bg-white overflow-auto">
             <BackBtn label="Back" />
@@ -168,23 +178,34 @@ export default async function ListingPage({
                 user={user}
                 listingId={listingId}
             />
-            <div className="fixed bottom-0 p-4 -mx-6 w-full bg-white rounded-t-lg border-t-2 border-t-gray-200 drop-shadow-2xl">
-                {user ? (
-                    user.id === owner.id ? null : (
-                        <TransactionBtn
-                            user={user}
-                            listing={listing}
-                            listingOwner={owner}
+            {user?.id !== owner.id && (
+                <div className="fixed bottom-0 p-4 -mx-6 w-full bg-white rounded-t-lg border-t-2 border-t-gray-200 drop-shadow-2xl">
+                    {user ? (
+                        matchingTransaction &&
+                        matchingTransaction.conversation ? (
+                            <ViewChatButton
+                                conversationId={
+                                    matchingTransaction.conversation?.id
+                                }
+                            />
+                        ) : (
+                            <TransactionBtn
+                                user={user}
+                                listing={listing}
+                                listingOwner={owner}
+                            />
+                        )
+                    ) : (
+                        <LoginButton
+                            text={
+                                listingType == "receive"
+                                    ? "Contribute"
+                                    : "Request"
+                            }
                         />
-                    )
-                ) : (
-                    <LoginButton
-                        text={
-                            listingType == "receive" ? "Contribute" : "Request"
-                        }
-                    />
-                )}
-            </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

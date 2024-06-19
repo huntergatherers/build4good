@@ -1,9 +1,9 @@
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUser, getCurrentUserId } from "@/lib/auth";
 import prisma from "@/lib/db";
 import ChatMessages from "./chatMessages";
 export default async function ChatId({ params }: { params: { id: string } }) {
-    const userId = await getCurrentUserId();
-    if (!userId) {
+    const user = await getCurrentUser();
+    if (!user) {
         return <div>Unauthorized</div>;
     }
     const conversation = await prisma.conversation.findUnique({
@@ -13,12 +13,18 @@ export default async function ChatId({ params }: { params: { id: string } }) {
         include: {
             transaction: {
                 include: {
-                    Listing: true
+                    Listing: {
+                        include: {
+                            Transaction: true,
+                            profiles: true,
+                        },
+                    },
                 },
             },
             message: true,
         },
     });
+
     console.log(conversation);
-    return <ChatMessages conversation={conversation} userId={userId} />;
+    return <ChatMessages conversation={conversation} user={user} />;
 }

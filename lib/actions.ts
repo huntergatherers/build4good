@@ -412,12 +412,14 @@ export async function deleteTransaction(transactionId: string | undefined) {
                 error: "User not found",
             };
         }
-        await prisma.transaction.delete({
+        await prisma.transaction.update({
             where: {
                 id: transactionId,
             },
+            data: {
+                cancelled_at: new Date(),
+            },
         });
-        revalidatePath("/listings/" + transactionId);
         return { success: "Transaction deleted" };
     } catch (error) {
         console.error("Error deleting transaction:", error);
@@ -751,6 +753,7 @@ export async function completeTransaction(transactionId: string) {
     // ensure transactionId is approved
     const transaction = await prisma.transaction.findUnique({
         where: { id: transactionId },
+        include: { conversation: true },
     });
     if (!transaction) {
         throw new Error(`Transaction with id ${transactionId} not found`);
@@ -761,11 +764,12 @@ export async function completeTransaction(transactionId: string) {
         );
     }
     try {
-        const transaction = await prisma.transaction.update({
+        const updatedTransaction = await prisma.transaction.update({
             where: { id: transactionId },
             data: { completed_at: new Date() },
         });
-        return transaction;
+        revalidatePath("/chats/" + transaction.conversation!.id);
+        return updatedTransaction;
     } catch (error) {
         console.error("Error completing transaction:", error);
         throw error;

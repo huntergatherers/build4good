@@ -19,6 +19,7 @@ import {
     createTransaction,
     deleteTransaction,
     editTransaction,
+    sendMessage,
 } from "@/lib/actions";
 
 import { Listing, Prisma, profiles } from "@prisma/client";
@@ -35,10 +36,12 @@ export default function TransactionBtn({
     user,
     listing,
     listingOwner,
+    conversationId,
 }: {
     user: User | null;
     listing: ListingWithTransaction;
     listingOwner: profiles;
+    conversationId?: string;
 }) {
     const [isLoading, setIsLoading] = useState(false);
     const hasPendingTransaction = listing.Transaction.some(
@@ -110,12 +113,18 @@ export default function TransactionBtn({
         if (response.success) {
             toast({
                 duration: 2000,
-                title: "Successfully deleted",
+                title: "Successfully cancelled",
                 action: <ToastAction altText="Close">Close</ToastAction>,
                 description: `Your ${
                     listing.listing_type === "donate" ? "request" : "offer"
-                } has been deleted.`,
+                } has been cancelled.`,
             });
+            await sendMessage(
+                `I have cancelled my ${
+                    listing.listing_type === "donate" ? "request" : "offer"
+                }`,
+                conversationId!
+            );
         } else {
             toast({
                 duration: 2000,
@@ -136,7 +145,15 @@ export default function TransactionBtn({
             goal
         );
         if (transaction.success) {
+            console.log("Successfully updated");
+            await sendMessage(
+                `I have updated my ${
+                    listing.listing_type === "donate" ? "request" : "offer"
+                } to ${goal}kg`,
+                conversationId!
+            );
             toast({
+                className: "z-10",
                 duration: 2000,
                 action: <ToastAction altText="Close">Close</ToastAction>,
                 title: "Successfully updated",
@@ -252,20 +269,20 @@ export default function TransactionBtn({
                         <DrawerFooter className="mt-4">
                             {hasPendingTransaction ? (
                                 <div className="space-y-2 flex flex-col">
-                                    <Button
-                                        disabled={
-                                            goal < 1 ||
-                                            goal ===
-                                                matchingTransaction!
-                                                    .donated_amount ||
-                                            isLoading
-                                        }
-                                        onClick={handleEditTransaction}
-                                    >
-                                        {listing.listing_type === "donate"
-                                            ? "Edit Request"
-                                            : "Edit Offer"}
-                                    </Button>
+                                    {listing.listing_type === "receive" && (
+                                        <Button
+                                            disabled={
+                                                goal < 1 ||
+                                                goal ===
+                                                    matchingTransaction!
+                                                        .donated_amount ||
+                                                isLoading
+                                            }
+                                            onClick={handleEditTransaction}
+                                        >
+                                            Edit Offer
+                                        </Button>
+                                    )}
                                     <Button
                                         variant="destructive"
                                         onClick={handleDeleteTransaction}

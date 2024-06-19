@@ -71,15 +71,6 @@ const ListingItemOne = ({
                         </div>
                         <h1 className="text-xs">{listing.profiles.username}</h1>
                     </div>
-                    {distance !== null && (
-                        <div className="flex items-center">
-                            <MapPinned size={15} className="text-gray-400" />
-                            <div className="ml-1 text-xs font-semibold text-gray-400">
-                                {distance.toFixed(1)} km
-                            </div>
-                        </div>
-                    )}
-
                     <p className="text-xs font-medium text-gray-400">
                         {formatDateTimeAgo(listing.created_at)}
                     </p>
@@ -98,17 +89,29 @@ const ListingItemOne = ({
                             value={(progress / listing.total_amount) * 100}
                             className={`mt-1 h-[6px] [&>*]:bg-green-700`}
                         />
-
-                        <div className="flex justify-between w-full">
-                            <label
-                                className={`text-xs mt-1 text-green-700
+                        <div className="flex justify-between items-center">
+                            <div className="flex justify-between w-full">
+                                <label
+                                    className={`text-xs mt-1 text-green-700
                                 `}
-                            >
-                                <span className="font-bold">
-                                    {progress}/{listing.total_amount}kg
-                                </span>{" "}
-                                contributed
-                            </label>
+                                >
+                                    <span className="font-bold">
+                                        {progress}/{listing.total_amount}kg
+                                    </span>{" "}
+                                    contributed
+                                </label>
+                            </div>
+                            {distance !== null && (
+                                <div className="flex items-center">
+                                    <MapPinned
+                                        size={12}
+                                        className="text-gray-400"
+                                    />
+                                    <div className="ml-1 text-[0.7rem] font-semibold text-gray-400">
+                                        {distance.toFixed(1)}km
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </>
                 )}
@@ -123,6 +126,17 @@ const ListingItemOne = ({
                             </span>{" "}
                             available
                         </label>
+                        {distance !== null && (
+                            <div className="flex items-center">
+                                <MapPinned
+                                    size={12}
+                                    className="text-gray-400"
+                                />
+                                <div className="ml-1 text-[0.7rem] font-semibold text-gray-400">
+                                    {distance.toFixed(1)}km
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
