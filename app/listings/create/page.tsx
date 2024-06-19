@@ -228,9 +228,9 @@ export default function CreateListing() {
                 {/* FIRST STEP: SELECT DONATE/RECEIVE */}
                 {step === 1 && (
                     <div className="h-[70vh]">
-                        <div className="flex flex-col justify-evenly h-full space-y-5">
+                        <div className="flex flex-col justify-start h-full space-y-5 px-4">
                             <Button
-                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/2 break-words whitespace-normal text-left items-start space-y-1 hover:bg-none ${
+                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/3 break-words whitespace-normal text-left items-start space-y-1 hover:bg-none ${
                                     selectedAction === "donate"
                                         ? "bg-primary"
                                         : ""
@@ -241,7 +241,7 @@ export default function CreateListing() {
                                 type="button"
                             >
                                 <PackageOpen
-                                    size={80}
+                                    size={50}
                                     color={
                                         selectedAction === "donate"
                                             ? "white"
@@ -249,7 +249,7 @@ export default function CreateListing() {
                                     }
                                 />
                                 <p
-                                    className={`text-2xl pt-1 ${
+                                    className={`text-xl pt-1 ${
                                         selectedAction === "donate"
                                             ? "text-white"
                                             : ""
@@ -258,7 +258,7 @@ export default function CreateListing() {
                                     Contribute
                                 </p>
                                 <p
-                                    className={`text-xl font-light ${
+                                    className={`text-md font-medium ${
                                         selectedAction === "donate"
                                             ? "text-white"
                                             : "text-gray-700"
@@ -268,7 +268,7 @@ export default function CreateListing() {
                                 </p>
                             </Button>
                             <Button
-                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/2 break-words whitespace-normal text-left items-start space-y-1 ${
+                                className={`bg-transparent border border-gray-400 rounded-xl text-black flex flex-col h-1/3 break-words whitespace-normal text-left items-start space-y-1 ${
                                     selectedAction === "receive"
                                         ? "bg-primary"
                                         : ""
@@ -279,7 +279,7 @@ export default function CreateListing() {
                                 type="button"
                             >
                                 <Package
-                                    size={80}
+                                    size={50}
                                     color={
                                         selectedAction === "receive"
                                             ? "white"
@@ -287,7 +287,7 @@ export default function CreateListing() {
                                     }
                                 />
                                 <p
-                                    className={`text-2xl pt-1 ${
+                                    className={`text-xl pt-1 ${
                                         selectedAction === "receive"
                                             ? "text-white"
                                             : ""
@@ -296,7 +296,7 @@ export default function CreateListing() {
                                     Receive
                                 </p>
                                 <p
-                                    className={`text-xl font-light ${
+                                    className={`text-md font-medium ${
                                         selectedAction === "receive"
                                             ? "text-white"
                                             : "text-gray-700"
@@ -406,24 +406,24 @@ export default function CreateListing() {
                                     }}
                                 >
                                     <Image
-                                        className="rounded-xs my-2 w-36 h-36 rounded-md object-cover"
+                                        className="rounded-xs w-28 h-28 rounded-md object-cover"
                                         src="https://images.unsplash.com/photo-1597362925123-77861d3fbac7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                         width={500}
                                         height={500}
                                         alt="Picture Uploaded"
                                     />
                                     <div className="ml-4 flex flex-col justify-center items-center">
-                                        <p className="text-xl font-semibold">
+                                        <p className="text-md font-semibold">
                                             Greens
                                         </p>
-                                        <p className="text-base">
+                                        <p className="text-sm">
                                             Vegetables and/or fruit scraps,
                                             grass clippings
                                         </p>
-                                        <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
+                                        <div className="flex items-center justify-center space-x-1 text-center px-2 mt-2">
                                             <Button
                                                 size="icon"
-                                                className={`h-10 w-10 shrink-0 rounded-full bg-black ${
+                                                className={`h-6 w-6 shrink-0 rounded-full bg-black ${
                                                     selectedType !== "greens" &&
                                                     selectedType
                                                         ? "opacity-50 pointer-events-none"
@@ -470,7 +470,7 @@ export default function CreateListing() {
                                             </div>
                                             <Button
                                                 size="icon"
-                                                className="h-10 w-10 shrink-0 rounded-full bg-black"
+                                                className="h-6 w-6 shrink-0 rounded-full bg-black"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     onClickGreens(1);
@@ -484,7 +484,7 @@ export default function CreateListing() {
                                                 />
                                             </Button>
                                         </div>
-                                        <span className="font-normal self-center pb-2">
+                                        <span className="font-normal self-center pb-2 text-xs">
                                             kg
                                         </span>
                                     </div>
@@ -507,24 +507,24 @@ export default function CreateListing() {
                                     }}
                                 >
                                     <Image
-                                        className="rounded-xs my-2 w-36 h-36 rounded-md object-cover"
+                                        className="rounded-xs w-28 h-28 rounded-md object-cover"
                                         src="https://images.unsplash.com/photo-1517424340038-3c3972e627d5?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                         width={500}
                                         height={500}
                                         alt="Picture of the author"
                                     />
                                     <div className="flex flex-col justify-center items-center ml-4">
-                                        <p className="text-xl font-semibold">
+                                        <p className="text-md font-semibold">
                                             Browns
                                         </p>
-                                        <p className="text-base">
+                                        <p className="text-xs">
                                             Dry leaves, newspaper, dead plant
                                             clippings
                                         </p>
-                                        <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
+                                        <div className="flex items-center justify-center space-x-1 text-center px-2 mt-2">
                                             <Button
                                                 size="icon"
-                                                className={`h-10 w-10 shrink-0 rounded-full bg-black ${
+                                                className={`h-6 w-6 shrink-0 rounded-full bg-black ${
                                                     selectedType !== "browns" &&
                                                     selectedType
                                                         ? "opacity-50 pointer-events-none"
@@ -571,7 +571,7 @@ export default function CreateListing() {
                                             </div>
                                             <Button
                                                 size="icon"
-                                                className="h-10 w-10 shrink-0 rounded-full bg-black"
+                                                className="h-6 w-6 shrink-0 rounded-full bg-black"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     onClickBrowns(1);
@@ -607,24 +607,24 @@ export default function CreateListing() {
                                     }}
                                 >
                                     <Image
-                                        className="rounded-xs my-2 w-36 h-36 object-cover rounded-md"
+                                        className="rounded-xs w-28 h-28 object-cover rounded-md"
                                         src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                         width={500}
                                         height={500}
                                         alt="Picture of the author"
                                     />
                                     <div className="flex flex-col justify-center items-center ml-4">
-                                        <p className="text-xl font-semibold">
+                                        <p className="text-md font-semibold">
                                             Compost
                                         </p>
-                                        <p className="text-base">
+                                        <p className="text-xs">
                                             Plant fertiliser to improve soil's
                                             properties
                                         </p>
-                                        <div className="flex items-center justify-center space-x-1 text-center px-2 mt-6">
+                                        <div className="flex items-center justify-center space-x-1 text-center px-2 mt-2">
                                             <Button
                                                 size="icon"
-                                                className={`h-10 w-10 shrink-0 rounded-full bg-black ${
+                                                className={`h-6 w-6 shrink-0 rounded-full bg-black ${
                                                     selectedType !==
                                                         "compost" &&
                                                     selectedType
@@ -672,7 +672,7 @@ export default function CreateListing() {
                                             </div>
                                             <Button
                                                 size="icon"
-                                                className="h-10 w-10 shrink-0 rounded-full bg-black"
+                                                className="h-6 w-6 shrink-0 rounded-full bg-black"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     onClickCompost(1);

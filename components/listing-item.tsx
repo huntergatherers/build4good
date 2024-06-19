@@ -46,31 +46,21 @@ const ListingItem = ({ listing, showDescription }: ListingItemProps) => {
                     alt={listing.header}
                 />
             </div>
-            <Progress
+           {listing.listing_type === listing_type_enum.receive && (<> <Progress
                 value={(progress / listing.total_amount) * 100}
-                className={`mt-2 h-[6px] ${
-                    listing.listing_type === "donate"
-                        ? "[&>*]:bg-blue-700"
-                        : "[&>*]:bg-green-700"
-                }`}
+                className={`mt-2 h-[6px] [&>*]:bg-green-700`
+                }
             />
             <div className="flex justify-between w-full">
                 <label
-                    className={`text-xs mt-1 ${
-                        listing.listing_type === "donate"
-                            ? "text-blue-700"
-                            : "text-green-700"
-                    }`}
+                    className={`text-xs mt-1 text-green-700`}
                 >
                     <span className="font-bold">
                         {progress}/{listing.total_amount}kg
                     </span>{" "}
-                    {listing.listing_type === "donate"
-                        ? "claimed"
-                        : "contributed"}
-                    {/* <p className="text-right"><Apple/></p> */}
+                        contributed
                 </label>
-            </div>
+            </div></>)}
             <div className="font-medium text-base mt-1 line-clamp-2 w-36 text-left">
                 {listing.header}
             </div>
@@ -78,6 +68,9 @@ const ListingItem = ({ listing, showDescription }: ListingItemProps) => {
                 <div className="font-light text-sm line-clamp-2 w-36 mb-1 text-left">
                     {listing.body}
                 </div>
+            )}
+            {listing.listing_type === listing_type_enum.donate && (
+              <div className="text-xs text-green-700 font-semibold">{listing.total_amount}kg available</div>
             )}
         </div>
     );
