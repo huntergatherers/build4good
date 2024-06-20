@@ -3,6 +3,7 @@ import { FacebookEmbed, LinkedInEmbed } from 'react-social-media-embed';
 import MapComponentPage from '../map/MapComponent';
 import FaceBookPosts from './FacebookPosts';
 import prisma from '@/lib/db';
+import { List } from 'lucide-react';
 
 // const FacebookEmbed = dynamic(
 //     import("react-social-media-embed").then((mod) => mod.FacebookEmbed),
@@ -12,7 +13,16 @@ import prisma from '@/lib/db';
 const CommunityPage = async () => {
   const users = await prisma.users.findMany({
     include: {
-      profiles: true,
+      profiles: {
+        include: {
+          Listing: {
+            include: {
+              ListingImage: true,
+            }
+          },
+          Transaction: true,
+        }
+      },
     },
   });
   console.log(users);

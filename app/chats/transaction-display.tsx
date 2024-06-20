@@ -40,14 +40,13 @@ export default function TransactionDisplay({
                 {transactions.length > 0 ? (
                     <div className="space-y-2">
                         {transactions.map((transaction) => (
-                            <>
+                            <div key={transaction.id}>
                                 <TransactionItem
                                     transaction={transaction}
                                     type="receive"
-                                    key={transaction.id}
                                     profile={profile}
                                 />
-                            </>
+                           </div>
                         ))}
                     </div>
                 ) : (

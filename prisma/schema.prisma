@@ -477,6 +477,7 @@ model Transaction {
 
 model profiles {
   id               String           @id @db.Uuid
+  about_me         String?
   username         String           @unique
   coords_lat       Float?
   coords_long      Float?

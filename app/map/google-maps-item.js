@@ -6,6 +6,7 @@ import {
     InfoWindow,
     useJsApiLoader,
 } from "@react-google-maps/api";
+import { useRouter } from "next/navigation";
 
 const containerStyle = {
     width: "100%",
@@ -17,6 +18,32 @@ const center = {
     lng: 103.821493,
 };
 
+const calculateFoodScrappingDuration = (startDate) => {
+  const today = new Date();
+  const diffInMonths =
+      (today.getFullYear() - startDate.getFullYear()) * 12 +
+      (today.getMonth() - startDate.getMonth());
+  const years = Math.floor(diffInMonths / 12);
+  const months = diffInMonths % 12;
+  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+  const diffInDays = Math.floor(
+      (today.getTime() - startDate.getTime()) / oneDay
+  );
+  let duration = "";
+
+  if (years > 0) {
+      duration += `${years}y `;
+  }
+  if (months > 0) {
+      duration += `${months}m `;
+  }
+  if (diffInDays > 0 && years === 0 && months === 0) {
+      duration += `${diffInDays}d`;
+  }
+
+  return duration.trim();
+};
+
 function GoogleMapsItem({ markers = [], users }) {
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
@@ -26,6 +53,11 @@ function GoogleMapsItem({ markers = [], users }) {
     const [map, setMap] = useState(null);
     const [icon, setIcon] = useState(null);
     const [selectedMarker, setSelectedMarker] = useState(null);
+
+    const totalAmount = selectedMarker?.profiles?.Transaction.reduce(
+        (acc, curr) => acc + curr.donated_amount,
+        0
+    );
 
     useEffect(() => {
         if (isLoaded && window.google) {
@@ -57,8 +89,12 @@ function GoogleMapsItem({ markers = [], users }) {
         setMap(null);
     }, []);
 
+    const router = useRouter();
+
     const handleMarkerClick = (marker) => {
-        setSelectedMarker(marker);
+        console.log(marker);
+        const user = users.find((user) => user.id === marker.id);
+        setSelectedMarker(user);
     };
 
     return isLoaded ? (
@@ -95,25 +131,31 @@ function GoogleMapsItem({ markers = [], users }) {
             {selectedMarker && (
                 <InfoWindow
                     position={{
-                        lat: selectedMarker.latitude,
-                        lng: selectedMarker.longitude,
+                        lat: selectedMarker.profiles.coords_lat,
+                        lng: selectedMarker.profiles.coords_long,
                     }}
                     onCloseClick={() => setSelectedMarker(null)}
                 >
                     <div className="text-2xl">
                         <h2 className="font-bold">
-                            {users[selectedMarker.id - 1].name}
+                            {selectedMarker.profiles.username}
                         </h2>
-                        <p className="text-green-600 font-medium text-xl">
-                            {users[selectedMarker.id - 1].wasteDonated +
-                                users[selectedMarker.id - 1].wasteDonated}{" "}
+                        <p className="text-green-600 font-medium text-base">
+                            {totalAmount}
                             kg{" "}
-                            <span className="text-md text-black font-normal">
-                                recycled
+                            <span className="text-base text-black font-normal">
+                                recycled <br/>since{" "}
+                                {calculateFoodScrappingDuration(
+                                    selectedMarker.profiles?.last_activity
+                                )} ago
                             </span>
                         </p>
-                        <p>{users[selectedMarker.id - 1].about}</p>
-                        <div className="text-gray-500 flex justify-between space-x-2 mt-4">
+                        <p className="text-xs">I am an avid compostor. I am interested in green living and enjoy caring for the environment!</p>
+                        <button className="bg-blue-500 rounded-md p-2 text-xs mt-2 font-semibold text-white" onClick={() => {
+                          router.push(`/user/${selectedMarker.profiles.username}`);
+                        }}>View Profile</button>
+                        {/* <p>{users[selectedMarker.id - 1].about}</p> */}
+                        {/* <div className="text-gray-500 flex justify-between space-x-2 mt-4">
                             {[
                                 "Monday",
                                 "Tuesday",
@@ -136,7 +178,7 @@ function GoogleMapsItem({ markers = [], users }) {
                                     {day[0]}
                                 </p>
                             ))}
-                        </div>
+                        </div> */}
                     </div>
                 </InfoWindow>
             )}

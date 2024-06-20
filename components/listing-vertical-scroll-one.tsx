@@ -14,12 +14,14 @@ export type ListingWithTransactionAndImage = Prisma.ListingGetPayload<{
 }>;
 
 interface ListingVerticleScrollProps {
+    isDistanceFilterOn: boolean;
     listings: ListingWithTransactionAndImage[];
 }
 
 const ListingVerticalScrollOne = async ({
-    listings,
+  isDistanceFilterOn, listings
 }: ListingVerticleScrollProps) => {
+  console.log(isDistanceFilterOn);
     return (
         <ScrollArea className="">
             <div className="grid grid-cols-1 gap-y-8">
@@ -28,6 +30,7 @@ const ListingVerticalScrollOne = async ({
                         coords_lat: listing.coords_lat,
                         coords_long: listing.coords_long,
                     });
+                    if (isDistanceFilterOn && distance! > 2) return null;
                     return (
                         <ListingItemOne
                             key={index}

@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Slider } from "@/components/ui/slider";
 
 interface Filters {
     greens: boolean;
@@ -25,6 +26,7 @@ export default function ListingsFilter({
     const router = useRouter();
     const params = useSearchParams();
     const filterString = params.get("filters");
+    const [distance, setDistance] = useState<number>(5);
 
     const parseFilterString = (filterString: string | null): Filters => {
         const filtersArray = filterString ? filterString.split(" ") : [];
@@ -128,6 +130,20 @@ export default function ListingsFilter({
                             </label>
                         </div>
                     </div>
+                    {/* <div>
+                        <div className="mt-4 text-xs font-semibold">Max distance from pick-up point: <br/>{distance}km</div>
+                        <Slider
+                            className="mt-2"
+                            onValueChange={(value) => {
+                              setDistance(value[0]);
+                            }}
+                            defaultValue={[distance]}
+                            max={10}
+                            min={1}
+                            step={1}
+                        />
+                    </div> */}
+
                     <Separator className="my-2" />
                     <div className="flex justify-center">
                         <Button onClick={applyFilters}>Apply Filter</Button>

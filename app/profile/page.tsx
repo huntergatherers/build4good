@@ -1,4 +1,4 @@
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma, { listing_type_enum } from "@/lib/db";
 import Image from "next/image";
@@ -22,6 +22,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import SignOutButton from "./signOutButton";
 
 export default async function Profile() {
     const userId = await getCurrentUserId();
@@ -86,7 +87,7 @@ export default async function Profile() {
                         food scraps. However i occasionally compost and would
                         sometimes like to receive too.
                     </p>
-                    <Button className="w-full">Edit Profile</Button>
+                    <SignOutButton />
                 </div>
 
                 <div className="mt-2">

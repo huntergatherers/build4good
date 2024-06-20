@@ -5,6 +5,7 @@ import Pills from "@/components/(navbar)/pills";
 import ListingVerticalScrollOne from "@/components/listing-vertical-scroll-one";
 import AboutUsPopUp from "@/components/aboutus-popup";
 import ListingsFilter from "./create/filter";
+import DistanceFilterButton from "./distance-filter-btn";
 
 function getFilterConditions(filters: string | undefined) {
     if (!filters) return {};
@@ -32,6 +33,7 @@ export default async function Index({
 }) {
     const type = searchParams["type"];
     const filters = searchParams["filters"] as string | undefined;
+    const distance = searchParams["distance"];
 
     const filterConditions = getFilterConditions(filters);
 
@@ -85,19 +87,20 @@ export default async function Index({
                         <ListingsFilter type={type} />
                     </div>
                 </div>
+                <div className="mt-2"><DistanceFilterButton/></div>
                 {type === "requests" ? (
                     <div className="mb-4">
                         <h1 className="text-md font-semibold my-4">
                             Check out what people are requesting for
                         </h1>
-                        <ListingVerticalScrollOne listings={requestListings} />
+                        <ListingVerticalScrollOne listings={requestListings} isDistanceFilterOn={distance ? true : false}/>
                     </div>
                 ) : (
                     <div className="mb-4">
                         <h1 className="text-md font-semibold my-4">
                             Check out what people are giving away
                         </h1>
-                        <ListingVerticalScrollOne listings={donationListings} />
+                        <ListingVerticalScrollOne listings={donationListings} isDistanceFilterOn={distance ? true : false}/>
                     </div>
                 )}
             </main>
