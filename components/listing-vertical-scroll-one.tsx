@@ -21,7 +21,6 @@ interface ListingVerticleScrollProps {
 const ListingVerticalScrollOne = async ({
   isDistanceFilterOn, listings
 }: ListingVerticleScrollProps) => {
-  console.log(isDistanceFilterOn);
     return (
         <ScrollArea className="">
             <div className="grid grid-cols-1 gap-y-8">

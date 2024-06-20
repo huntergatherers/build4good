@@ -85,7 +85,7 @@ export default async function ListingPage({
                 <p className="text-xl font-semibold w-[80%] overflow-hidden text-ellipsis">
                     {listing.header}
                 </p>
-                <Badge>2.1km</Badge>
+                {/* <Badge>2.1km</Badge> */}
             </div>
             <p className="text-gray-400 my-2">{listing.body}</p>
             {listing.listing_type === "donate" && (
