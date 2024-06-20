@@ -12,8 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Broccoli from "./assets/broccoli";
-import Apple from "./assets/apple";
 import dynamic from "next/dynamic";
 import GoogleMapsItem from "./google-maps-item";
 import Link from "next/link";
@@ -42,111 +40,68 @@ const MapComponentPage = ({ users }: MapComponentPageProps) => {
     const [filter, setFilter] = useState<"All Users" | "Giver" | "Receiver">(
         "All Users"
     );
+    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const [distances, setDistances] = useState<number[]>([]);
 
-    //   id: '21b30206-3823-4063-b001-c0c8a4511a55',
-    //   username: 'aden teo',
-    //   coords_lat: 1.485513,
-    //   coords_long: 103.879777,
-    //   is_composter: true,
-    //   is_donor: true,
-    //   is_gardener: false,
-    //   last_activity: 2024-06-18T07:02:50.423Z,
-    //   social_media_url: 'https://example.com/user21'
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setUserLocation({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    });
+                },
+                (error) => {
+                    console.error("Error obtaining location:", error);
+                }
+            );
+        }
+    }, []);
 
-    const userData = [
-        {
-            id: 1,
-            name: "user7",
-            about: "I am a compost enthusiast",
-            profilePicture:
-                "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
-            wasteReceived: 150,
-            wasteDonated: 75,
-            startDate: new Date("2023-05-15"),
-            freeDays: ["Monday", "Wednesday", "Friday"],
-            role: "Receiver",
-            latitude: 1.3521,
-            longitude: 103.8198,
-        },
-        {
-            id: 2,
-            name: "user15",
-            about: "I have my own farm and I love to recycle waste",
-            profilePicture:
-                "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
-            wasteReceived: 200,
-            wasteDonated: 100,
-            startDate: new Date("2023-03-20"),
-            freeDays: ["Tuesday", "Thursday"],
-            role: "Receiver",
-            latitude: 1.3422,
-            longitude: 103.82,
-        },
-        {
-            id: 3,
-            name: "user4",
-            about: "I am a compost enthusiast",
-            profilePicture:
-                "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
-            wasteReceived: 100,
-            wasteDonated: 50,
-            startDate: new Date("2024-05-15"),
-            freeDays: ["Saturday", "Sunday"],
-            role: "Giver",
-            latitude: 1.3623,
-            longitude: 103.8202,
-        },
-        {
-            id: 4,
-            name: "user18",
-            about: "I am a compost enthusiast",
-            profilePicture:
-                "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
-            wasteReceived: 150,
-            wasteDonated: 75,
-            startDate: new Date("2023-01-15"),
-            freeDays: ["Monday", "Wednesday", "Friday"],
-            role: "Giver",
-            latitude: 1.3524,
-            longitude: 103.8004,
-        },
-        {
-            id: 5,
-            name: "user9",
-            about: "I am a compost enthusiast",
-            profilePicture:
-                "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
-            wasteReceived: 200,
-            wasteDonated: 100,
-            startDate: new Date("2023-05-15"),
-            freeDays: ["Tuesday", "Thursday"],
-            role: "Receiver",
-            latitude: 1.3525,
-            longitude: 103.8406,
-        },
-        {
-            id: 6,
-            name: "user12",
-            about: "I am a compost enthusiast",
-            profilePicture:
-                "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg",
-            wasteReceived: 100,
-            wasteDonated: 50,
-            startDate: new Date("2023-05-15"),
-            freeDays: ["Saturday", "Sunday"],
-            role: "Receiver",
-            latitude: 1.3526,
-            longitude: 103.8318,
-        },
-    ];
+    useEffect(() => {
+        if (userLocation) {
+            const calculateDistances = () => {
+                const distances = users.map((user) => {
+                    if (user.profiles?.coords_lat && user.profiles?.coords_long) {
+                        return haversineDistance(
+                            userLocation.lat,
+                            userLocation.lng,
+                            user.profiles.coords_lat,
+                            user.profiles.coords_long
+                        );
+                    }
+                    return 0;
+                });
+                setDistances(distances);
+            };
 
-    const markers = users.map((user) => ({
-        id: user.id,
-        latitude: user.profiles?.coords_lat,
-        longitude: user.profiles?.coords_long,
-    }));
+            calculateDistances();
+        }
+    }, [userLocation, users]);
 
-    console.log(markers);
+    const haversineDistance = (
+      lat1: number,
+      lon1: number,
+      lat2: number,
+      lon2: number
+    ): number => {
+      const toRad = (x: number): number => (x * Math.PI) / 180;
+    
+      const R = 6371; // Earth's radius in kilometers
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const lat1Rad = toRad(lat1);
+      const lat2Rad = toRad(lat2);
+    
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+      return R * c; // Distance in kilometers
+    };
 
     const calculateFoodScrappingDuration = (startDate: Date) => {
         const today = new Date();
@@ -174,16 +129,14 @@ const MapComponentPage = ({ users }: MapComponentPageProps) => {
         return duration.trim();
     };
 
-    const filteredUserData = userData.filter(
-        (user) => filter === "All Users" || user.role === filter
-    );
 
     return (
         <div className="relative min-h-screen w-screen flex justify-center items-center">
-            {/* <MapItem /> */}
-            <GoogleMapsItem markers={markers} users={users} />
-            {/* <GoogleMapsItem /> */}
-
+            <GoogleMapsItem markers={users.map(user => ({
+                id: user.id,
+                latitude: user.profiles?.coords_lat,
+                longitude: user.profiles?.coords_long,
+            }))} users={users} />
             <Drawer>
                 <DrawerTrigger
                     style={{
@@ -216,26 +169,6 @@ const MapComponentPage = ({ users }: MapComponentPageProps) => {
                             />
                         </DrawerTitle>
                     </DrawerHeader>
-                    {/* <div className="flex justify-between pl-6 pr-6 mb-6 z-50">
-            <Button
-              className="rounded-3xl text-black bg-white hover:bg-black hover:text-white"
-              onClick={() => setFilter('All Users')}
-            >
-              All Users
-            </Button>
-            <Button
-              className="rounded-3xl text-black bg-white hover:bg-black hover:text-white"
-              onClick={() => setFilter('Giver')}
-            >
-              Donors
-            </Button>
-            <Button
-              className="rounded-3xl text-black bg-white hover:bg-black hover:text-white"
-              onClick={() => setFilter('Receiver')}
-            >
-              Composters
-            </Button>
-          </div> */}
 
                     <ScrollArea className="bg-gray-100 h-full">
                         <div>
@@ -280,35 +213,9 @@ const MapComponentPage = ({ users }: MapComponentPageProps) => {
                                                     recycled
                                                 </span>
                                             </p>
-
-                                            {/* <p className="text-gray-500 text-xs">
-                      since {calculateFoodScrappingDuration(user.created_at!)} ago
-                    </p> */}
-                                            {/* <div className="text-gray-500 flex justify-between space-x-2 mt-4">
-                      {[
-                        'Monday',
-                        'Tuesday',
-                        'Wednesday',
-                        'Thursday',
-                        'Friday',
-                        'Saturday',
-                        'Sunday',
-                      ].map((day, idx) => (
-                        <p
-                          key={idx}
-                          className={`flex items-center justify-center font-semibold rounded-full w-6 h-6 ${
-                            user.freeDays.includes(day)
-                              ? 'bg-green-300'
-                              : 'bg-gray-200'
-                          }`}
-                        >
-                          {day[0]}
-                        </p>
-                      ))}
-                    </div> */}
                                             <div className="flex justify-center items-center mt-1">
                                                 <div className="bg-gray-500 text-xs rounded-3xl py-1 px-2 text-white">
-                                                    2.4km
+                                                    {distances[index] ? `${distances[index].toFixed(1)}km` : 'N/A'}
                                                 </div>
                                                 <div className="text-gray-500 ml-2 text-xs">
                                                     from you
@@ -317,10 +224,10 @@ const MapComponentPage = ({ users }: MapComponentPageProps) => {
                                             <p className="mt-2 text-xs font-semibold">
                                                 Active Listings
                                             </p>
-                                            <div className="flex justify-center items-center mt-1">
+                                            <div className="flex justify-center items-center mt-1 space-x-2">
                                                 {user.profiles?.Listing.map(
                                                     (listing, idx) => (
-                                                        <div>
+                                                        <div key={idx}>
                                                             <div className="relative w-16 h-16">
                                                                 <div
                                                                     className={`text-[0.5rem] text-white absolute -left-[1px] top-2 px-1 rounded-r-md z-10 ${
