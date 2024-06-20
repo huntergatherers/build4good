@@ -6,22 +6,41 @@ import ListingVerticalScrollOne from "@/components/listing-vertical-scroll-one";
 import AboutUsPopUp from "@/components/aboutus-popup";
 import ListingsFilter from "./create/filter";
 import DistanceFilterButton from "./distance-filter-btn";
+import SearchBox from "./search-box";
 
-function getFilterConditions(filters: string | undefined) {
-    if (!filters) return {};
-    console.log(filters);
-    const filterArray = filters.split(" ");
-    const conditions: { OR: any[] } = { OR: [] };
+function getFilterConditions(filters: string | undefined, search: string | undefined) {
+    const conditions: { OR?: any[]; AND?: any[] } = {};
 
-    filterArray.forEach((filter) => {
-        if (filter === "greens") {
-            conditions.OR.push({ listing_item_type: "greens" });
-        } else if (filter === "browns") {
-            conditions.OR.push({ listing_item_type: "browns" });
-        } else if (filter === "compost") {
-            conditions.OR.push({ listing_item_type: "compost" });
+    if (filters) {
+        const filterArray = filters.split(" ");
+        conditions.OR = conditions.OR || [];
+
+        filterArray.forEach((filter) => {
+            if (filter === "greens") {
+                conditions.OR!.push({ listing_item_type: "greens" });
+            } else if (filter === "browns") {
+                conditions.OR!.push({ listing_item_type: "browns" });
+            } else if (filter === "compost") {
+                conditions.OR!.push({ listing_item_type: "compost" });
+            }
+        });
+    }
+
+    if (search) {
+        const searchConditions = {
+            OR: [
+                { header: { contains: search, mode: 'insensitive' } },
+                { body: { contains: search, mode: 'insensitive' } },
+            ],
+        };
+
+        if (conditions.OR) {
+            conditions.AND = conditions.AND || [];
+            conditions.AND.push(searchConditions);
+        } else {
+            conditions.OR = [searchConditions];
         }
-    });
+    }
 
     return conditions;
 }
@@ -34,8 +53,9 @@ export default async function Index({
     const type = searchParams["type"];
     const filters = searchParams["filters"] as string | undefined;
     const distance = searchParams["distance"];
+    const search = searchParams["search"] as string | undefined;
 
-    const filterConditions = getFilterConditions(filters);
+    const filterConditions = getFilterConditions(filters, search);
 
     const requestListings = await prisma.listing.findMany({
         where: {
@@ -75,32 +95,33 @@ export default async function Index({
             <Pills />
             <main className="flex-1 flex flex-col w-full">
                 <div className="flex justify-center items-center space-x-2">
-                    <div className="relative w-full ml-auto">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            type="search"
-                            placeholder="Search..."
-                            className="rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
-                        />
-                    </div>
+                    <SearchBox />
                     <div className="flex items-center justify-center h-10 w-10 bg-gray-100 rounded-md">
                         <ListingsFilter type={type} />
                     </div>
                 </div>
-                <div className="mt-2"><DistanceFilterButton/></div>
+                <div className="mt-2">
+                    <DistanceFilterButton />
+                </div>
                 {type === "requests" ? (
                     <div className="mb-4">
                         <h1 className="text-md font-semibold my-4">
                             Check out what people are requesting for
                         </h1>
-                        <ListingVerticalScrollOne listings={requestListings} isDistanceFilterOn={distance ? true : false}/>
+                        <ListingVerticalScrollOne
+                            listings={requestListings}
+                            isDistanceFilterOn={distance ? true : false}
+                        />
                     </div>
                 ) : (
                     <div className="mb-4">
                         <h1 className="text-md font-semibold my-4">
                             Check out what people are giving away
                         </h1>
-                        <ListingVerticalScrollOne listings={donationListings} isDistanceFilterOn={distance ? true : false}/>
+                        <ListingVerticalScrollOne
+                            listings={donationListings}
+                            isDistanceFilterOn={distance ? true : false}
+                        />
                     </div>
                 )}
             </main>

@@ -26,7 +26,8 @@ export default function ListingsFilter({
     const router = useRouter();
     const params = useSearchParams();
     const filterString = params.get("filters");
-    const [distance, setDistance] = useState<number>(5);
+    const search = params.get("search");
+    const searchArray = search ? search.split(" ") : [];
 
     const parseFilterString = (filterString: string | null): Filters => {
         const filtersArray = filterString ? filterString.split(" ") : [];
@@ -59,7 +60,7 @@ export default function ListingsFilter({
         );
         const filterString = selectedFilters.join("+");
         console.log(filterString);
-        router.push(`/listings?type=${type}&filters=${filterString}`);
+        router.push(`/listings?type=${type}&filters=${filterString}&search=${searchArray.join("+")}`);
     };
 
     return (
