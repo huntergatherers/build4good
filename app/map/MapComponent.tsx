@@ -16,6 +16,7 @@ import dynamic from "next/dynamic";
 import GoogleMapsItem from "./google-maps-item";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 const MapItem = dynamic(() => import("./map-item"), { ssr: false });
 
@@ -42,6 +43,7 @@ const MapComponentPage = ({ users }: MapComponentPageProps) => {
     );
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [distances, setDistances] = useState<number[]>([]);
+    const router = useRouter();
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -180,12 +182,14 @@ const MapComponentPage = ({ users }: MapComponentPageProps) => {
                                         0
                                     );
                                 return (
-                                    <Link
+                                    <div
                                         key={index}
                                         className="flex text-sm text-center mb-4 p-6 bg-white"
-                                        href={`/user/${user.profiles?.username}`}
+                                        // href={`/user/${user.profiles?.username}`}
                                     >
-                                        <div className="text-center mr-4 flex flex-col justify-center items-center">
+                                        <div className="text-center mr-4 flex flex-col justify-center items-center" onClick={() => {
+                                          router.push(`/user/${user.profiles?.username}`);
+                                        }}>
                                             <img
                                                 src={
                                                     "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
@@ -227,7 +231,9 @@ const MapComponentPage = ({ users }: MapComponentPageProps) => {
                                             <div className="flex justify-center items-center mt-1 space-x-2">
                                                 {user.profiles?.Listing.map(
                                                     (listing, idx) => (
-                                                        <div key={idx}>
+                                                        <div key={idx} onClick={() => {
+                                                          router.push(`/listings/${listing.id}`)
+                                                        }}>
                                                             <div className="relative w-16 h-16">
                                                                 <div
                                                                     className={`text-[0.5rem] text-white absolute -left-[1px] top-2 px-1 rounded-r-md z-10 ${
@@ -267,7 +273,7 @@ const MapComponentPage = ({ users }: MapComponentPageProps) => {
                                                 )}
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 );
                             })}
                         </div>
