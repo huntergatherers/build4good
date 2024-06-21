@@ -146,6 +146,7 @@ export async function createComment(
                 parent_id: parentId,
             },
         });
+        revalidatePath("/listings/" + listingId);
     } catch (error) {
         throw new Error("Error creating comment: " + error);
     }
