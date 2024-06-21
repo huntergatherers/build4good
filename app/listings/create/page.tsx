@@ -758,6 +758,7 @@ export default function CreateListing() {
                                                         : "E.g. 'compost for my garden'"
                                                 }`}
                                                 {...field}
+                                                // defaultValue="Dried Leaves or Coffee Grounds"
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -989,6 +990,7 @@ export default function CreateListing() {
                                             placeholder="Include some additional information or custom instructions you may have"
                                             className="resize-none text-md"
                                             {...field}
+                                            defaultValue="I can only meet on weekdays at Clementi MRT"
                                         />
                                     </FormControl>
                                     <FormMessage />

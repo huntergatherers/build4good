@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 
 export default function AboutUsPopUp() {
     const [isOpen, setIsOpen] = useState(false);
-    const [dontShowAgain, setDontShowAgain] = useState(false);
+    const [dontShowAgain, setDontShowAgain] = useState(true);
 
     useEffect(() => {
         // Check if the dialog has been shown before
@@ -34,7 +34,12 @@ export default function AboutUsPopUp() {
 
     return (
         <div className="mt-3 px-3">
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <Dialog open={isOpen} onOpenChange={(bool) => {
+              setIsOpen(bool);
+              if (!bool) {
+                handleDialogClose();
+              }
+            }}>
                 <DialogTrigger className="bg-transparent border-none">
                     <Info color="#4d4c4c" />
                 </DialogTrigger>
@@ -92,6 +97,7 @@ export default function AboutUsPopUp() {
                         <div className="mt-4 flex justify-center items-center">
                             <Checkbox
                                 id="dont-show-again"
+                                defaultChecked={true}
                                 onCheckedChange={() => {
                                     setDontShowAgain(!dontShowAgain);
                                 }}
